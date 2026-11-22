@@ -1,4 +1,3 @@
-#include <string.h>
 #include <gba.h>
 
 #include "platform/render.h"
@@ -520,7 +519,6 @@ static const GbaSpriteAnim *choose_shrewy_anim(const ShrewyBoss *boss)
 static void scene_stream_update(int cam_x, int cam_y)
 {
     const NativeSceneAsset *scene = scene_asset_source();
-    NativeSceneUpload uploads[NATIVE_SCENE_CACHE_TILES];
     uint16_t upload_count = 0;
     int origin_x, origin_y;
 
@@ -535,13 +533,14 @@ static void scene_stream_update(int cam_x, int cam_y)
     if (origin_x == s_scene_start_x && origin_y == s_scene_start_y &&
         !s_scene_map_dirty) return;
 
+    /* The former 1024-entry local upload array consumed 4096B of GBA
+     * stack and copied 4KB on every cache rebuild. There can be no pending
+     * transfers at this point (guarded above), so fill the persistent upload
+     * staging buffer directly; its ownership passes to VBlank below. */
     if (!native_scene_cache_build(scene, origin_x, origin_y, &s_scene_cache,
-                                  s_scene_map, uploads, &upload_count))
+                                  s_scene_map, s_scene_uploads, &upload_count))
         return;
 
-    if (upload_count)
-        memcpy(s_scene_uploads, uploads,
-               (unsigned int)upload_count * sizeof(NativeSceneUpload));
     s_scene_upload_count = upload_count;
     s_scene_upload_pos = 0;
     s_scene_start_x = origin_x;
