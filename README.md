@@ -1,6 +1,6 @@
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: World 1 Levels 1–3, a provisional native-resolution Shrewy boss encounter, extracted cage-drop playback helper, and a source-derived World 1 bonus/race mode prototype (v1.4). This is an engine/source integration prototype, not a completed or hardware-verified port.**
+**Current milestone: World 1 Levels 1–3, a provisional native-resolution Shrewy boss encounter, extracted cage-drop playback helper, and a source-derived World 1 bonus/race mode prototype (v1.5). This is an engine/source integration prototype, not a completed or hardware-verified port.**
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
@@ -88,7 +88,7 @@ make
 
 The expected output is `volvy_reslimed.gba`.
 
-**Current environment status:** no devkitARM/libgba SDK or mGBA executable is installed here. No `.gba` ROM has been produced, and no emulator or physical-hardware boot is claimed. Clang has emitted and relocatably linked 33 ARMv4T/Thumb translation units using test-only GBA headers; that is CPU code-generation validation, not a real SDK link or bootable ROM.
+**Current environment status:** no devkitARM/libgba SDK or mGBA executable is installed here. A separate experimental Clang/LLD build now produces a 1 MiB `.gba` cartridge image locally, but it has NOT been booted in mGBA or on hardware; the standard devkitARM/libgba build is still unverified. Clang has emitted and relocatably linked 33 ARMv4T/Thumb translation units using test-only GBA headers; that is CPU code-generation validation, not a real SDK link or bootable ROM.
 
 ## Reproducible host checks
 
@@ -178,7 +178,7 @@ New v1.3 movement diagnostics: `previews/bonus_bunny_movement_comparison_v13.png
 
 See `docs/shrewy-boss.md`, `docs/world1-gameplay.md`, `docs/architecture.md`, `docs/asset-extraction.md`, `docs/source-audit.md` and `docs/verification.md`.
 
-**Informal overall project progress estimate: 37%.** This is a planning estimate, not a verified measure of completeness or playability.
+**Informal overall project progress estimate: 38%.** This is a planning estimate, not a verified measure of completeness or playability.
 
 ### New v1.4 moving-platform reconstruction
 
@@ -187,3 +187,11 @@ See `docs/shrewy-boss.md`, `docs/world1-gameplay.md`, `docs/architecture.md`, `d
 - Their initial one-way collision footprints are now excluded from the static room grid and handled dynamically. The prototype supports descending landings, fractional-pixel carrying while standing, pass-through from below, and reset.
 - Host regression tests and a C-generated motion trace accompany new 240×160 visual comparisons.
 - The actual devkitARM/libgba build and mGBA boot remain **unverified**.
+
+### New v1.5 experimental ROM milestone
+
+- Run `sh tests/run_experimental_clang.sh` locally **after generating the proprietary original-derived assets** to compile an ARM7TDMI `.gba` using Clang, LLD and a minimal standalone GBA register layer. This is not libgba.
+- Local image: 1,048,576 bytes (payload 599,500 bytes), valid cartridge header checksum, ARM ELF entry and 36,608 bytes of EWRAM data/BSS.
+- Fixed palette RAM clearing and initial OBJ-palette loading to use GBA-compatible 16-bit or DMA transfers.
+- The experimental ROM is for mGBA testing, NOT verified working gameplay. It is kept outside this public repository because it contains converted graphics from the original game.
+- See `docs/experimental-rom-v15.md` for the build commands, known limitations and emulator test checklist.
