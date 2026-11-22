@@ -1,3 +1,11 @@
+## v1.9.10 — title-menu navigation scaffold
+
+- Match the three title entries directly observed in the supplied walkthrough: Start Game, Settings and Quit.
+- Add bounded Up/Down navigation and a visible focus bar using the existing original-font dash glyph.
+- Connect A/Start to the existing Start Game path.
+- Leave Settings and Quit non-dispatched pending source behavior evidence and a verified GBA mapping; no placeholder settings controls or unsafe reset/exit behavior are fabricated.
+- Add public host C tests for navigation boundaries, invalid indices and dispatch.
+
 ## v1.9.9 — fatal-contact interaction guard
 
 - Stop the world-interaction pass immediately after a fatal collision marks Volvy dead. A later overlapping action block can no longer apply a bounce in the same frame.
