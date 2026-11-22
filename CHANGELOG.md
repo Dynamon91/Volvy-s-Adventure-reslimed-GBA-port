@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.5 — First experimental ARM7TDMI cartridge image
+
+- Built a 1 MiB GBA cartridge image with Clang/LLD and the user's locally converted game assets (599,500-byte payload).
+- Added a standalone ARM startup, ROM/EWRAM linker layout, GBA direct-register layer, and EABI division helpers.
+- Added ROM structure, checksum, RAM and host CRT regression tests.
+- Fixed 8-bit palette clearing and replaced initial OBJ palette memcpy with aligned DMA.
+- This ROM has NOT yet been boot-tested in mGBA or compiled with real devkitARM/libgba. The ROM and commercial converted graphics are deliberately not pushed to this public repository.
+
+
 ## v1.4 — Source-derived bonus moving platforms
 
 - Extracted original moving-platform and cloud-platform animation resources.
