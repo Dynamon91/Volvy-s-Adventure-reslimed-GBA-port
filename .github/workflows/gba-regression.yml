@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install Python image dependency
+        run: python -m pip install --disable-pip-version-check Pillow
       - name: Run asset-independent host regressions
         run: sh tests/run_public_tests.sh
 
