@@ -24,8 +24,8 @@ bonus_collision = json.loads((root / 'assets/converted/rooms/bonus_w1_collision_
 bonus_composite = json.loads((root / 'assets/converted/rooms/bonus_w1_composite_manifest.json').read_text())
 oam_density = json.loads((root / 'assets/converted/rooms/bonus_w1_oam_density_v12.json').read_text())
 
-assert actors['opaque_palette_colors'] == 32
-assert len(actors['sprites']) == 41
+assert actors['opaque_palette_colors'] == 34
+assert len(actors['sprites']) == 44
 assert scene['unique_tiles'] <= 256
 assert scene['tile_bytes'] <= 16384
 assert scene['gba_scene'] == [1129, 180]
@@ -121,9 +121,9 @@ assert bonus_composite['tile_bytes'] <= 32768
 assert bonus_collision['object_placements_used']['obj_solid'] == 166
 assert bonus_collision['object_placements_used']['obj_destructible_block'] == 193
 assert bonus_collision['object_placements_used']['obj_cloud_platform'] == 7
-assert bonus_collision['object_placements_used']['obj_moving_platform'] == 2
+assert 'obj_moving_platform' not in bonus_collision['object_placements_used']
 assert bonus_collision['object_placements_used']['obj_destructible_block_oneway'] == 4
-assert bonus_collision['collision_cell_counts']['7'] == 43
+assert bonus_collision['collision_cell_counts']['7'] == 36
 assert bonus_collision['collision_cell_counts']['8'] == 4
 assert bonus_collision['collision_cell_counts']['9'] == 8
 assert oam_density['source_objects_tracked'] == 672
@@ -141,7 +141,8 @@ required = (
     'spr_action_block_spent', 'spr_squirrel_idle',
     'spr_squirrel_walk', 'spr_springboard',
     'spr_destructible_block_swolvy', 'spr_bunny_hop',
-    'spr_bumper_sq', 'spr_bumper_tri'
+    'spr_bumper_sq', 'spr_bumper_tri',
+    'spr_moving_platform', 'spr_moving_platform_wide', 'spr_cloud_platform'
 )
 static_bytes = 0
 for name in required:
@@ -164,7 +165,7 @@ max_player_frame_bytes = max(
 )
 assert max_player_frame_bytes <= 2048
 assert 2048 + static_bytes <= 32768
-assert static_bytes == 7360  # source-cache payload, before alignment
+assert static_bytes == 8512  # source-cache payload, before alignment
 
 
 # Native-resolution Shrewy arena uses a separate OBJ palette and mode-specific
