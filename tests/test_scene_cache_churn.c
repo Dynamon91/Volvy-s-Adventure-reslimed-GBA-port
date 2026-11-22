@@ -97,18 +97,16 @@ int main(void)
     scene.map_width = MAP_WIDTH;
     scene.map_height = MAP_HEIGHT;
     native_scene_cache_reset(&cache);
-    verify_window(0, 0);
-    /* Alternating directions, narrow shifts, and distant camera jumps. */
+    /* Exactly three windows per iteration: a warp followed by one-tile
+     * horizontal and vertical movements, including map-boundary cases. */
     for (n = 0; n < 180; ++n) {
         state = state * 1664525u + 1013904223u;
         x = (int)((state >> 9) % (MAP_WIDTH - NATIVE_SCENE_WINDOW_W + 1));
         state = state * 1664525u + 1013904223u;
         y = (int)((state >> 10) % (MAP_HEIGHT - NATIVE_SCENE_WINDOW_H + 1));
         verify_window(x, y);
-        if (x < MAP_WIDTH - NATIVE_SCENE_WINDOW_W)
-            verify_window(x + 1, y);
-        if (y < MAP_HEIGHT - NATIVE_SCENE_WINDOW_H)
-            verify_window(x, y + 1);
+        verify_window(x < MAP_WIDTH - NATIVE_SCENE_WINDOW_W ? x + 1 : x - 1, y);
+        verify_window(x, y < MAP_HEIGHT - NATIVE_SCENE_WINDOW_H ? y + 1 : y - 1);
     }
     puts("Native 4bpp scene cache first-fit equivalence under 540 mixed scroll/warp windows: PASS");
     return 0;
