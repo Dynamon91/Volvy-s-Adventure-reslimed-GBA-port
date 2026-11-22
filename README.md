@@ -1,8 +1,9 @@
 
-> **Current local continuation: v1.9.1 (22 Nov 2026).** Recovered v1.9 is the
-> canonical baseline. The v1.9.1 patch synchronizes static actor sprite frames
-> with their VBlank uploads; see `RELEASE_NOTES_v1_9_1.md`. The generated
-> experimental ROM passes structural checks but is not mGBA-boot-tested.
+> **Current development milestone: v1.9.2 (22 Nov 2026).** Continued from
+> v1.9.1 without resetting World 1, Bonus Race, Shrewy or converted assets.
+> Off-screen static actors no longer reserve the shared VBlank sprite upload
+> budget. See `RELEASE_NOTES_v1_9_2.md`. Experimental ROM structural tests
+> pass, but the v1.9.2 ROM has **not** been booted in mGBA or on real GBA.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
