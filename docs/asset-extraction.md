@@ -10,7 +10,7 @@ The active platform renderer uses native 1:1 source-pixel assets, not the earlie
 - Five active room scenes are converted to native 4bpp, per-tile palette-bank maps. Their visible 32×32 tile windows stream through BG1.
 - `tools/prepare_player_assets.py` sorts source sprite names before conversion. A fresh extraction and conversion of the same `data.win` reproduces the generated player C/header/manifest byte-for-byte.
 
-See the v1.6 pipeline and commands at the end of this document, plus `docs/visual-fidelity-v16.md`.
+See the v1.6 pipeline and commands at the end of this document, plus `docs/visual-fidelity-v16.md`. For the walkthrough-derived handheld selection-card pipeline, see `docs/handheld-selection-reconstruction-v111.md`.
 
 
 ## Results
