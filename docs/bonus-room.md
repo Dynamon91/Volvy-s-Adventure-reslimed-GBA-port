@@ -153,3 +153,11 @@ python tools/build_bonus_bumper_bounds.py \
 ```
 
 Pending: original AI scripts, official racing opponents, precise bumper masks/rotated graphics, bonus race rewards and actual GBA testing.
+
+## Moving platform integration (v1.4)
+
+Two original `obj_moving_platform` placements are present at source pivots `(2576,488)` and `(3080,424)`, with `scale_x` 1.333333 and 1.0. Their source sprite is `spr_moving_platform` (48×8; origin `(24,8)`). The resulting GBA widths are 32 and 24 pixels, with 4-pixel height. The first instance uses a generated 4/3 horizontal source-art scale, performed inside `prepare_player_assets.py` so no extra private PNG is required. Five original cloud platform frames are also converted.
+
+The original platform setup IDs 3320 and 3321 are recorded, but their event code/path controllers have not been decompiled. Thus this prototype deliberately uses ±24 GBA-pixel patrols at 0.5 px/frame. The current runtime handles one-way landing and carrying while standing. Their original collision AABBs are excluded from the static grid to prevent invisible platforms after the actors move. Static cloud platforms retain downward-only tile collisions.
+
+`tools/trace_bonus_platforms.c` generates the compiled C frame-position CSV. `tools/preview_bonus_platforms.py` composites those positions over the source-derived backdrop for diagnostic frames 0 and 48; this is not an mGBA capture. `tests/test_bonus_platforms.c` verifies the original pivots/scale, dynamic geometry, carriage, pass-through from below, movement limits, and reset.
