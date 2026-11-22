@@ -1,6 +1,7 @@
 #include <gba.h>
 #include <string.h>
 #include "platform/ui.h"
+#include "core/game_timer.h"
 #include "hud_source_font.h"
 
 #define UI_FONT_COUNT VOLVY_HUD_FONT_TILES
@@ -18,7 +19,7 @@ static GameMode s_last_mode = (GameMode)255;
 static uint16_t s_last_onions = 0xFFFF;
 static uint8_t s_last_stage = 0;
 static uint8_t s_last_boss_health = 0xFF;
-static uint32_t s_last_timer_seconds = 0xFFFFFFFFu;
+static uint32_t s_last_timer_centiseconds = 0xFFFFFFFFu;
 static u8 s_dirty;
 
 static unsigned int glyph_index(char ch)
@@ -52,78 +53,64 @@ void gba_ui_init(void)
     s_last_onions=0xFFFF;
     s_last_stage=0;
     s_last_boss_health=0xFF;
-    s_last_timer_seconds=0xFFFFFFFFu;
+    s_last_timer_centiseconds=0xFFFFFFFFu;
     s_dirty=1;
 }
 
 void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
                    uint8_t boss_health, uint32_t timer_frames)
 {
-    char count[]="000";
-    char boss_count[]="0";
-    char time_text[]="00:00";
-    uint32_t total_seconds = timer_frames / 60u;
-    uint32_t minutes = total_seconds / 60u;
-    uint32_t seconds = total_seconds % 60u;
-    if (minutes > 99u) minutes = 99u;
-    if (mode==s_last_mode && onions==s_last_onions && stage==s_last_stage &&
-        boss_health==s_last_boss_health && total_seconds==s_last_timer_seconds) return;
-    s_last_mode=mode;
-    s_last_onions=onions;
-    s_last_stage=stage;
-    s_last_boss_health=boss_health;
-    s_last_timer_seconds=total_seconds;
-    memset(s_ui_map,0,sizeof(s_ui_map));
-    if (mode==GAME_TITLE) {
-        draw_str(12,5,"VOLVY");
-        draw_str(11,7,"RESLIMED");
-        draw_str(9,13,"PRESS START");
-        draw_str(8,15,"SELECT LEVEL");
-        draw_str(11,17,stage==5 ? "BONUS RACE" :
-                         stage==4 ? "SHREWY" :
-                         stage==3 ? "W1-L3" : stage==2 ? "W1-L2" : "W1-L1");
-    } else if (mode==GAME_PLAYING || mode==GAME_PAUSED || mode==GAME_BOSS || mode==GAME_BONUS) {
-        if (stage==4 || mode==GAME_BOSS) {
-            boss_count[0]=(char)('0'+(boss_health>9 ? 9 : boss_health));
-            draw_str(1,1,"SHREWY");
-            draw_str(22,1,"HP");
-            draw_str(25,1,boss_count);
-            draw_str(7,18,"HAND ATTACK");
-        } else if (stage==5 || mode==GAME_BONUS) {
-            time_text[0]=(char)('0'+(minutes/10u));
-            time_text[1]=(char)('0'+(minutes%10u));
-            time_text[3]=(char)('0'+(seconds/10u));
-            time_text[4]=(char)('0'+(seconds%10u));
-            draw_str(1,1,"RACE");
-            draw_str(21,1,time_text);
-            if (onions>999) onions=999;
-            count[0]=(char)('0'+onions/100);
-            count[1]=(char)('0'+(onions/10)%10);
-            count[2]=(char)('0'+onions%10);
-            draw_str(1,18,"ONIONS");
-            draw_str(8,18,count);
-        } else {
-            if (onions>999) onions=999;
-            count[0]=(char)('0'+onions/100);
-            count[1]=(char)('0'+(onions/10)%10);
-            count[2]=(char)('0'+onions%10);
-            draw_str(1,1,"ONIONS");
-            draw_str(8,1,count);
-            draw_str(22,1,stage==3 ? "W1-L3" : stage==2 ? "W1-L2" : "W1-L1");
+    char count[] = "X000";
+    char time_text[9];
+    uint8_t time_length;
+    int time_column;
+    uint32_t elapsed_centiseconds = (timer_frames * 100u) / 60u;
+
+    (void)boss_health;
+    (void)stage;
+
+    if (mode == s_last_mode && onions == s_last_onions &&
+        elapsed_centiseconds == s_last_timer_centiseconds)
+        return;
+
+    s_last_mode = mode;
+    s_last_onions = onions;
+    s_last_stage = stage;
+    s_last_boss_health = boss_health;
+    s_last_timer_centiseconds = elapsed_centiseconds;
+
+    memset(s_ui_map, 0, sizeof(s_ui_map));
+
+    if (mode == GAME_TITLE) {
+        draw_str(12, 5, "VOLVY");
+        draw_str(11, 7, "RESLIMED");
+        draw_str(9, 13, "START GAME");
+        draw_str(9, 15, "SETTINGS");
+        draw_str(10, 17, "QUIT");
+    } else if (mode == GAME_PLAYING || mode == GAME_PAUSED ||
+               mode == GAME_BOSS || mode == GAME_BONUS) {
+        if (onions > 999u) onions = 999u;
+        count[1] = (char)('0' + onions / 100u);
+        count[2] = (char)('0' + (onions / 10u) % 10u);
+        count[3] = (char)('0' + onions % 10u);
+        draw_str(1, 0, count);
+
+        time_length = game_timer_format(timer_frames, time_text);
+        time_column = 30 - (int)time_length;
+        draw_str(time_column, 0, time_text);
+
+        if (mode == GAME_PAUSED) {
+            draw_str(12, 8, "PAUSED");
+            draw_str(9, 10, "PRESS START");
         }
-        if (mode==GAME_PAUSED) {
-            draw_str(12,8,"PAUSED");
-            draw_str(9,10,"PRESS START");
-        }
-    } else if (mode==GAME_OVER) {
-        draw_str(11,8,"GAME OVER");
-        draw_str(9,10,"PRESS START");
-    } else if (mode==GAME_VICTORY) {
-        draw_str(10,8,stage==5 ? "RACE CLEAR" :
-                         stage==4 ? "BOSS CLEAR" : "STAGE CLEAR");
-        draw_str(9,10,"PRESS START");
+    } else if (mode == GAME_OVER) {
+        draw_str(11, 8, "GAME OVER");
+        draw_str(9, 10, "PRESS START");
+    } else if (mode == GAME_VICTORY) {
+        draw_str(10, 8, "STAGE CLEAR");
+        draw_str(9, 10, "PRESS START");
     }
-    s_dirty=1;
+    s_dirty = 1;
 }
 
 void gba_ui_vblank_commit(void)
