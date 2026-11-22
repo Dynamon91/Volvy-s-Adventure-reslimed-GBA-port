@@ -1,6 +1,6 @@
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: World 1 Levels 1–3, a provisional native-resolution Shrewy boss encounter, extracted cage-drop playback helper, and a source-derived World 1 bonus/race mode prototype (v1.3). This is an engine/source integration prototype, not a completed or hardware-verified port.**
+**Current milestone: World 1 Levels 1–3, a provisional native-resolution Shrewy boss encounter, extracted cage-drop playback helper, and a source-derived World 1 bonus/race mode prototype (v1.4). This is an engine/source integration prototype, not a completed or hardware-verified port.**
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
@@ -8,7 +8,7 @@ The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba
 
 ### Original graphics and scenes
 
-- 29 original Volvy/Swolvy animation sets and 8 world-actor sets are converted to 8bpp OBJ graphics at 2:1 scale. The updated 41-set player/world/bonus package shares 32 opaque colors plus transparent index 0.
+- 29 original Volvy/Swolvy animation sets and 8 world-actor sets are converted to 8bpp OBJ graphics at 2:1 scale. The updated 44-set player/world/bonus package shares 34 opaque colors plus transparent index 0.
 - A separate native-resolution boss/actor package contains 58 sprite sets and an 81-color 8bpp OBJ palette. It includes Volvy, Swolvy, Shrewy, Shrewy's rock, onions, TNT, snakes, mole animations, holes, emitter art, and cage art.
 - W1 L1 `rm_w1_l1_00`: 1129×180 GBA-world pixels, 209 unique 8×8 BG tiles, 13,376 bytes.
 - W1 L2 `rm_w1_l2_00`: 1129×180 pixels, 453 BG tiles, 28,992 bytes.
@@ -24,13 +24,13 @@ The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba
 - Stage routing: W1 L1 → W1 L2 → W1 L3 → Shrewy arena. The title-screen `Select` key cycles W1 L1/L2/L3/Bonus Race for development testing; this is not an original-game menu feature.
 - The W1 L3 mole, snake, TNT, boulder-spawner, hivefly and auto-digger placements are preserved as source metadata, but their gameplay is not yet reconstructed.
 
-### World 1 bonus/race mode (v1.3)
+### World 1 bonus/race mode (v1.4)
 
 - `GAME_BONUS` loads `rm_w1_b1_00` with a 332×70 GBA scene map, two-axis 64×32 BG streaming and a 332×70 AABB-derived collision grid.
 - The original `obj_volvy` placement is not used as the runtime spawn; the initial spawn is based on the first source trace frame `(264.3,535.0)` at 2:1 scale.
 - Both original race-start gate AABBs activate a local 60 Hz frame timer. The finish uses the horizontal marker plane, consistent with the recorded race event near the finish marker.
-- All 397 source onions, 42 action blocks, 7 springboards, standard breakable blocks, six squirrels, 11 bunny placements, six square bumpers, four triangular bumpers and both Swolvy-only blocks are rendered from original converted sprites. Two `obj_bunny` actors now use separate source-anchored movement/hopping prototypes, while nine `obj_bunny_ground` instances remain static. Bumper contacts now give provisional impulses using source-rotation-aware bounding boxes; the original game logic is not reconstructed. Action blocks rebound on Big Hand contact; springboards bounce on descending contact. One-way cloud platforms and breakable one-way blocks are supported. Moving platforms are static.
-- Authentic bunny competitor AI, the original bumper impulses, official race timer/rewards, dynamic platform paths, live parallax and room entry/exit callsites are not yet reconstructed. The provisional 5-onion transformation has been disabled for the bonus room because the supplied traces record collected onions but no Swolvy frames. The two larger Swolvy-only blocks now have dedicated graphics and collision tiles that normal Volvy cannot break.
+- All 397 source onions, 42 action blocks, 7 springboards, standard breakable blocks, six squirrels, 11 bunny placements, six square bumpers, four triangular bumpers and both Swolvy-only blocks are rendered from original converted sprites. Two `obj_bunny` actors now use separate source-anchored movement/hopping prototypes, while nine `obj_bunny_ground` instances remain static. Bumper contacts now give provisional impulses using source-rotation-aware bounding boxes; the original game logic is not reconstructed. Action blocks rebound on Big Hand contact; springboards bounce on descending contact. One-way cloud platforms and breakable one-way blocks are supported. Two moving platforms now use source-derived pivots, per-instance scale and original sprite art, with provisional horizontal patrol and player carry.
+- Authentic bunny competitor AI, the original bumper impulses, official race timer/rewards, authentic platform paths, live parallax and room entry/exit callsites are not yet reconstructed. The provisional 5-onion transformation has been disabled for the bonus room because the supplied traces record collected onions but no Swolvy frames. The two larger Swolvy-only blocks now have dedicated graphics and collision tiles that normal Volvy cannot break.
 
 ### Shrewy boss encounter (new in v0.6)
 
@@ -88,7 +88,7 @@ make
 
 The expected output is `volvy_reslimed.gba`.
 
-**Current environment status:** no devkitARM/libgba SDK or mGBA executable is installed here. No `.gba` ROM has been produced, and no emulator or physical-hardware boot is claimed. Clang has emitted and relocatably linked 32 ARMv4T/Thumb translation units using test-only GBA headers; that is CPU code-generation validation, not a real SDK link or bootable ROM.
+**Current environment status:** no devkitARM/libgba SDK or mGBA executable is installed here. No `.gba` ROM has been produced, and no emulator or physical-hardware boot is claimed. Clang has emitted and relocatably linked 33 ARMv4T/Thumb translation units using test-only GBA headers; that is CPU code-generation validation, not a real SDK link or bootable ROM.
 
 ## Reproducible host checks
 
@@ -162,14 +162,14 @@ The bonus collision exporter is `tools/build_bonus_collision.py`; it converts so
 - BG1 screen blocks 27–28: 64×32 streamed map window, now streamed horizontally and vertically for the 70-tile-high bonus room.
 - Level state: 27,352 bytes on the host ABI, including the 332×70 collision backing grid and 1,024 actor/removal slots.
 - BG0 screen block 29: 4bpp HUD glyph overlay in character block 0.
-- World-mode OBJ: player frame region at OBJ VRAM offset 0; static actor cache begins at 2 KiB and contains 7,360 bytes of 8bpp artwork (plus 2 KiB player reservation).
+- World-mode OBJ: player frame region at OBJ VRAM offset 0; static actor cache begins at 2 KiB and contains 8,512 bytes of 8bpp artwork (plus 2 KiB player reservation).
 - Boss-mode OBJ: native player frames at offset 0; boss onion frames at 4 KiB; Shrewy frames at 8 KiB; rock frame at 24 KiB. The world actor cache overlaps the boss onion window and is rebuilt when returning to a platform stage.
 - All BG-map, OBJ-frame and OAM commits are synchronized to VBlank.
 
 ## Remaining work and limitations
 
 - Decode and reproduce the original GameMaker scripts, pixel collision masks, boss behavior, spawn relocation, enemy AI and hazard logic.
-- Refine the `rm_w1_b1_00` race/bonus prototype: recover original controller and entry/exit flow, validate/reconstruct authentic bunny AI, official timer/reward rules, moving-platform paths and remaining hazard behavior.
+- Refine the `rm_w1_b1_00` race/bonus prototype: recover original controller and entry/exit flow, validate/reconstruct authentic bunny AI, official timer/reward rules, original moving-platform paths and remaining hazard behavior.
 - Implement authentic title/intro flow, saves, sound/music and live parallax.
 - Run a real devkitARM/libgba build, boot in mGBA, inspect VRAM/OAM and test timing on hardware.
 - Confirm original sprite scaling, onion threshold, boss HP, attack timings, hit rules and stage transitions against source scripts or captured gameplay.
@@ -178,4 +178,12 @@ New v1.3 movement diagnostics: `previews/bonus_bunny_movement_comparison_v13.png
 
 See `docs/shrewy-boss.md`, `docs/world1-gameplay.md`, `docs/architecture.md`, `docs/asset-extraction.md`, `docs/source-audit.md` and `docs/verification.md`.
 
-**Informal overall project progress estimate: 36%.** This is a planning estimate, not a verified measure of completeness or playability.
+**Informal overall project progress estimate: 37%.** This is a planning estimate, not a verified measure of completeness or playability.
+
+### New v1.4 moving-platform reconstruction
+
+- Both original `obj_moving_platform` instance positions and source scaling (1.333× and 1.0×) are preserved. Their original 48×8 pixel sprite is converted to 24×4 GBA pixels, with an automatically generated 32×4 scaled variant for the wider instance. Five original `spr_cloud_platform` animation frames are also included.
+- Moving platforms use a **provisional**, 0.5 GBA pixel/frame horizontal oscillation over ±24 pixels around the source pivot. The original per-instance `pre_create_code` IDs (3320 and 3321) have not been decoded, so these paths are not authentic.
+- Their initial one-way collision footprints are now excluded from the static room grid and handled dynamically. The prototype supports descending landings, fractional-pixel carrying while standing, pass-through from below, and reset.
+- Host regression tests and a C-generated motion trace accompany new 240×160 visual comparisons.
+- The actual devkitARM/libgba build and mGBA boot remain **unverified**.
