@@ -10,7 +10,7 @@ TARGET := volvy_reslimed
 BUILD := build
 SOURCES := source source/core source/platform assets/converted assets/converted/tilesets assets/converted/rooms
 INCLUDES := include include/core include/platform assets/converted assets/converted/tilesets assets/converted/rooms
-DATA :=
+DATA := assets/converted/ui
 
 ARCH := -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork
 CFLAGS := -g -Wall -Wextra -O2 -std=gnu11 $(ARCH) -ffunction-sections -fdata-sections
@@ -32,15 +32,17 @@ export OUTPUT := $(CURDIR)/$(TARGET)
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
                 $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
+BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.bin)))
 export HFILES := $(shell find $(CURDIR)/include -name '*.h') \
                  $(wildcard $(CURDIR)/assets/converted/*.h) \
                  $(wildcard $(CURDIR)/assets/converted/tilesets/*.h) \
-                 $(wildcard $(CURDIR)/assets/converted/rooms/*.h)
+                 $(wildcard $(CURDIR)/assets/converted/rooms/*.h) \\
+                 $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 CFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 
-export OFILES_BIN :=
+export OFILES_BIN := $(addsuffix .o,$(BINFILES))
 export OFILES_SOURCES := $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
 
@@ -67,6 +69,11 @@ $(OUTPUT).gba: $(OUTPUT).elf
 $(OUTPUT).elf: $(OFILES)
 
 $(OFILES_SOURCES): $(HFILES)
+
+# Link the walkthrough-derived binary asset with devkitPro's standard bin2o rule.
+%.bin.o %_bin.h : %.bin
+	@echo $(notdir $<)
+	@$(bin2o)
 
 -include $(DEPENDS)
 

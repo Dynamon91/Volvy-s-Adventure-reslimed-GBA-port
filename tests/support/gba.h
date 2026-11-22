@@ -23,6 +23,7 @@ typedef struct { u16 attr0, attr1, attr2, dummy; } OBJATTR;
 #define ATTR1_SIZE_32 (2u << 14)
 #define OBJ_PALETTE(n) ((n) << 12)
 #define MODE_0 0
+#define MODE_4 4
 #define BG0_ON (1u << 8)
 #define BG1_ON (1u << 9)
 #define BG2_ON (1u << 10)
@@ -52,4 +53,5 @@ static inline void VBlankIntrWait(void) {}
 static inline void SetMode(u16 x) {(void)x;}
 static inline void dmaCopy(const void *src, void *dst, u32 size)
 { (void)src; (void)dst; (void)size; }
+void LZ77UnCompWram(const void *src, void *dst);
 #endif

@@ -18,6 +18,7 @@
 #include "bonus_native.h"
 #include "shrewy_native.h"
 #include "platform/ui.h"
+#include "platform/stage_clear_screen.h"
 
 #define BG_MAP_MAIN ((u16 *)0x0600D800)
 #define BG_CHAR_BLOCK_1 ((u8 *)0x06004000)
@@ -61,6 +62,9 @@ static u8 s_boss_onion_frame_count;
 static int s_actor_cache_ready = 1;
 static int s_actor_reload_anim;
 static int s_actor_reload_part;
+static u8 s_stage_clear_pending;
+static u8 s_stage_clear_active;
+static u8 s_stage_clear_restore_pending;
 
 static const NativeSceneAsset *scene_asset_source(void)
 {
@@ -810,6 +814,22 @@ void render_draw(const Level *level, const Player *player,
     int boss_room = level->boss_room != 0;
     int player_scale = boss_room ? 1 : 2;
 
+    /* The 04:00 walkthrough result frame is tentatively mapped to W1-L1.
+       Keep boss and bonus result flows on their existing renderer path. */
+    if (mode == GAME_VICTORY && level->active_stage == 1u &&
+        !level->boss_room && !level->bonus_room &&
+        stage_clear_screen_prepare()) {
+        if (!s_stage_clear_active && !s_stage_clear_pending)
+            s_stage_clear_pending = 1;
+        hide_all_objects(oam);
+        s_pending_frame = 0;
+        s_pending_boss_frame = 0;
+        s_pending_rock_frame = 0;
+        return;
+    }
+    if (s_stage_clear_active || s_stage_clear_pending)
+        s_stage_clear_restore_pending = 1;
+
     render_compute_camera(level, player, camera, mode, &cam_x, &cam_y);
     s_render_cam_x = cam_x;
     s_render_cam_y = cam_y;
@@ -924,6 +944,27 @@ void render_vblank_commit(Level *level, const Camera *camera)
     const NativeSceneAsset *scene = scene_asset_source();
     (void)level;
     (void)camera;
+
+    /* Result-screen VRAM writes are isolated to VBlank. If the game leaves
+       the screen before its first commit, cancel the queued bitmap safely. */
+    if (s_stage_clear_restore_pending) {
+        s_stage_clear_pending = 0;
+        if (s_stage_clear_active)
+            stage_clear_screen_restore();
+        s_stage_clear_active = 0;
+        s_stage_clear_restore_pending = 0;
+    }
+    if (s_stage_clear_pending) {
+        stage_clear_screen_commit();
+        s_stage_clear_pending = 0;
+        s_stage_clear_active = 1;
+        gba_display_commit_oam();
+        return;
+    }
+    if (s_stage_clear_active) {
+        gba_display_commit_oam();
+        return;
+    }
 
     if (s_stage_loaded != s_stage_requested) {
         /* All scenes use native-resolution 4bpp tiles and per-tile palette

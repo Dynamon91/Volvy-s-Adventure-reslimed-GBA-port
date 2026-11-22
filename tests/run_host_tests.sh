@@ -100,5 +100,7 @@ python3 "$ROOT/tests/test_static_visibility_renderer.py"
 python3 "$ROOT/tests/test_scene_stream_staging.py"
 python3 "$ROOT/tests/test_hud_walkthrough_icons.py"
 python3 "$ROOT/tests/test_walkthrough_hud_contract.py"
+python3 "$ROOT/tests/test_stage_clear_asset.py"
+python3 "$ROOT/tests/test_stage_clear_screen_contract.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 printf '%s\n' 'All host C tests and source syntax checks PASS (hardware build not tested).'
