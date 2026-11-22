@@ -22,6 +22,23 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_obj_parts_v193.c" \
 "$TMP/obj_parts_v193"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_player.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/player"
 "$TMP/player"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_collision_sweep_v195.c" \
+    "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" \
+    "$ROOT/assets/converted/rooms/bonus_w1_room.c" \
+    "$ROOT/assets/converted/rooms/bonus_w1_collision.c" \
+    "$ROOT/assets/converted/rooms/w1_l1_objects.c" \
+    "$ROOT/assets/converted/rooms/w1_l2_objects.c" \
+    "$ROOT/assets/converted/rooms/w1_l3_objects.c" \
+    "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/collision_sweep_v195"
+"$TMP/collision_sweep_v195"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_collision_sweep_vertical_v195.c" \
+    "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" \
+    "$ROOT/assets/converted/rooms/bonus_w1_collision.c" \
+    "$ROOT/assets/converted/rooms/w1_l1_objects.c" \
+    "$ROOT/assets/converted/rooms/w1_l2_objects.c" \
+    "$ROOT/assets/converted/rooms/w1_l3_objects.c" \
+    "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/collision_sweep_vertical_v195"
+"$TMP/collision_sweep_vertical_v195"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_world1.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/world1"
 "$TMP/world1"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_gameplay.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/source/core/camera.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/gameplay"
