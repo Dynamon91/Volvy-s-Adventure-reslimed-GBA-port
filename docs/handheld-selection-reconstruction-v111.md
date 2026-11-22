@@ -66,3 +66,33 @@ claimed. In particular, Fuzz Forest is not mapped to World 1 Level 2 without
 transition evidence. The source-derived images, binaries and per-card palettes
 remain in the private asset bundle; the public repository receives only the
 reproducible converter, tests and documentation.
+
+## v1.9.12 — Development-only Mode 4 preview in the engine
+
+The GBA now has a generic 8bpp Mode 4 card renderer, with deterministic
+host tests. For an authorized local copy of the original reference frame,
+run the converter (as documented above) to produce
+assets/converted/ui/fuzz_forest.bin and
+assets/converted/fuzz_forest_palette.c/.h. Build with:
+
+    make DEV_CARD_PREVIEW=1
+
+On the title screen press L to preview Fuzz Forest. Press B or START to
+return to the title. Release builds use DEV_CARD_PREVIEW=0 and do not
+include the private card payload. This flow is a reference viewer only;
+it is intentionally not inserted into the unverified W1 stage sequence.
+
+The bitmap is committed during VBlank, not directly during gameplay.
+Mode 4 writes to BG VRAM that previously contained tiled scene graphics
+and the HUD font. On exit the renderer now invalidates the tile cache,
+reloads BG palette and HUD glyph/icon tiles, and streams the scene tiles
+again before exposing the normal Mode 0 backgrounds. This safeguard
+also applies to the existing Stage Clear result screen.
+
+Verification: public host test checks invalid headers, LZ77 call and
+frame placement, 256 BGR555 palette slots, top/bottom letterbox and
+Mode 0 restore; ARM7TDMI codegen checks the new module. Public source
+contract checks the optional dev-only input flow and restoration ordering.
+
+Limitations: no complete devkitARM/libgba ROM build or mGBA visual test
+with the private card assets; no new level or selection-hub progression.

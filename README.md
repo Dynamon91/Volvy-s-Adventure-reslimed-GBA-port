@@ -1,12 +1,13 @@
 
-> **Current development milestone: v1.9.11 walkthrough handheld-card asset pipeline (22 Nov 2026).** Reopens the full
+> **Current development milestone: v1.9.12 private handheld-card runtime preview (22 Nov 2026).** Reopens the full
 > 2h22 reference, verifies the Rigatoni Rooftops card at 57:00, and adds a
 > tested 4bpp/8bpp BIOS-LZ77 converter for private 240×135 selection/title
-> frames. Runtime selection flow is not yet integrated; full ROM/mGBA remains unverified.
+> frames. An optional L-button Mode 4 viewer is now connected in development
+> builds, without changing release progression. Full ROM/mGBA remains unverified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.11 walkthrough handheld-card asset pipeline.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.12 private handheld-card runtime preview.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
 
@@ -29,6 +30,21 @@ See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md),
 ### Release input behavior
 
 The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
+
+## v1.9.12: handheld Mode 4 viewer and bitmap VRAM restore
+
+- Add a development-only Fuzz Forest reference-card viewer. Convert the
+  source frame with tools/build_handheld_select_asset.py, then use
+  make DEV_CARD_PREVIEW=1. On the title screen, L opens the reference card;
+  B/START dismisses it. Standard builds default to DEV_CARD_PREVIEW=0.
+- Restore background charblocks, streamed tile caches and original HUD
+  font/icon palettes after leaving a Mode 4 bitmap. This also corrects
+  the previous Stage Clear return-to-gameplay path.
+- The Mode 4 module decompresses trusted BIOS-LZ77 8bpp image content
+  directly into EWRAM at row 12; it supports up to 256 BGR555 colors.
+- Public tests cover the bitmap runtime and ARM7TDMI object generation.
+  The full private-asset-enabled ROM has not been linked or boot-tested.
+- This is a diagnostic viewer, NOT original hub navigation or a new level.
 
 ## v1.9.10: title-menu navigation scaffold
 

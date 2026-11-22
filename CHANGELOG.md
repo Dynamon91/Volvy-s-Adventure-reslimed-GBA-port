@@ -1,3 +1,11 @@
+## v1.9.12 — Mode 4 reference-card viewer and VRAM restore repair
+
+- Add a generic GBA 256-color Mode 4 renderer for the private selection-card assets, decompressing 240x135 8bpp content directly into a 240x160 EWRAM buffer with 12/13px letterbox margins.
+- Add optional dev-only title shortcut L to preview the Fuzz Forest card; B/START returns to title. The release build has DEV_CARD_PREVIEW=0 and no private card references.
+- Repair Stage Clear and card-preview exits: invalidate the BG tile cache and reload the HUD font, icon graphics and BG color banks after Mode 4 overwrites shared VRAM.
+- Add public runtime C and ARM7TDMI module tests and source-contract checks.
+- No new course gameplay, selection hub, or complete .gba/mGBA build is claimed.
+
 ## v1.9.11 — walkthrough handheld-card asset pipeline
 
 - Rejoined and reopened the six supplied walkthrough segments; extracted full-resolution 640×360 reference frames for the title and handheld selection cards.
