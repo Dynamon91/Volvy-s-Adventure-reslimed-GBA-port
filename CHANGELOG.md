@@ -1,3 +1,10 @@
+## v1.9.9 — fatal-contact interaction guard
+
+- Stop the world-interaction pass immediately after a fatal collision marks Volvy dead. A later overlapping action block can no longer apply a bounce in the same frame.
+- Add an asset-independent host C harness with synthetic World 1 objects.
+- Cover springboard crossing and cooldown, enemy stomp, side damage, invulnerability, forward punch, action-block cooldown, inactive mode and fatal-frame termination.
+- Public host regression and isolated ARM7TDMI Stage Clear module checks are tracked in GitHub Actions. Full ROM build and mGBA gameplay remain unverified.
+
 ## Post-v1.9.8 development correction — release input fidelity
 
 - Disable the development-only SELECT stage-cycling shortcut in normal builds.

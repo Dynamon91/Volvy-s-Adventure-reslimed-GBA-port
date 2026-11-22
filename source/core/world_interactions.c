@@ -53,7 +53,9 @@ unsigned int world_interact_player(Level *level, Player *player,
     int bottom = py + player->height;
     if (!level->world1_active || player->dead) return events;
 
-    for (i = 0; i < level_world_object_count(level); ++i) {
+    /* A fatal contact ends this frame's interaction pass. Do not allow a later
+     * overlapping object to apply a bounce/defeat after the player is dead. */
+    for (i = 0; i < level_world_object_count(level) && !player->dead; ++i) {
         const WorldObject *obj = level_world_object(level, i);
         int ox, oy, ow, oh;
         if (!level_world_actor_rect(level, i, &ox, &oy, &ow, &oh)) continue;

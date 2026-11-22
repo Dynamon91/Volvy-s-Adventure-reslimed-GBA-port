@@ -1,5 +1,5 @@
 
-> **Current development milestone: v1.9.8 test hardening (22 Nov 2026).** Adds
+> **Current development milestone: v1.9.9 gameplay interaction regression (22 Nov 2026).** Stops object processing after fatal contact and adds synthetic public interaction tests. The earlier v1.9.8 Stage Clear test hardening adds
 > a host runtime regression test for Stage Clear's one-time preparation,
 > 4bpp-to-8bpp expansion, palette/frame commit and Mode 0 restore. The
 > development-only SELECT stage cycling is now disabled in normal builds.
@@ -30,6 +30,13 @@ See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md),
 ### Release input behavior
 
 The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
+
+## v1.9.9: fatal-contact interaction guard
+
+- Stop processing later overlapping world objects as soon as a collision marks Volvy dead. This prevents contradictory same-frame effects such as a fatal side hit followed by an action-block bounce.
+- Add an asset-independent C regression harness using synthetic public world objects.
+- Cover springboard crossing/cooldown, enemy stomp, side damage, invulnerability, forward punch, action-block cooldown, inactive modes and fatal-frame termination.
+- Public host regression and isolated ARM7TDMI Stage Clear module checks are tracked in GitHub Actions. This does not verify a complete ROM or mGBA gameplay.
 
 ## v1.9.7: walkthrough-derived HUD icon pass
 
