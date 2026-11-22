@@ -14,6 +14,8 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_fixed.c" -o "$TMP/fixed"
 "$TMP/fixed"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_static_frame_scheduler.c" \
     "$ROOT/source/core/static_frame_scheduler.c" -o "$TMP/static_frame_scheduler"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_sprite_visibility.c" -o "$TMP/sprite_visibility"
+"$TMP/sprite_visibility"
 "$TMP/static_frame_scheduler"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_player.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/player"
 "$TMP/player"
@@ -69,5 +71,6 @@ python3 "$ROOT/tests/test_obj_vram_layout_v17.py"
 python3 "$ROOT/tests/test_oam_priority_v18.py"
 python3 "$ROOT/tests/test_invisible_marker_assets.py"
 python3 "$ROOT/tests/test_static_frame_renderer.py"
+python3 "$ROOT/tests/test_static_visibility_renderer.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 printf '%s\n' 'All host C tests and source syntax checks PASS (hardware build not tested).'
