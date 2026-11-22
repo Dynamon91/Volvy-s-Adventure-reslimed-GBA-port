@@ -7,7 +7,7 @@
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9 source-marker cleanup after mGBA gameplay review.** The platform scenes and primary actor sprites now render at 1:1 source-pixel scale. Five source scenes are converted to 4bpp BG tiles with palette banks and a 32×32 streaming cache. The project now includes 56 native-resolution sprite animation sets, expanded World 1 enemy/prop rendering, original HUD glyphs, an OAM priority fix that keeps gameplay sprites from covering the HUD, and suppression of the source-only solid-green `spr_hole` marker. This remains a reconstruction prototype; the v1.9 ROM still needs an mGBA retest.
+**Current milestone: v1.9.2 visible-actor animation streaming optimization (built on the v1.9 source-marker fix and v1.9.1 VBlank synchronization).** The platform scenes and primary actor sprites now render at 1:1 source-pixel scale. Five source scenes are converted to 4bpp BG tiles with palette banks and a 32×32 streaming cache. The project now includes 56 native-resolution sprite animation sets, expanded World 1 enemy/prop rendering, original HUD glyphs, an OAM priority fix that keeps gameplay sprites from covering the HUD, and suppression of the source-only solid-green `spr_hole` marker. This remains a reconstruction prototype; the v1.9 ROM still needs an mGBA retest.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
