@@ -18,4 +18,7 @@ assert 'LZ77UnCompWram(stage_clear_v198_bin, s_stage_clear_packed);' in screen
 assert 'SetMode(MODE_4 | BG2_ON);' in screen
 assert 'dmaCopy(s_stage_clear_frame, STAGE_CLEAR_FRAMEBUFFER,' in screen
 assert 'SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);' in screen
+arm_gba = (root / "experimental/clang-gba/include/gba.h").read_text()
+assert "#define MODE_4 4" in arm_gba
+assert 'swi 0x11' in arm_gba
 print("Stage Clear renderer contract: PASS (stage-1 gate, VBlank commit, restore path)")

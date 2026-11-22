@@ -27,6 +27,7 @@ typedef struct { u16 attr0, attr1, attr2, dummy; } OBJATTR;
 #define ATTR1_SIZE_32 (2u << 14)
 #define OBJ_PALETTE(n) ((n) << 12)
 #define MODE_0 0
+#define MODE_4 4
 #define BG0_ON (1u << 8)
 #define BG1_ON (1u << 9)
 #define BG2_ON (1u << 10)
@@ -56,6 +57,17 @@ static inline void VBlankIntrWait(void)
     while (REG_VCOUNT < 160u) { }
 }
 static inline void SetMode(u16 mode) { REG_DISPCNT = mode; }
+
+/* BIOS SWI 0x11: decompress a GBA-format LZ77 stream into EWRAM. */
+static inline void LZ77UnCompWram(const void *source, void *destination)
+{
+    register const void *r0 __asm__("r0") = source;
+    register void *r1 __asm__("r1") = destination;
+    __asm__ volatile ("swi 0x11"
+                      : "+r"(r0), "+r"(r1)
+                      :
+                      : "r2", "r3", "memory");
+}
 
 /* GBA DMA3 copies 32-bit units; all original project callsites are 4B aligned. */
 #define REG_DMA3_SRC (*(volatile u32*)0x040000D4u)
