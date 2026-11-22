@@ -12,6 +12,8 @@ FLAGS="-std=gnu11 -Wall -Wextra -Werror"
 # shellcheck disable=SC2086
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_fixed.c" -o "$TMP/fixed"
 "$TMP/fixed"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_game_timer.c" "$ROOT/source/core/game_timer.c" -o "$TMP/game_timer"
+"$TMP/game_timer"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_static_frame_scheduler.c" \
     "$ROOT/source/core/static_frame_scheduler.c" -o "$TMP/static_frame_scheduler"
 "$TMP/static_frame_scheduler"
@@ -96,5 +98,6 @@ python3 "$ROOT/tests/test_invisible_marker_assets.py"
 python3 "$ROOT/tests/test_static_frame_renderer.py"
 python3 "$ROOT/tests/test_static_visibility_renderer.py"
 python3 "$ROOT/tests/test_scene_stream_staging.py"
+python3 "$ROOT/tests/test_walkthrough_hud_contract.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 printf '%s\n' 'All host C tests and source syntax checks PASS (hardware build not tested).'
