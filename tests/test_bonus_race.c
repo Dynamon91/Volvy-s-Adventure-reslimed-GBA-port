@@ -212,7 +212,7 @@ int main(void)
         player_init(&player, spring_left + 1, spring_top - 9);
         player.grounded = 0;
         player.vy = FX_ONE;
-        assert(!bonus_race_update(&race, &level, &player,
+        assert(!bonus_race_update(&race, &level, &player, 0,
                                   spring_top - 1, 1));
         assert(player.spring_activations == 1);
         assert(player.vy == -FX_ONE * 9 / 2);
@@ -228,7 +228,7 @@ int main(void)
         player_init(&player, left - 16, top - 2);
         player.facing = 1;
         player.hand_state = HAND_PUNCH;
-        (void)bonus_race_update(&race, &level, &player, top - 1, 0);
+        (void)bonus_race_update(&race, &level, &player, 0, top - 1, 0);
         assert(player.vy == -FX_ONE * 5 / 2);
         assert(level.actor_cooldown[
             (unsigned int)(action_block - bonus_w1_room_instances)] == 24);
@@ -271,11 +271,11 @@ int main(void)
         top = square->y / 2 - 8;
         player_init(&player, left - 7, top + 4);
         idx = (unsigned int)(square - bonus_w1_room_instances);
-        assert(!bonus_race_update(&race, &level, &player, 0, 0));
+        assert(!bonus_race_update(&race, &level, &player, 0, 0, 0));
         assert(player.vx == -3 * FX_ONE);
         assert(level.actor_cooldown[idx] == 12);
         assert(race.bumper_hits == 1);
-        assert(!bonus_race_update(&race, &level, &player, 0, 0));
+        assert(!bonus_race_update(&race, &level, &player, 0, 0, 0));
         assert(race.bumper_hits == 1); /* no immediate repeated impact */
 
         level_init_bonus_race(&level);
@@ -294,7 +294,7 @@ int main(void)
             assert(b < BONUS_W1_BUMPER_COUNT);
         }
         player_init(&player, left - 7, top - 7);
-        assert(!bonus_race_update(&race, &level, &player, 0, 0));
+        assert(!bonus_race_update(&race, &level, &player, 0, 0, 0));
         assert(player.vx == -2 * FX_ONE);
         assert(player.vy == -2 * FX_ONE);
         assert(race.bumper_hits == 1);
@@ -311,7 +311,7 @@ int main(void)
             assert(fx_to_int(race.bunnies[j].x) == race.bunnies[j].home_x);
         }
         player_init(&player, 24, 24);
-        (void)bonus_race_update(&race, &level, &player, 0, 0);
+        (void)bonus_race_update(&race, &level, &player, 0, 0, 0);
         assert(!race.started);
         for (j = 0; j < BONUS_ACTIVE_BUNNY_COUNT; ++j)
             assert(race.bunnies[j].frame_counter == j * 19u);
@@ -326,21 +326,21 @@ int main(void)
 
     player.x = fx_from_int(210);
     player.y = fx_from_int(263);
-    assert(!bonus_race_update(&race, &level, &player, 0, 0));
+    assert(!bonus_race_update(&race, &level, &player, 0, 0, 0));
     assert(race.started);
     assert(race.elapsed_frames == 1);
     assert(level.race_elapsed_frames == 1);
 
     player.x = fx_from_int(300);
-    (void)bonus_race_update(&race, &level, &player, 0, 0);
+    (void)bonus_race_update(&race, &level, &player, 0, 0, 0);
     assert(race.elapsed_frames == 2);
 
     /* Finish is the source-derived horizontal crossing plane. */
     player.x = fx_from_int(2477);
-    assert(bonus_race_update(&race, &level, &player, 0, 0));
+    assert(bonus_race_update(&race, &level, &player, 0, 0, 0));
     assert(race.finished);
     assert(race.elapsed_frames == 3);
-    (void)bonus_race_update(&race, &level, &player, 0, 0);
+    (void)bonus_race_update(&race, &level, &player, 0, 0, 0);
     assert(race.elapsed_frames == 3);
 
     puts("Bonus race controller, source gates, onion collection and collision tests: PASS");
