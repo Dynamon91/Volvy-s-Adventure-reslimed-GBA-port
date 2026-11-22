@@ -1,0 +1,24 @@
+{
+  "project": "Volvy’s Adventure: ReSlimed GBA port",
+  "version": "1.9.5",
+  "base": "recovered v1.9 → v1.9.1 → v1.9.2 → v1.9.3 → v1.9.4",
+  "rom": "volvy_reslimed_gba_v195_experimental.gba",
+  "rom_bytes": 2097152,
+  "rom_sha256": "cd0c8c48650b5536ef52906b78676ebce29d82ab887836cda5f759861bf88f3c",
+  "verification": {
+    "portable_host_tests": "PASS",
+    "armv4t_stub_codegen": "PASS",
+    "clang_lld_rom_structure": "PASS",
+    "mgba_boot": "NOT_TESTED",
+    "real_hardware": "NOT_TESTED",
+    "devkitARM_libgba": "NOT_TESTED"
+  },
+  "fixes": [
+    "swept collision across every tile row/column",
+    "negative world boundary floor division"
+  ],
+  "source_asset_changes": false,
+  "content_expansion": false,
+  "fidelity_to_original_verified": false,
+  "reference_video_frames_accessed_in_this_turn": false
+}
