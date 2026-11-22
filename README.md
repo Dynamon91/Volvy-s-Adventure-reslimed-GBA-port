@@ -1,19 +1,35 @@
 
-> **Current development milestone: v1.9.5 (22 Nov 2026).** Continues v1.9.4
-> without resetting World 1, Bonus Race, Shrewy or source-derived artwork.
-> High-speed player movement now checks every crossed collision tile and
-> correctly floors negative boundary coordinates. See
-> `RELEASE_NOTES_v1_9_5.md` and `docs/fidelity-gap-audit-v195.md`.
-> Host, ARM codegen and ROM structural tests pass; mGBA gameplay/hardware
-> for v1.9.5 have **not** been verified.
+> **Current development milestone: v1.9.6 (22 Nov 2026).** Uses the newly
+> supplied 2h22 gameplay walkthrough to correct the HUD: standard stages and
+> Shrewy now have a 60 Hz stopwatch (`M:SS:CC`) and compact onion count, while
+> prototype-only labels are removed. See `RELEASE_NOTES_v1_9_6.md` and
+> `docs/walkthrough-reference-v1_0.md`. Host, ARM and ROM structure pass;
+> mGBA rendering and hardware remain **not verified**.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.5 collision sweep and world-edge correctness (built on v1.9.4 streaming improvements).** The platform scenes and primary actor sprites now render at 1:1 source-pixel scale. Five source scenes are converted to 4bpp BG tiles with palette banks and a 32×32 streaming cache. The project now includes 56 native-resolution sprite animation sets, expanded World 1 enemy/prop rendering, original HUD glyphs, an OAM priority fix that keeps gameplay sprites from covering the HUD, and suppression of the source-only solid-green `spr_hole` marker. This remains a reconstruction prototype; the v1.9 ROM still needs an mGBA retest.
+**Current milestone: v1.9.6 walkthrough-derived HUD timer correction.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+
+**New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md) for the timestamped 2h22 source-game timeline and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md) for confirmed missing content and next reconstruction priorities. The private keyframe pack is stored separately from the public source repository.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
 **Public repository asset policy:** the GitHub repository contains source code, conversion tools, tests and documentation. It intentionally excludes the original `data.win`, converted source-derived sprite/tile graphics and the experimental ROM. Those generated assets are included in the private v1.9 development ZIP; rebuilding from source requires supplying your own original `data.win` and running the extraction commands below.
+
+## v1.9.6: walkthrough-derived gameplay HUD correction
+
+- Joined and sampled the user's six-part 2h22 walkthrough; added a timestamped
+  visual timeline and keyframe reference pack.
+- Replaced prototype-only stage/boss HUD labels with the observed compact
+  onion count and a 60 Hz stage timer formatted as `M:SS:CC`.
+- Standard levels and Shrewy now tick the timer while active and freeze it
+  during pause; Bonus Race keeps its separate start-gate timer.
+- Added a C timer-format regression test. Host, ARM stub codegen and
+  experimental ROM structural checks pass; actual mGBA rendering remains
+  unverified.
+- The walkthrough also confirms content beyond the five current scenes,
+  including Fishpig, Master Gator, city/metro courses and a later mechanical
+  boss. These remain reconstruction gaps, not implemented content.
 
 ## v1.9: hide source-only green hole markers (new mGBA capture review)
 
