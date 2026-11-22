@@ -34,7 +34,9 @@
     "armv4t_thumb_codegen": "NOT_TESTED",
     "devkitarm_libgba_rom": "NOT_BUILT",
     "mgba_boot_and_render": "NOT_TESTED",
-    "physical_gba": "NOT_TESTED"
+    "physical_gba": "NOT_TESTED",
+    "stage_clear_module_armv4t_thumb_codegen": "PASS",
+    "full_project_armv4t_thumb_codegen": "NOT_TESTED"
   },
   "dynamic_results_system": false,
   "fidelity_to_original_verified": false,

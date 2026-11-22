@@ -22,7 +22,8 @@ The Stage Clear artwork and result text are a static walkthrough frame. The resu
 - Standalone stage_clear_screen.c syntax check with test GBA headers: **PASS**.
 - Renderer transition contract: **PASS**.
 - Full host suite: **NOT RUN** (the public repository omits private generated room assets required by older tests).
-- ARMv4T/Thumb build: **NOT TESTED**.
+- Isolated Stage Clear module ARMv4T/Thumb code generation: **PASS**.
+- Full-project ARMv4T/Thumb link and devkitARM/libgba ROM build: **NOT TESTED**.
 - devkitARM/libgba ROM build: **NOT TESTED**.
 - mGBA boot/rendered screen: **NOT TESTED**.
 - Physical GBA: **NOT TESTED**.

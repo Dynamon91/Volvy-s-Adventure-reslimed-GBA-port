@@ -15,13 +15,14 @@
 | Python BIOS-LZ77 decompression and pixel/palette/layout test | **PASS** |
 | stage_clear_screen.c syntax with test GBA headers | **PASS** |
 | Renderer transition source contract | **PASS** |
+| Isolated ARMv4T/Thumb code generation for the Stage Clear module and asset object | **PASS** |
 
-The syntax check is isolated to the new platform module. The renderer integration was source-contract checked, not compiled as part of a full project build.
+The C syntax and ARMv4T/Thumb code-generation checks cover the new platform module in isolation, using the experimental GBA shim and asset object. The renderer integration was source-contract checked, not compiled as part of a full project build.
 
 ## Not verified
 
 - Full host C suite (the public repository omits private generated room assets required by existing tests).
-- ARMv4T/Thumb code generation for v1.9.8.
+- Full-project ARMv4T/Thumb code generation and link.
 - Full devkitARM/libgba ROM build.
 - mGBA boot or actual rendered Stage Clear screen.
 - Physical GBA hardware.
