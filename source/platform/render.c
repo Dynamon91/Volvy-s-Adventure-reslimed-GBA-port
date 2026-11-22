@@ -21,7 +21,7 @@
 #define BG_CHAR_BLOCK_1 ((u8 *)0x06004000)
 #define OBJ_VRAM ((u8 *)0x06010000)
 #define MAX_PLAYER_PARTS 8
-#define STATIC_ANIM_COUNT 11
+#define STATIC_ANIM_COUNT 14
 #define MAX_STATIC_FRAMES 16
 #define STATIC_OBJ_BASE_32 64 /* reserve first 2048B for animated player */
 #define OBJ_8BPP_BIT (1u << 13)
@@ -119,7 +119,10 @@ typedef enum StaticAnimId {
     STATIC_SWOLVY_BLOCK,
     STATIC_BUNNY_HOP,
     STATIC_BUMPER_SQ,
-    STATIC_BUMPER_TRI
+    STATIC_BUMPER_TRI,
+    STATIC_MOVING_PLATFORM,
+    STATIC_MOVING_PLATFORM_WIDE,
+    STATIC_CLOUD_PLATFORM
 } StaticAnimId;
 
 typedef struct StaticAnimGraphic {
@@ -136,7 +139,9 @@ static void load_actor_graphics(void)
         &g_spr_action_block_spent, &g_spr_squirrel_walk,
         &g_spr_squirrel_idle, &g_spr_springboard,
         &g_spr_destructible_block_swolvy, &g_spr_bunny_hop,
-        &g_spr_bumper_sq, &g_spr_bumper_tri
+        &g_spr_bumper_sq, &g_spr_bumper_tri,
+        &g_spr_moving_platform, &g_spr_moving_platform_wide,
+        &g_spr_cloud_platform
     };
     u16 base = STATIC_OBJ_BASE_32;
     int i, f;
@@ -474,6 +479,11 @@ static int bonus_static_animation_for_instance(const Level *level,
         return STATIC_BUMPER_SQ;
     case BONUS_W1_ROOM_OBJ_CORNER_BUMPER:
         return STATIC_BUMPER_TRI;
+    case BONUS_W1_ROOM_OBJ_MOVING_PLATFORM:
+        return instance->scale_x_q8 > 300u ?
+            STATIC_MOVING_PLATFORM_WIDE : STATIC_MOVING_PLATFORM;
+    case BONUS_W1_ROOM_OBJ_CLOUD_PLATFORM:
+        return STATIC_CLOUD_PLATFORM;
     case BONUS_W1_ROOM_OBJ_ACTION_BLOCK:
         return level->actor_cooldown[index] ? STATIC_ACTION_SPENT : STATIC_ACTION;
     case BONUS_W1_ROOM_OBJ_SQUIRREL:
@@ -526,7 +536,14 @@ static int draw_bonus_actors(const Level *level, const BonusRace *race, OBJATTR 
         if (frame->part_count != 1) continue;
         part = &frame->parts[0];
 
-        if (instance->kind == BONUS_W1_ROOM_OBJ_BUNNY && race) {
+        if (instance->kind == BONUS_W1_ROOM_OBJ_MOVING_PLATFORM && race) {
+            const BonusMovingPlatform *platform = bonus_platform_for_instance(
+                race->platforms, (unsigned int)i);
+            x = (platform ? fx_to_int(platform->x) : instance->x / 2) -
+                frame->origin_x + part->offset_x - cam_x;
+            y = (platform ? fx_to_int(platform->y) : instance->y / 2) -
+                frame->origin_y + part->offset_y - cam_y;
+        } else if (instance->kind == BONUS_W1_ROOM_OBJ_BUNNY && race) {
             const BonusBunny *bunny = bonus_bunny_for_instance(
                 race->bunnies, (unsigned int)i);
             x = (bunny ? fx_to_int(bunny->x) : instance->x / 2) -
