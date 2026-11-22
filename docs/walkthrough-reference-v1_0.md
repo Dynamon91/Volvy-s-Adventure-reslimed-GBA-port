@@ -20,7 +20,7 @@
 | 00:00 | Title screen with Volvy logo and `START GAME`, `SETTINGS`, `QUIT`. | High |
 | 00:30–04:00 | Outdoor platforming: blue sky, clouds, orange/checkerboard terrain, green grass, collectibles and vertical traversal. `STAGE CLEAR!` at 04:00. | High |
 | 04:30–10:00 | Further outdoor platforming with pipes, gates, moving/vertical routes and action effects. | High |
-| 10:30 | Green handheld-style selection screen; title reads **Fuzz Forest** (pixel text; spelling should be confirmed against source). Progress indicator `0/4`. | Medium |
+| 10:30 | Green handheld-style selection screen; title reads **Fuzz Forest**. Progress indicator `0/4`. | High |
 | 11:00–15:30 | Dark forest/checkerboard platform section; onion pickups, breakable blocks and combo/action effects. | High |
 | 16:30 | Green handheld-style selection screen reading **Bonus Stage**, with a `×20` reward indicator. | High |
 | 17:00–24:30 | Brown/orange cave-like obstacle course with destructible blocks, combo scoring and placement/ranking presentation. | High |
@@ -30,7 +30,7 @@
 | 40:00–44:30 | Dark green/grey industrial facility with pipes, platforms and fluid hazards. `STAGE CLEAR!` at 44:30. | High |
 | 45:00–51:00 | Further industrial hazard encounter: green liquid, vertical jets and a large moving/spinning hazard or enemy. | Medium; exact encounter identity not established |
 | 51:30–56:30 | Brown enclosed challenge course; a `2ND` placement indicator appears. | High |
-| 57:00–65:30 | Handheld selection / orange city-rooftop and vertical-building course; a selection card appears to read **Big City Rooftops** (pixel text partly ambiguous). `STAGE CLEAR!` at 65:30. | Medium |
+| 57:00–65:30 | Pink handheld selection card reads **Rigatoni Rooftops**; orange city-rooftop and vertical-building course follows. `STAGE CLEAR!` at 65:30. | High for card title and course |
 | 66:00–71:30 | Blue industrial/construction course with hanging chains, suspended platforms and swinging wrecking-ball hazards. | High |
 | 72:00–79:30 | Dark industrial/city course with spotlights and vertical routes. `FISHPIG DEFEATED!` at 79:30. | High; boss name is **Fishpig**, not Ashpig |
 | 80:00–88:30 | A handheld selection card appears at 81:30 and appears to read **Macho Metro**; the starry blue course follows, with multicolored platforms, `1ST`/`2ND` placement indicators and an `ON YOUR MARKS!` cue at 82:00. | Medium for title, high for course |
@@ -52,7 +52,7 @@
 1. **The target is substantially larger than the current GBA prototype.** The supplied recording contains many visual environments and encounters that are not represented by the five currently converted scenes.
 2. **The HUD is not the old prototype HUD.** Gameplay frames consistently show a compact onion icon/count at top-left and a stopwatch/time display at top-right. The timer appears in `M:SS:CC` form and resets for separate stage/encounter runs. Combo and placement indicators appear in relevant sections.
 3. **Results screens are distinctive.** Stage results use a purple illustrated screen, Volvy thumbs-up artwork, a green splat graphic and performance text (for example `Highest combo: 73`). Boss results name the boss and show completion time/ranking.
-4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fuzz Forest`, `Bonus Stage`, `Big City Rooftops` (partly legible), `Macho Metro` (partly legible), `Fishpig` and `Master Gator`, plus an outdoor hub.
+4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fuzz Forest`, `Bonus Stage`, `Rigatoni Rooftops`, `Macho Metro` (partly legible), `Fishpig`, `Bundtcake Burrows` and `Master Gator`, plus an outdoor hub. The cards use distinct green, pink and teal handheld shells.
 5. **Boss content extends beyond Shrewy.** Fishpig is explicitly defeated twice in the recording. A later dark-city mechanical boss encounter is also visible, but its name is not legible enough to assert.
 6. **The video is a reference capture, not a GBA emulator test.** It must not be cited as proof that any experimental GBA ROM boots or matches the original.
 
