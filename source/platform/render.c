@@ -3,6 +3,7 @@
 
 #include "platform/render.h"
 #include "platform/gba_display.h"
+#include "platform/obj_parts.h"
 #include "player_sprites.h"
 #include "boss_sprites.h"
 #include "core/boss_shrewy.h"
@@ -640,33 +641,6 @@ static void hide_all_objects(OBJATTR *oam)
     }
 }
 
-static void draw_frame_parts(const GbaSpriteFrame *frame, OBJATTR *oam,
-                             int first_oam, int base_x, int base_y,
-                             int facing_left, int base_tile64, unsigned int priority)
-{
-    int tile_index = 0;
-    int i;
-    int count = frame->part_count;
-    if (count > MAX_PLAYER_PARTS) count = MAX_PLAYER_PARTS;
-    for (i = 0; i < count; ++i) {
-        const GbaSpritePart *part = &frame->parts[i];
-        int x = base_x + part->offset_x;
-        int y = base_y + part->offset_y;
-        if (tile_index & 1) ++tile_index;
-        if (facing_left)
-            x = base_x + frame->width - part->offset_x - part->hw_w;
-        oam[first_oam + i].attr0 = (u16)((y & 0x00FF) | OBJ_8BPP_BIT |
-                                         ((u16)part->shape << 14));
-        oam[first_oam + i].attr1 = (u16)((x & 0x01FF) |
-                                         (facing_left ? OBJ_HFLIP_BIT : 0) |
-                                         ((u16)part->size_code << 14));
-        /* OBJ attr2 addresses 32-byte units; 8bpp tile payloads are 64B. */
-        oam[first_oam + i].attr2 = (u16)(((base_tile64 + tile_index) * 2) |
-                                                ((priority & 3u) << OBJ_PRIORITY_SHIFT));
-        oam[first_oam + i].dummy = 0;
-        tile_index += part->tile_bytes / 64;
-    }
-}
 
 static int draw_boss_room_props(const Level *level, OBJATTR *oam, int next_oam,
                                 int cam_x, int cam_y, uint32_t anim_tick)
@@ -832,7 +806,7 @@ void render_draw(const Level *level, const Player *player,
     unsigned int frame_index;
     int base_x, base_y;
     int cam_x, cam_y;
-    int part_count, next_oam;
+    int next_oam;
     int facing = player->facing < 0 ? 1 : 0;
     int boss_room = level->boss_room != 0;
     int player_scale = boss_room ? 1 : 2;
@@ -897,30 +871,24 @@ void render_draw(const Level *level, const Player *player,
                  frame->origin_y - cam_y;
     }
 
-    part_count = frame->part_count;
-    if (part_count > MAX_PLAYER_PARTS) part_count = MAX_PLAYER_PARTS;
-    draw_frame_parts(frame, oam, 0, base_x, base_y, facing, 0,
-                     mode == GAME_TITLE ? 0u : 1u);
+    next_oam = volvy_obj_draw_frame_parts(frame, oam, 0, base_x, base_y, facing, 0,
+                                mode == GAME_TITLE ? 0u : 1u);
     s_pending_frame = frame;
-    next_oam = part_count;
 
     if (boss_room && mode != GAME_TITLE) {
         const GbaSpriteAnim *boss_anim = choose_shrewy_anim(boss);
         const GbaSpriteFrame *boss_frame;
         unsigned int boss_frame_index;
         int boss_base_x, boss_base_y;
-        int boss_parts;
         if (boss_anim && boss_anim->frame_count) {
             boss_frame_index = (anim_tick / (boss_anim->frame_duration ?
                                 boss_anim->frame_duration : 1u)) % boss_anim->frame_count;
             boss_frame = &boss_anim->frames[boss_frame_index];
             boss_base_x = fx_to_int(boss->x) - boss_frame->origin_x - cam_x;
             boss_base_y = fx_to_int(boss->y) - boss_frame->origin_y - cam_y;
-            draw_frame_parts(boss_frame, oam, next_oam, boss_base_x, boss_base_y,
-                             boss->facing == 0, 128, 1u);
-            boss_parts = boss_frame->part_count;
-            if (boss_parts > MAX_PLAYER_PARTS) boss_parts = MAX_PLAYER_PARTS;
-            next_oam += boss_parts;
+            next_oam = volvy_obj_draw_frame_parts(boss_frame, oam, next_oam,
+                                        boss_base_x, boss_base_y,
+                                        boss->facing == 0, 128, 1u);
             s_pending_boss_frame = boss_frame;
         }
 
@@ -932,8 +900,8 @@ void render_draw(const Level *level, const Player *player,
             const GbaSpriteFrame *rock_frame = &rock_anim->frames[rock_frame_index];
             int rock_x = fx_to_int(boss->rock_x) - rock_frame->origin_x - cam_x;
             int rock_y = fx_to_int(boss->rock_y) - rock_frame->origin_y - cam_y;
-            draw_frame_parts(rock_frame, oam, next_oam, rock_x, rock_y, 0, 384, 1u);
-            next_oam += rock_frame->part_count;
+            next_oam = volvy_obj_draw_frame_parts(rock_frame, oam, next_oam,
+                                        rock_x, rock_y, 0, 384, 1u);
             s_pending_rock_frame = rock_frame;
         } else {
             s_pending_rock_frame = 0;
