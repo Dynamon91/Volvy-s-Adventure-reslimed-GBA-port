@@ -7,7 +7,7 @@
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.8 Stage Clear runtime test hardening.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.10 title-menu navigation scaffold.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md) for the timestamped 2h22 source-game timeline and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md) for confirmed missing content and next reconstruction priorities. The private keyframe pack is stored separately from the public source repository.
 
@@ -30,6 +30,14 @@ See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md),
 ### Release input behavior
 
 The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
+
+## v1.9.10: title-menu navigation scaffold
+
+- Add a tested three-entry title menu model matching the walkthrough's observed order: Start Game, Settings, Quit.
+- Add Up/Down focus movement, a visible focus bar using the existing source-font dash glyph, and A/Start activation for Start Game.
+- Keep Settings and Quit as visible, non-dispatched entries until their original behavior and GBA semantics are verified. This avoids inventing a settings screen or a host-style quit action.
+- Add public C regression coverage for menu bounds, invalid selection recovery and activation dispatch.
+- Exact cursor artwork, animation, menu sound, Settings behavior and Quit behavior remain open fidelity tasks.
 
 ## v1.9.9: fatal-contact interaction guard
 
