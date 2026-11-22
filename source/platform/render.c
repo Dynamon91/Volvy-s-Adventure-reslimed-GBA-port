@@ -371,8 +371,9 @@ void render_init(Level *level)
     BG_OFFSET[2].x = 0; BG_OFFSET[2].y = 0;
     BG_OFFSET[3].x = 0; BG_OFFSET[3].y = 0;
 
-    memcpy((void *)OBJ_COLORS, g_player_obj_palette,
-           sizeof(g_player_obj_palette));
+    /* Palette RAM requires 16/32-bit stores: use aligned 32-bit DMA. */
+    dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
+            sizeof(g_player_obj_palette));
     load_actor_graphics();
     gba_ui_init();
 
