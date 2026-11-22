@@ -14,8 +14,9 @@ DATA := assets/converted/ui
 
 ARCH := -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork
 DEV_STAGE_SELECT ?= 0
+DEV_CARD_PREVIEW ?= 0
 CFLAGS := -g -Wall -Wextra -O2 -std=gnu11 $(ARCH) -ffunction-sections -fdata-sections
-CFLAGS += $(INCLUDE) -DVOLVY_DEV_STAGE_SELECT=$(DEV_STAGE_SELECT)
+CFLAGS += $(INCLUDE) -DVOLVY_DEV_STAGE_SELECT=$(DEV_STAGE_SELECT) -DVOLVY_DEV_CARD_PREVIEW=$(DEV_CARD_PREVIEW)
 LDFLAGS = -g $(ARCH) -Wl,-Map,$(OUTPUT).map -Wl,--gc-sections
 
 LIBS := -lgba

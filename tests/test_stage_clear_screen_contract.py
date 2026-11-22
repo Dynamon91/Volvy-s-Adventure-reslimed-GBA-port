@@ -40,6 +40,11 @@ assert restore < pending < scene_load
 restore_block = vblank[restore:pending]
 assert "s_stage_clear_pending = 0;" in restore_block
 assert "stage_clear_screen_restore();" in restore_block
+assert "s_stage_loaded = 0;" in vblank
+assert "reset_native_scene_cache();" in vblank
+assert "s_bitmap_ui_reload_needed = 1;" in vblank
+assert "gba_ui_init();" in vblank
+assert "SetMode(MODE_0 | OBJ_ON | OBJ_1D_MAP);" in vblank
 commit_block = vblank[pending:scene_load]
 assert "stage_clear_screen_commit();" in commit_block
 assert "s_stage_clear_active = 1;" in commit_block

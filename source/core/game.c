@@ -14,6 +14,10 @@
 #include "rm_w1_l2_scene.h"
 #include "rm_w1_l3_scene.h"
 
+#ifndef VOLVY_DEV_CARD_PREVIEW
+#define VOLVY_DEV_CARD_PREVIEW 0
+#endif
+
 static Level s_level;
 static Player s_player;
 static Camera s_camera;
@@ -131,6 +135,13 @@ void game_update(void)
             select_title_stage(next);
         }
 #endif
+#if VOLVY_DEV_CARD_PREVIEW
+        /* Developer-only reference viewer; not part of original stage routing. */
+        if (input_was_pressed(KEY_L)) {
+            s_mode = GAME_CARD_PREVIEW;
+            break;
+        }
+#endif
         if ((input_was_pressed(KEY_START) || input_was_pressed(KEY_A)) &&
             title_menu_can_start(s_title_selection)) {
             if (s_level.bonus_room) reset_bonus_race();
@@ -211,6 +222,14 @@ void game_update(void)
         if (s_player.dead) s_mode = GAME_OVER;
         else if (shrewy_is_defeated(&s_shrewy)) s_mode = GAME_VICTORY;
         break;
+
+#if VOLVY_DEV_CARD_PREVIEW
+    case GAME_CARD_PREVIEW:
+        /* B or START dismisses the reference card without changing stage. */
+        if (input_was_pressed(KEY_B) || input_was_pressed(KEY_START))
+            s_mode = GAME_TITLE;
+        break;
+#endif
 
     case GAME_PAUSED:
         if (input_was_pressed(KEY_START)) {

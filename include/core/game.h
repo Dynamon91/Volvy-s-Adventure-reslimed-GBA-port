@@ -8,7 +8,8 @@ typedef enum GameMode {
     GAME_OVER,
     GAME_VICTORY,
     GAME_BOSS,
-    GAME_BONUS
+    GAME_BONUS,
+    GAME_CARD_PREVIEW /* Optional developer-only reference viewer. */
 } GameMode;
 
 void game_init(void);
