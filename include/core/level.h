@@ -37,6 +37,7 @@ typedef struct Level {
     int8_t actor_dir[LEVEL_MAX_OBJECTS];
     uint8_t actor_cooldown[LEVEL_MAX_OBJECTS];
     uint16_t actor_frame;
+    uint32_t elapsed_frames;
     uint32_t race_elapsed_frames;
 } Level;
 
