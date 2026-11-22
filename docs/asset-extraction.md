@@ -203,3 +203,18 @@ python tools/preview_bonus_runtime_assets.py \
   --asset-manifest private_assets/manifest.json --assets-root private_assets \
   --out previews
 ```
+
+## v1.4 moving-platform graphics
+
+Extract the source sprites (keeping the original room and manifest private):
+
+```sh
+python tools/extract_gamemaker_assets.py data.win --out private_assets \
+  --only-sprites spr_moving_platform spr_cloud_platform --no-tilesets
+python tools/prepare_player_assets.py private_assets/manifest.json \
+  --assets-root private_assets --out assets/converted --scale 2
+```
+
+The OBJ converter automatically derives `spr_moving_platform_wide` (source art stretched from 48×8 to 64×8 before 2:1 downscaling), matching the source room's 4/3 scale. No duplicate public source graphic is required. The shared 8bpp world palette now holds 34 opaque colors.
+
+Regenerate `bonus_w1_collision.c` with `tools/build_bonus_collision.py`. It deliberately excludes the moving platform placements from the static tile grid; their source pivots, dimensions and runtime collisions are in `bonus_platforms.c`.
