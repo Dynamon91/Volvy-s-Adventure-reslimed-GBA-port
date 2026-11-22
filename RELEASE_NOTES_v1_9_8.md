@@ -18,14 +18,15 @@ The Stage Clear artwork and result text are a static walkthrough frame. The resu
 
 ### Verification
 
-- BIOS LZ77 asset decompression and packed-pixel checks: **PASS**.
-- Standalone stage_clear_screen.c syntax check with test GBA headers: **PASS**.
-- Renderer transition contract: **PASS**.
-- Full host suite: **NOT RUN** (the public repository omits private generated room assets required by older tests).
-- Isolated Stage Clear module ARMv4T/Thumb code generation: **PASS**.
-- Full-project ARMv4T/Thumb link and devkitARM/libgba ROM build: **NOT TESTED**.
+- Independent BIOS-LZ77 asset round-trip: **PASS**.
+- Packed-pixel dimensions and 16-color palette inspection: **PASS**.
+- Renderer gate/VBlank/restore source-contract inspection: **PASS**.
+- C syntax check: **NOT RUN**.
+- ARMv4T/Thumb code generation: **NOT RUN**.
+- Full host suite: **NOT RUN** (the public repository excludes the private generated game-asset bundle).
+- Full-project ARMv4T/Thumb link: **NOT TESTED**.
 - devkitARM/libgba ROM build: **NOT TESTED**.
 - mGBA boot/rendered screen: **NOT TESTED**.
 - Physical GBA: **NOT TESTED**.
 
-No v1.9.8 ROM is claimed. Overall reconstruction estimate remains **44%**, a planning estimate rather than a measured fidelity score.
+A public CI workflow and asset-independent public test scripts have been added, but no completed CI run is recorded yet. No v1.9.8 ROM is claimed. Overall reconstruction estimate remains **44%**, a planning estimate rather than a measured fidelity score.

@@ -27,16 +27,15 @@
     "integration restricted to provisional W1-L1 victory; boss and bonus excluded"
   ],
   "verification": {
-    "asset_lz77_pixel_palette_test": "PASS",
-    "stage_clear_c_syntax_with_test_gba_header": "PASS",
-    "renderer_transition_source_contract": "PASS",
-    "full_host_suite": "NOT_RUN_PRIVATE_GENERATED_ASSETS_REQUIRED",
-    "armv4t_thumb_codegen": "NOT_TESTED",
+    "asset_lz77_round_trip": "PASS",
+    "asset_dimensions_palette_inspection": "PASS",
+    "renderer_source_contract_inspection": "PASS",
+    "stage_clear_c_syntax": "NOT_RUN",
+    "full_host_suite": "NOT_RUN_PRIVATE_ASSETS_REQUIRED",
+    "armv4t_thumb_codegen": "NOT_RUN",
     "devkitarm_libgba_rom": "NOT_BUILT",
     "mgba_boot_and_render": "NOT_TESTED",
-    "physical_gba": "NOT_TESTED",
-    "stage_clear_module_armv4t_thumb_codegen": "PASS",
-    "full_project_armv4t_thumb_codegen": "NOT_TESTED"
+    "physical_gba": "NOT_TESTED"
   },
   "dynamic_results_system": false,
   "fidelity_to_original_verified": false,
