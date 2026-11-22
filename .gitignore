@@ -27,3 +27,8 @@ __pycache__/
 /assets/converted/boss_sprites.c
 /assets/converted/boss_sprites.h
 /assets/converted/boss_sprites_manifest.json
+
+# Experimental local Clang image contains converted commercial game assets
+/build-clang-experimental/
+*.gba
+*.elf
