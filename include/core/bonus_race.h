@@ -5,6 +5,7 @@
 #include "core/level.h"
 #include "core/player.h"
 #include "core/bonus_bunnies.h"
+#include "core/bonus_platforms.h"
 
 typedef struct BonusRace {
     uint32_t elapsed_frames;
@@ -12,10 +13,11 @@ typedef struct BonusRace {
     uint8_t finished;
     uint16_t bumper_hits;
     BonusBunny bunnies[BONUS_ACTIVE_BUNNY_COUNT];
+    BonusMovingPlatform platforms[BONUS_MOVING_PLATFORM_COUNT];
 } BonusRace;
 
 void bonus_race_init(BonusRace *race);
 int bonus_race_update(BonusRace *race, Level *level, Player *player,
-                      int pre_bottom, int was_descending);
+                      int pre_x, int pre_bottom, int was_descending);
 
 #endif
