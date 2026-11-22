@@ -6,6 +6,7 @@
 #include "core/input.h"
 #include "core/level.h"
 #include "core/player.h"
+#include "core/title_menu.h"
 #include "core/world_interactions.h"
 #include "platform/render.h"
 #include "rm_w1_l1_scene.h"
@@ -21,6 +22,7 @@ static BonusRace s_bonus_race;
 static GameMode s_mode;
 static GameMode s_resume_mode;
 static uint32_t s_anim_tick;
+static uint8_t s_title_selection;
 
 #ifndef VOLVY_DEV_STAGE_SELECT
 #define VOLVY_DEV_STAGE_SELECT 0
@@ -101,6 +103,7 @@ void game_init(void)
     s_mode = GAME_TITLE;
     s_resume_mode = GAME_PLAYING;
     s_anim_tick = 0;
+    s_title_selection = TITLE_MENU_START_GAME;
 
     render_init(&s_level);
 }
@@ -112,6 +115,14 @@ void game_update(void)
 
     switch (s_mode) {
     case GAME_TITLE:
+        /* The walkthrough confirms three title entries. Navigation is a
+         * conservative GBA scaffold; Settings/Quit actions await source
+         * behavior evidence and are deliberately not fabricated. */
+        if (input_was_pressed(KEY_UP)) {
+            s_title_selection = title_menu_move(s_title_selection, -1);
+        } else if (input_was_pressed(KEY_DOWN)) {
+            s_title_selection = title_menu_move(s_title_selection, 1);
+        }
         /* Development-only level selector: enables direct tests of L2/L3.
          * This is not an original Volvy menu behavior. */
 #if VOLVY_DEV_STAGE_SELECT
@@ -120,7 +131,8 @@ void game_update(void)
             select_title_stage(next);
         }
 #endif
-        if (input_was_pressed(KEY_START)) {
+        if ((input_was_pressed(KEY_START) || input_was_pressed(KEY_A)) &&
+            title_menu_can_start(s_title_selection)) {
             if (s_level.bonus_room) reset_bonus_race();
             else reset_world1(s_level.active_stage);
         }
@@ -217,6 +229,7 @@ void game_update(void)
         if (input_was_pressed(KEY_START)) {
             if (s_level.boss_room || s_level.bonus_room) {
                 s_mode = GAME_TITLE;
+                s_title_selection = TITLE_MENU_START_GAME;
                 level_init_world1_stage(&s_level, 1);
                 render_select_stage(1);
                 camera_init(&s_camera);
@@ -237,7 +250,7 @@ void game_update(void)
 void game_render(void)
 {
     render_draw(&s_level, &s_player, &s_shrewy, &s_bonus_race,
-                &s_camera, s_mode, s_anim_tick);
+                &s_camera, s_mode, s_anim_tick, s_title_selection);
 }
 
 void game_vblank_commit(void)
