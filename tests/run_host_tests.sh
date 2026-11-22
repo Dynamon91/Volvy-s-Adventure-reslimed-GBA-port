@@ -32,10 +32,13 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_cage_sequence.c" "$ROOT/source/core/cage_
 "$TMP/cage_sequence"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_room.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" -o "$TMP/bonus_room"
 "$TMP/bonus_room"
-$CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_race.c" "$ROOT/source/core/bonus_race.c" "$ROOT/source/core/bonus_bunnies.c" "$ROOT/assets/converted/rooms/bonus_w1_bumper_bounds.c" "$ROOT/source/core/level.c" "$ROOT/source/core/player.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/bonus_race"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_race.c" "$ROOT/source/core/bonus_race.c" "$ROOT/source/core/bonus_bunnies.c" "$ROOT/source/core/bonus_platforms.c" "$ROOT/assets/converted/rooms/bonus_w1_bumper_bounds.c" "$ROOT/source/core/level.c" "$ROOT/source/core/player.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/bonus_race"
 "$TMP/bonus_race"
-$CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_bunnies.c" "$ROOT/source/core/bonus_bunnies.c" "$ROOT/assets/converted/rooms/bonus_w1_bumper_bounds.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/bonus_bunnies"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_bunnies.c" "$ROOT/source/core/bonus_bunnies.c" "$ROOT/source/core/bonus_platforms.c" "$ROOT/assets/converted/rooms/bonus_w1_bumper_bounds.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/bonus_bunnies"
 "$TMP/bonus_bunnies"
+
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_platforms.c" "$ROOT/source/core/bonus_platforms.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/bonus_platforms"
+"$TMP/bonus_platforms"
 
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_window.c" "$ROOT/source/core/scene_window.c" -o "$TMP/scene_window"
 "$TMP/scene_window"
