@@ -8,7 +8,7 @@ header = (root / "include/platform/hud_walkthrough_icons.h").read_text()
 ui = (root / "source/platform/ui.c").read_text()
 
 def macro(name):
-    match = re.search(rf"^#define\\s+{name}\\s+(\\d+)u?$", header, re.M)
+    match = re.search(rf"^#define\s+{name}\s+(\d+)u?$", header, re.M)
     assert match, f"missing {name}"
     return int(match.group(1))
 
@@ -19,7 +19,7 @@ assert macro("VOLVY_HUD_ONION_TILE") == 40
 assert macro("VOLVY_HUD_STOPWATCH_TILE") == 44
 
 palette_match = re.search(
-    r"g_hud_icon_palette\\[16\\]\\s*=\\s*\\{([^}]*)\\}", header, re.S
+    r"g_hud_icon_palette\[16\]\s*=\s*\{([^}]*)\}", header, re.S
 )
 assert palette_match, "missing 16-entry icon palette"
 palette = [int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{4})", palette_match.group(1))]
@@ -28,7 +28,7 @@ assert palette[0] == 0x0000 and palette[1] == 0x7FFF
 assert all(0 <= color <= 0x7FFF for color in palette)
 
 tiles_match = re.search(
-    r"g_hud_icon_tiles\\[256\\]\\s*=\\s*\\{([^}]*)\\}", header, re.S
+    r"g_hud_icon_tiles\[256\]\s*=\s*\{([^}]*)\}", header, re.S
 )
 assert tiles_match, "missing 256-byte icon tile payload"
 tiles = [int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{2})", tiles_match.group(1))]
