@@ -1,0 +1,29 @@
+/build/
+/volvy_reslimed.elf
+/volvy_reslimed.gba
+/volvy_reslimed.map
+__pycache__/
+*.pyc
+
+# Keep the original commercial game package and unconverted source assets
+# out of public repositories unless redistribution rights are confirmed.
+/assets/original/*
+!/assets/original/README.md
+
+# Extracted proprietary assets: keep private unless redistribution rights are confirmed.
+/assets/extracted_private/
+
+# Generated data derived from the original game's proprietary assets.
+# Keep locally for builds; only commit publicly if redistribution is permitted.
+/assets/converted/player_sprites.c
+/assets/converted/player_sprites.h
+/assets/converted/player_sprites_manifest.json
+/assets/converted/tilesets/*.c
+/assets/converted/tilesets/*.h
+/assets/converted/tilesets/*.json
+/assets/converted/rooms/*.c
+/assets/converted/rooms/*.h
+/assets/converted/rooms/*.json
+/assets/converted/boss_sprites.c
+/assets/converted/boss_sprites.h
+/assets/converted/boss_sprites_manifest.json
