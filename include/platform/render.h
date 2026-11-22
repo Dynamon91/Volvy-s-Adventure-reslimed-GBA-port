@@ -15,7 +15,8 @@ void render_select_boss(void);
 void render_select_bonus(void);
 void render_draw(const Level *level, const Player *player,
                  const ShrewyBoss *boss, const BonusRace *race, const Camera *camera,
-                 GameMode mode, uint32_t anim_tick);
+                 GameMode mode, uint32_t anim_tick,
+                 uint8_t title_selection);
 void render_vblank_commit(Level *level, const Camera *camera);
 
 #endif
