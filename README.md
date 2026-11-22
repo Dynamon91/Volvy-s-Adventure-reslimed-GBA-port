@@ -1,15 +1,14 @@
 
-> **Current development milestone: v1.9.10 title-menu navigation scaffold (22 Nov 2026).** Adds
-> bounded Up/Down navigation and a focus marker for the three title entries
-> confirmed in the walkthrough. A/Start launches Start Game; Settings and Quit
-> remain non-dispatched pending verified original behavior and GBA mapping.
-> Public host and ARM7TDMI CI checks pass; full ROM/mGBA verification remains separate.
+> **Current development milestone: v1.9.11 walkthrough handheld-card asset pipeline (22 Nov 2026).** Reopens the full
+> 2h22 reference, verifies the Rigatoni Rooftops card at 57:00, and adds a
+> tested 4bpp/8bpp BIOS-LZ77 converter for private 240×135 selection/title
+> frames. Runtime selection flow is not yet integrated; full ROM/mGBA remains unverified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.10 title-menu navigation scaffold.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.11 walkthrough handheld-card asset pipeline.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
-**New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md) for the timestamped 2h22 source-game timeline and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md) for confirmed missing content and next reconstruction priorities. The private keyframe pack is stored separately from the public source repository.
+**New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
