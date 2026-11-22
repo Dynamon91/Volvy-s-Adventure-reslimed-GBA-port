@@ -65,6 +65,8 @@ static int s_actor_reload_part;
 static u8 s_stage_clear_pending;
 static u8 s_stage_clear_active;
 static u8 s_stage_clear_restore_pending;
+/* Mode 4 clobbers BG0 font graphics and BG1 tile cache in the shared VRAM. */
+static u8 s_bitmap_ui_reload_needed;
 
 static const NativeSceneAsset *scene_asset_source(void)
 {
@@ -947,14 +949,26 @@ void render_vblank_commit(Level *level, const Camera *camera)
     (void)level;
     (void)camera;
 
-    /* Result-screen VRAM writes are isolated to VBlank. If the game leaves
-       the screen before its first commit, cancel the queued bitmap safely. */
+    /* Bitmap writes are VBlank-only. Cancelling a queued, uncommitted screen
+     * does not need a tile rebuild. Leaving a COMMITTED Mode 4 screen does:
+     * Mode 4 overwrites the same VRAM banks used by BG0 and BG1 in Mode 0. */
     if (s_stage_clear_restore_pending) {
         s_stage_clear_pending = 0;
-        if (s_stage_clear_active)
+        if (s_stage_clear_active) {
             stage_clear_screen_restore();
+            s_stage_loaded = 0;
+            reset_native_scene_cache();
+            s_bitmap_ui_reload_needed = 1;
+            /* Hide both tiled layers until their source art is restored.
+             * Do not upload an obsolete map or turn on BG1 in this VBlank. */
+            SetMode(MODE_0 | OBJ_ON | OBJ_1D_MAP);
+        }
         s_stage_clear_active = 0;
         s_stage_clear_restore_pending = 0;
+        if (s_bitmap_ui_reload_needed) {
+            gba_display_commit_oam();
+            return;
+        }
     }
     if (s_stage_clear_pending) {
         stage_clear_screen_commit();
@@ -1006,6 +1020,11 @@ void render_vblank_commit(Level *level, const Camera *camera)
         BG_COLORS[15 * 16 + 1] = 0x7FFF;
         s_stage_loaded = s_stage_requested;
         s_scene_loading = 1;
+        if (s_bitmap_ui_reload_needed) {
+            /* The image erased BG0 font/icon tiles and the BG palette bank. */
+            gba_ui_init();
+            s_bitmap_ui_reload_needed = 0;
+        }
     }
 
     /* A distant camera warp may reuse tiles that appear under the previous
