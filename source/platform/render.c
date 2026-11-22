@@ -801,7 +801,8 @@ static int draw_bonus_actors(const Level *level, const BonusRace *race,
 
 void render_draw(const Level *level, const Player *player,
                  const ShrewyBoss *boss, const BonusRace *race, const Camera *camera,
-                 GameMode mode, uint32_t anim_tick)
+                 GameMode mode, uint32_t anim_tick,
+                 uint8_t title_selection)
 {
     OBJATTR *oam = gba_display_oam_shadow();
     const GbaSpriteAnim *anim;
@@ -854,7 +855,8 @@ void render_draw(const Level *level, const Player *player,
     gba_ui_update(mode, player->onions, level->active_stage,
                   boss_room ? boss->health : 0,
                   mode == GAME_BONUS ? level->race_elapsed_frames :
-                                       level->elapsed_frames);
+                                       level->elapsed_frames,
+                  title_selection);
     /* A single DMA budget is shared by all visible animation sets. Reserve
        uploads before filling OAM, rather than drawing previous-frame geometry
        above tiles that will be replaced in this same VBlank. */
