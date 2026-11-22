@@ -1,8 +1,9 @@
 
 > **Current development milestone: v1.9.8 test hardening (22 Nov 2026).** Adds
 > a host runtime regression test for Stage Clear's one-time preparation,
-> 4bpp-to-8bpp expansion, palette/frame commit and Mode 0 restore. Full ROM
-> boot and mGBA rendering remain unverified.
+> 4bpp-to-8bpp expansion, palette/frame commit and Mode 0 restore. The
+> development-only SELECT stage cycling is now disabled in normal builds.
+> Full ROM boot and mGBA rendering remain unverified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
@@ -25,6 +26,10 @@ The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba
 - The result text, medals and score display are static reference data, not a dynamic scoring/ranking system. No v1.9.8 ROM or mGBA capture is claimed.
 
 See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md), [v1.9.8 verification](docs/verification-v198.md) and [the Stage Clear runtime test](tests/test_stage_clear_screen_runtime.c).
+
+### Release input behavior
+
+The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
 
 ## v1.9.7: walkthrough-derived HUD icon pass
 

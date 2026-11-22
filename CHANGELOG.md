@@ -1,3 +1,10 @@
+## Post-v1.9.8 development correction — release input fidelity
+
+- Disable the development-only SELECT stage-cycling shortcut in normal builds.
+- Compile the helper functions only when `VOLVY_DEV_STAGE_SELECT=1`, avoiding unused-function warnings in release builds.
+- Expose an explicit Make variable: `make DEV_STAGE_SELECT=1` for test builds; default `make` keeps the original-game input surface free of the debug shortcut.
+- Add a public source-contract regression to prevent the debug selector from silently becoming the default again.
+
 # Changelog
 
 ## v1.9.8 test hardening — Stage Clear runtime coverage

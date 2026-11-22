@@ -49,6 +49,7 @@ python3 "$ROOT/tests/test_hud_walkthrough_icons.py"
 python3 "$ROOT/tests/test_walkthrough_hud_contract.py"
 python3 "$ROOT/tests/test_stage_clear_asset.py"
 python3 "$ROOT/tests/test_stage_clear_screen_contract.py"
+python3 "$ROOT/tests/test_release_flags.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 
 printf '%s\n' 'All public host regressions PASS. Private-asset gameplay suite and full ROM build are separate.'

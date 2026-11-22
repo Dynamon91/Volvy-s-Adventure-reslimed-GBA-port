@@ -13,8 +13,9 @@ INCLUDES := include include/core include/platform assets/converted assets/conver
 DATA := assets/converted/ui
 
 ARCH := -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork
+DEV_STAGE_SELECT ?= 0
 CFLAGS := -g -Wall -Wextra -O2 -std=gnu11 $(ARCH) -ffunction-sections -fdata-sections
-CFLAGS += $(INCLUDE)
+CFLAGS += $(INCLUDE) -DVOLVY_DEV_STAGE_SELECT=$(DEV_STAGE_SELECT)
 LDFLAGS = -g $(ARCH) -Wl,-Map,$(OUTPUT).map -Wl,--gc-sections
 
 LIBS := -lgba

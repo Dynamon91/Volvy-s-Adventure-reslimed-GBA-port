@@ -23,7 +23,7 @@ static GameMode s_resume_mode;
 static uint32_t s_anim_tick;
 
 #ifndef VOLVY_DEV_STAGE_SELECT
-#define VOLVY_DEV_STAGE_SELECT 1
+#define VOLVY_DEV_STAGE_SELECT 0
 #endif
 
 static void reset_world1(uint8_t stage)
@@ -69,6 +69,7 @@ static void reset_bonus_race(void)
     s_anim_tick = 0;
 }
 
+#if VOLVY_DEV_STAGE_SELECT
 static uint8_t next_title_stage(uint8_t current)
 {
     if (current == 1) return 2;
@@ -89,6 +90,7 @@ static void select_title_stage(uint8_t stage)
     }
     camera_init(&s_camera);
 }
+#endif
 
 void game_init(void)
 {
