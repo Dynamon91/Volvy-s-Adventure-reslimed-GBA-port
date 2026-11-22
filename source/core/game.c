@@ -164,11 +164,12 @@ void game_update(void)
             break;
         }
         {
+            int old_x = fx_to_int(s_player.x);
             int old_bottom = fx_to_int(s_player.y) + s_player.height;
             int descending = s_player.vy >= 0;
             player_update(&s_player, input, &s_level);
             (void)bonus_race_update(&s_bonus_race, &s_level, &s_player,
-                                   old_bottom, descending);
+                                   old_x, old_bottom, descending);
         }
         camera_update(&s_camera, &s_player,
                       level_width_pixels(&s_level),
