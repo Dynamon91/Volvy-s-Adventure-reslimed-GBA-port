@@ -38,6 +38,11 @@ PLAYER_SPRITES = {
     "spr_bumper_sq", "spr_bumper_tri",
     "spr_squirrel_idle", "spr_squirrel_walk", "spr_squirrel_hurt",
     "spr_springboard", "spr_action_block_spent",
+    "spr_moving_platform", "spr_cloud_platform", "spr_corner_bumper",
+    "spr_hivefly", "spr_crowly_fly", "spr_vinechomp_base",
+    "spr_spikes_dave", "spr_cannon", "spr_button_off", "spr_hole",
+    "spr_rail_slice", "spr_bkg_space_onion", "spr_worm", "spr_plants",
+    "spr_level_exit_hole", "spr_platform_placeholder",
     # World 1 burrow hazards and dedicated Shrewy boss encounter.
     "spr_autodig_hitbox", "spr_autohole", "spr_mega_boulder",
     "spr_mole_dig_enter", "spr_mole_dig_exit_no_inbetween",

@@ -67,7 +67,7 @@ def main():
     ap.add_argument("manifest", type=Path)
     ap.add_argument("--assets-root", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--scale", type=int, default=2)
+    ap.add_argument("--scale", type=int, default=1)
     ap.add_argument("--frame-duration", type=int, default=6)
     args = ap.parse_args()
 
@@ -84,9 +84,15 @@ def main():
         "spr_bunny_hop", "spr_bumper_sq", "spr_bumper_tri",
         "spr_moving_platform", "spr_moving_platform_wide", "spr_cloud_platform",
         "spr_action_block", "spr_action_block_spent",
-        "spr_squirrel_idle", "spr_squirrel_walk", "spr_squirrel_hurt", "spr_springboard"
+        "spr_squirrel_idle", "spr_squirrel_walk", "spr_squirrel_hurt", "spr_springboard",
+        "spr_hivefly", "spr_crowly_fly", "spr_vinechomp_base", "spr_spikes_dave",
+        "spr_cannon", "spr_button_off", "spr_hole", "spr_rail_slice",
+        "spr_bkg_space_onion", "spr_worm", "spr_plants", "spr_level_exit_hole"
     }
-    sprites = [s for s in manifest["selected_sprites"] if s["name"] in player_render_sprites]
+    sprites = sorted(
+        (s for s in manifest["selected_sprites"] if s["name"] in player_render_sprites),
+        key=lambda sprite: sprite["name"]
+    )
     # Reproduce the source room's 4/3 X-scale instance without shipping an
     # extra source PNG. The original 48x8 moving-platform art becomes 64x8
     # (32x4 at 2:1) before the normal OBJ converter runs.

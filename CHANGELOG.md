@@ -1,12 +1,69 @@
 # Changelog
 
-## v1.5 — First experimental ARM7TDMI cartridge image
+## v1.9 — suppress source-only green hole marker
 
-- Built a 1 MiB GBA cartridge image with Clang/LLD and the user's locally converted game assets (599,500-byte payload).
-- Added a standalone ARM startup, ROM/EWRAM linker layout, GBA direct-register layer, and EABI division helpers.
-- Added ROM structure, checksum, RAM and host CRT regression tests.
-- Fixed 8-bit palette clearing and replaced initial OBJ palette memcpy with aligned DMA.
-- This ROM has NOT yet been boot-tested in mGBA or compiled with real devkitARM/libgba. The ROM and commercial converted graphics are deliberately not pushed to this public repository.
+- Reviewed the new mGBA recording and traced the neon-green 16×16 rectangle to the uniform `spr_hole` source marker (palette index 36 / BGR555 `0x33E6`).
+- Kept `obj_hole` placements for source logic but removed their world/bonus OBJ rendering.
+- Removed the unused static animation cache slot: 25 visible static animation sets, 18,560 bytes; combined player+static OBJ allocation 23,680 bytes, 9,088 bytes free.
+- Added source-asset regression coverage and excluded invisible markers from future OAM estimates. See `previews/v19_hole_marker_before_after.png` for the capture/source comparison.
+
+
+## v1.8 — HUD priority correction from user mGBA footage
+
+- Reviewed the 117.5-second user-supplied mGBA capture, covering title, W1-L1, onions, blocks, pipes, Volvy/Swolvy states, Big Hand movement and vertical sections.
+- Identified foreground OBJ/HUD overlap: gameplay sprites were at OBJ priority 0, tying BG0's priority; GBA OBJ wins same-priority ties.
+- Moved gameplay player, world actors, bonus actors, boss, boss rock and boss onions to OBJ priority 1. BG0 HUD remains priority 0; BG1 scene remains priority 1. The title-screen Volvy keeps priority 0 for its intended title composition.
+- Added a dedicated HUD/OAM priority regression test and updated the 8bpp OBJ layout test.
+- Host C regression suite: PASS. ARMv4T/Thumb code generation: PASS (40 translation units with test-only headers).
+- Experimental Clang/LLD ROM: PASS structural checks, 2 MiB image, 1,240,964-byte payload, 41 C files.
+- devkitARM/libgba build and v1.8 mGBA boot: NOT VERIFIED.
+
+
+## v1.7 — scroll stability, source-font rendering and boss VRAM safety
+
+- Staged and displayed 4bpp BG windows now track separate origins; scroll is calculated against the **committed** window rather than the upcoming streamed window.
+- Added camera clamping during incremental streaming, plus one-frame BG blackout for hard teleports, including cache-only window switches.
+- Relocated Shrewy boss onions to OBJ VRAM bytes 6,144–7,168 to avoid overlapping the 5,120-byte player reservation.
+- Recovered the `fnt_small` original 39-character GameMaker font atlas, converted the original ink pixels to 40×8×8 GBA 4bpp tiles, and integrated them into the HUD.
+- Added source-derived old/new HUD comparison PNG and original Volvy walking GIF (not emulator screenshots).
+- Added `test_native_presentation.c`, `test_hud_font_asset_v17.py`, `test_obj_vram_layout_v17.py`, and the source font extraction tool.
+- Host logic/asset tests: PASS; ARMv4T/Thumb code generation: PASS (40 units using test headers); Clang/LLD experimental ROM header/ELF verification: PASS (41 C files).
+- v1.7 ROM boot in mGBA: NOT YET TESTED. The later user-supplied mGBA capture shows a running build but does not identify the exact ROM revision.
+
+
+## v1.6 — native-pixel visual fidelity pass
+
+- Switched the active player/actor rendering package from 2:1 downscaled sprites to 1:1 source-pixel sprites.
+- Expanded the native sprite set to 56 animation sets, 501 metasprite parts and a 71-color OBJ palette.
+- Added a 5,120-byte player frame reservation and a streamed one-frame-per-animation cache for 26 static actor animation sets (18,816 bytes).
+- Added source sprites for hivefly, Crowly, Vinechomp, spikes, cannon, button, holes, rail slices, background-onion props and level-exit holes.
+- Expanded World 1 object tables to render hivefly, hole, plant, worm and level-exit actors.
+- Converted W1 L1/L2/L3, Bonus Race and Shrewy scenes to native 1:1 4bpp tilemaps with 15 scene palette banks and a reserved HUD bank.
+- Added a 32×32 / 1,024-tile BG cache, H/V flip flags, per-tile palette banks and bounded VBlank uploads.
+- Verified all five native scene outputs by rendering the generated tile/map/palette data back to PNG: zero differing pixels after BGR555 quantization.
+- Added native-resolution OAM audits and tests for actual generated scene assets and cache windows.
+- Rebuilt the experimental Clang/LLD ROM image and passed structural GBA/ELF checks.
+
+### v1.6 verification status
+
+- Host C regression suite: PASS.
+- ARMv4T/Thumb code generation: PASS, 39 translation units with test-only headers.
+- Experimental Clang/LLD ROM: structurally valid 2 MiB image; boot not verified.
+- Standard devkitARM/libgba build: NOT VERIFIED.
+- mGBA / physical GBA execution: NOT VERIFIED.
+
+
+## v1.5 — Experimental ARM7TDMI ROM image
+
+v1.5 experimental Clang/LLD cartridge build
+- Added isolated ARM7TDMI bare-metal build, startup, data/BSS setup and custom linker layout.
+- Added direct-register GBA graphics/keys/VBlank DMA bridge and minimal C runtime.
+- Added ARM EABI division/modulo stubs plus host regression tests.
+- Added binary header, ROM padding, memory-limit, ELF-structure and checksum checks.
+- Fixed 8-bit writes to palette RAM in the regular initialization pathway; initial
+  player OBJ palette now uses 32-bit DMA.
+- First 1 MiB experimental .gba test file generated with 599,500-byte code/data payload.
+- Real mGBA boot, physical GBA gameplay and devkitARM/libgba build NOT verified.
 
 
 ## v1.4 — Source-derived bonus moving platforms
@@ -64,3 +121,11 @@ Verification: host C tests PASS; 30 ARMv4T/Thumb units codegen/relocatable linki
 - Makefile parser check with a parser-only `gba_rules` stub: PASS.
 - Real devkitARM/libgba ROM build: NOT VERIFIED.
 - mGBA / physical GBA execution: NOT VERIFIED.
+
+## v1.9.1 — Static OBJ animation-frame synchronization
+
+- Preserve the verified v1.9 game, world layouts, source graphics and invisible marker fix.
+- Synchronize the frame selected for static actor OAM with its VBlank tile upload.
+- Reserve the 6144-byte shared DMA budget deterministically; defer full frames that do not fit.
+- Add stand-alone host scheduler unit tests and renderer integration regression.
+- Rebuild/test experimental ARMv4T cartridge image; **emulator boot still unverified**.

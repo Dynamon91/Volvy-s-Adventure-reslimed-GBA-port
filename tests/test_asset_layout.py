@@ -22,24 +22,32 @@ bonus_room = json.loads((root / 'assets/converted/rooms/bonus_w1_room_manifest.j
 bonus_trace = json.loads((root / 'assets/converted/rooms/bonus_w1_trace_summary.json').read_text())
 bonus_collision = json.loads((root / 'assets/converted/rooms/bonus_w1_collision_report.json').read_text())
 bonus_composite = json.loads((root / 'assets/converted/rooms/bonus_w1_composite_manifest.json').read_text())
-oam_density = json.loads((root / 'assets/converted/rooms/bonus_w1_oam_density_v12.json').read_text())
+native_scenes = {
+    name: json.loads((root / 'assets/converted/rooms' / (name + '_native_manifest.json')).read_text())
+    for name in ('w1_l1', 'w1_l2', 'w1_l3', 'bonus', 'shrewy')
+}
+oam_density = json.loads((root / 'assets/converted/rooms/bonus_w1_oam_density_native_v16.json').read_text())
 
-assert actors['opaque_palette_colors'] == 34
-assert len(actors['sprites']) == 44
+assert actors['scale_divisor'] == 1
+assert actors['opaque_palette_colors'] == 71
+assert len(actors['sprites']) == 56
 assert scene['unique_tiles'] <= 256
 assert scene['tile_bytes'] <= 16384
 assert scene['gba_scene'] == [1129, 180]
-assert room['object_count'] <= 160
+assert room['object_count'] == 214 and room['object_count'] <= 256
 assert room['actors']['WORLD_SQUIRREL'] == 3
 assert room['actors']['WORLD_SPRINGBOARD'] == 2
 assert room['actors']['WORLD_ONION'] == 84
+assert room['actors']['WORLD_HIVEFLY'] == 1
+assert room['actors']['WORLD_PLANT'] == 63
 assert scene2['unique_tiles'] <= 512
 assert scene2['tile_bytes'] <= 32768
 assert scene2['unique_tiles'] == 453
 assert scene2['gba_scene'] == [1129,180]
-assert room2['object_count'] == 308
+assert room2['object_count'] == 367
 assert room2['object_count'] < 384
 assert room2['actors']['WORLD_ONION'] == 180
+assert room2['actors']['WORLD_HIVEFLY'] == 2
 assert room2['actors']['WORLD_BREAKABLE'] == 107
 assert room2['actors']['WORLD_SPRINGBOARD'] == 4
 assert room2['actors']['WORLD_SQUIRREL'] == 3
@@ -49,13 +57,13 @@ assert scene3['unique_tiles'] == 473
 assert scene3['tile_bytes'] == 30272
 assert scene3['unique_tiles'] <= 512 and 0x4000 + scene3['tile_bytes'] <= 0xC000
 assert scene3['gba_scene'] == [1129,180]
-assert room3['object_count'] == 495 and room3['object_count'] < 576
+assert room3['object_count'] == 502 and room3['object_count'] < 576
 assert room3['actors']['WORLD_ONION'] == 318
 assert room3['actors']['WORLD_BREAKABLE'] == 157
 assert room3['actors']['WORLD_SPRINGBOARD'] == 3
 assert room3['solid_instances'] == 78
 assert room3['spawn_source_pivot'] == [49,382]
-assert missing3['unimplemented_objects'] == 60
+assert missing3['unimplemented_objects'] == 53
 assert boss_scene['unique_tiles'] == 417
 assert boss_scene['tile_bytes'] == 26688
 assert boss_scene['gba_scene'] == [256, 144]
@@ -126,11 +134,22 @@ assert bonus_collision['object_placements_used']['obj_destructible_block_oneway'
 assert bonus_collision['collision_cell_counts']['7'] == 36
 assert bonus_collision['collision_cell_counts']['8'] == 4
 assert bonus_collision['collision_cell_counts']['9'] == 8
-assert oam_density['source_objects_tracked'] == 672
+assert oam_density['source_objects_tracked'] == 793
 assert oam_density['source_object_counts']['obj_bunny'] == 2
 assert oam_density['source_object_counts']['obj_bunny_ground'] == 9
 assert oam_density['max_hardware_oam_estimate_including_8_player_parts'] <= 128
-assert oam_density['camera_grid_positions_evaluated'] > 900000
+assert oam_density['max_hardware_oam_estimate_including_8_player_parts'] == 66
+assert oam_density['camera_grid_positions_evaluated'] > 4800000
+
+world_oam = {
+    name: json.loads((root / 'assets/converted/rooms' /
+                      (name + '_oam_density_native_v16.json')).read_text())
+    for name in ('w1_l1', 'w1_l2', 'w1_l3')
+}
+assert world_oam['w1_l1']['max_hardware_oam_estimate_including_player'] == 58
+assert world_oam['w1_l2']['max_hardware_oam_estimate_including_player'] == 66
+assert world_oam['w1_l3']['max_hardware_oam_estimate_including_player'] == 82
+assert all(item['fits_128_obj_entries'] for item in world_oam.values())
 assert bonus_collision['collision_cell_counts']['2'] == 271
 assert 0x4000 + bonus_room['tile_bytes'] <= 0xC000
 
@@ -138,34 +157,43 @@ assert 0x4000 + bonus_room['tile_bytes'] <= 0xC000
 by_name = {a['name']: a for a in actors['sprites']}
 required = (
     'spr_onion', 'spr_destructible_block', 'spr_action_block',
-    'spr_action_block_spent', 'spr_squirrel_idle',
-    'spr_squirrel_walk', 'spr_springboard',
-    'spr_destructible_block_swolvy', 'spr_bunny_hop',
-    'spr_bumper_sq', 'spr_bumper_tri',
-    'spr_moving_platform', 'spr_moving_platform_wide', 'spr_cloud_platform'
+    'spr_action_block_spent', 'spr_squirrel_idle', 'spr_squirrel_walk',
+    'spr_springboard', 'spr_destructible_block_swolvy', 'spr_bunny_hop',
+    'spr_bumper_sq', 'spr_bumper_tri', 'spr_moving_platform',
+    'spr_moving_platform_wide', 'spr_cloud_platform', 'spr_hivefly',
+    'spr_crowly_fly', 'spr_vinechomp_base', 'spr_spikes_dave',
+    'spr_cannon', 'spr_button_off', 'spr_rail_slice',
+    'spr_bkg_space_onion', 'spr_worm', 'spr_plants', 'spr_level_exit_hole'
 )
 static_bytes = 0
+base32 = 160  # 5120B reserved for native player frames
 for name in required:
     assert name in by_name, f'missing generated actor animation {name}'
-    for frame in by_name[name]['frames']:
-        parts = frame['parts']
-        assert len(parts) == 1, f'{name} frame requires multipart OAM support'
-        part = parts[0]
-        assert part['tile_bytes'] % 64 == 0
-        assert part['hw_w'] in (8, 16, 32, 64)
-        assert part['hw_h'] in (8, 16, 32, 64)
-        static_bytes += part['tile_bytes']
+    animation = by_name[name]
+    max_parts = max(len(frame['parts']) for frame in animation['frames'])
+    assert max_parts <= 8
+    for part_index in range(max_parts):
+        capacity = max(frame['parts'][part_index]['tile_bytes']
+                       if part_index < len(frame['parts']) else 0
+                       for frame in animation['frames'])
+        assert capacity % 64 == 0
+        static_bytes += capacity
+        if base32 & 1:
+            base32 += 1
+        base32 += capacity // 32
 
-# First 2048 OBJ VRAM bytes are reserved for the streaming player frames.
+# Actor animation cache stores one frame per animation and streams frame
+# changes into fixed slots, instead of reserving VRAM for every animation frame.
 max_player_frame_bytes = max(
     sum(part['tile_bytes'] for part in frame['parts'])
     for actor in actors['sprites']
     if actor['name'] not in required
     for frame in actor['frames']
 )
-assert max_player_frame_bytes <= 2048
-assert 2048 + static_bytes <= 32768
-assert static_bytes == 8512  # source-cache payload, before alignment
+assert max_player_frame_bytes <= 5120
+assert static_bytes == 18560
+assert base32 == 740
+assert base32 * 32 <= 32768
 
 
 # Native-resolution Shrewy arena uses a separate OBJ palette and mode-specific

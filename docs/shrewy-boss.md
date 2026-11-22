@@ -33,7 +33,7 @@ Shrewy's idle sprite is 48×48 with origin `(25,39)`. Volvy's source idle sprite
 | Boss/actor OBJ palette | 81 opaque colors |
 | Boss/room props exported | 11 |
 
-The scene fits the 32 KiB available in BG character blocks 1+2. The renderer uses the same 64×32 BG1 screen-block window as the scrolling platform stages, with the 32×18 arena map occupying its upper-left region.
+The scene fits the 32 KiB available in BG character blocks 1+2. The v1.6 renderer uses the native 4bpp `shrewy_native.c/.h` scene and a 32×32 BG1 cache window; the 32×18 arena map occupies its upper-left region.
 
 The boss room collision grid is 32×18. It is derived from three `obj_solid` sprite AABBs and the top surface of one `obj_owp` AABB. The one-way floor surface rounds to y=112. This is coarse AABB collision, not a decoded pixel-perfect mask or a verified reproduction of the original platform collision script.
 

@@ -1,3 +1,7 @@
+# Historical v1.5 experimental ROM note (superseded by v1.6)
+
+The v1.5 1 MiB payload figures below refer to the earlier experimental build. Current v1.6 build status is documented in `docs/verification.md` and `docs/visual-fidelity-v16.md`.
+
 # v1.5: experimental ARM7TDMI ROM image
 
 This milestone provides the **first locally linked `.gba` file** for the current Volvy C source.

@@ -14,7 +14,8 @@ void gba_display_init(void)
 
     /* GBA VRAM spans 96 KiB: 64 KiB BG + 32 KiB OBJ. */
     memset((void *)VRAM, 0, 0x18000);
-    /* Palette RAM requires halfword or word writes on GBA hardware. */
+    /* Palette RAM ignores/duplicates 8-bit stores on real GBA hardware.
+     * Explicit 16-bit writes clear each color exactly. */
     for (i = 0; i < 256; ++i) {
         BG_COLORS[i] = 0;
         OBJ_COLORS[i] = 0;
@@ -27,12 +28,10 @@ void gba_display_init(void)
         s_oam_shadow[i].dummy = 0;
     }
 
-    /*
-     * BG1 is the 512x256 world map: screen blocks 27 and 28.
-     * BG0, BG2 and BG3 are 256x256 maps at blocks 29, 30 and 31.
-     * The active renderer later configures BG1 for 8bpp artwork in
-     * character block 1 and BG0 for 4bpp HUD glyphs in block 0.
-     */
+    /* The native 4bpp renderer configures BG1 as a 32x32 scene-window map
+     * in screen block 27, with a 32 KiB tile cache at character blocks 1+2.
+     * BG0 uses screen block 29 and character block 0 for original source
+     * HUD glyphs; BG2 and BG3 are disabled in the current runtime. */
     BGCTRL[0] = BG_SIZE_0 | CHAR_BASE(0) | SCREEN_BASE(29) | 0;
     BGCTRL[1] = BG_SIZE_1 | CHAR_BASE(0) | SCREEN_BASE(27) | 1;
     BGCTRL[2] = BG_SIZE_0 | CHAR_BASE(0) | SCREEN_BASE(30) | 2;

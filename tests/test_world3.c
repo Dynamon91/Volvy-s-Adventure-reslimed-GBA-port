@@ -27,7 +27,7 @@ int main(void)
 
     level_init_world1_stage(&level, 3);
     assert(level.world1_active && level.active_stage == 3);
-    assert(W1_L3_OBJECT_COUNT == 495);
+    assert(W1_L3_OBJECT_COUNT == 502);
     assert(W1_L3_OBJECT_COUNT < LEVEL_MAX_OBJECTS);
     assert(level_world_object_count(&level) == W1_L3_OBJECT_COUNT);
     assert(W1_L3_ONION_COUNT == 318);

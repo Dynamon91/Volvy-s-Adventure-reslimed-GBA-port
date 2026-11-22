@@ -116,3 +116,13 @@ This is sequence-resource data, not decompiled GML. The original object event th
 The `rm_w1_b1_00` room now has a 332×70 AABB-derived collision grid. `obj_solid`, destructible blocks, spikes, rails, cloud platforms, and moving-platform initial footprints use the source object sprite dimensions/origins and instance transforms parsed from `data.win`. The grid is not a pixel collision mask. One-way cloud platforms and breakable one-way blocks use downward-only collision in the player controller; moving-platform paths remain unimplemented.
 
 The `GAME_BONUS` prototype loads the room scene and collision map, renders/collects the 397 source onions, applies provisional bounce behavior to all seven source springboards and all 42 action blocks, renders the 6 squirrel placements, removes full source breakable-block footprints on destruction, starts a local frame timer when the player overlaps either race-start marker, and finishes on the horizontal finish-marker plane. The runtime spawn uses the first source trace frame (264.3,535.0 source pixels), not the raw `obj_volvy` placement at (158,675), which lies within a large solid AABB. The trace supports the finish X-plane because its `race` event occurs near the finish marker's X coordinate, but the original controller logic is unavailable. Bunny AI, official timing/reward rules, and the exact start/finish callsites remain unverified.
+
+
+## Native-pixel actor and scene audit (v1.6)
+
+- Re-extracted the default source sprite set with the added bonus-room enemy, hazard and prop sprites. The native sprite builder now emits 56 animation sets at 1:1 source scale, 501 OBJ metasprite parts and 71 opaque OBJ palette colors.
+- `prepare_player_assets.py` sorts sprite names before conversion. Re-running the extractor and converter against the same `data.win` produced byte-identical `player_sprites.c`, `player_sprites.h` and manifest outputs.
+- Expanded World 1 object tables to include `obj_hivefly`, `obj_hole`, `obj_plant`, `obj_game`/worm and `obj_level_exit_hole` for rendering. Updated source object counts: L1 214, L2 367, L3 502.
+- Added bonus-room visible source sprites for hivefly, Crowly, Vinechomp, spikes, cannon, button, holes, rail slices and background-onion decoration. Their AI and damage behavior are not inferred from sprite presence.
+- Native scene builder output is 4bpp with 15 scene palette banks and a reserved HUD bank. The five active scenes round-trip to their source composites with zero differing pixels after BGR555 quantization.
+- The old 2:1/8bpp scene and actor assets remain under the experimental legacy paths for comparison; they are not the v1.6 runtime source.

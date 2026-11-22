@@ -28,7 +28,17 @@ __pycache__/
 /assets/converted/boss_sprites.h
 /assets/converted/boss_sprites_manifest.json
 
-# Experimental local Clang image contains converted commercial game assets
-/build-clang-experimental/
+# Experimental local ROM/ELF build (contains user-provided original game assets)
+build-clang-experimental/
 *.gba
 *.elf
+
+# v1.6+ native-pixel derived resources and privately generated original-font art.
+/assets/experimental/
+/assets/converted/hud_source_font.c
+/assets/converted/hud_source_font.h
+/assets/converted/hud_source_font_manifest.json
+
+# Source-derived sprite/level screenshots and GIFs are kept in the private ZIP.
+/previews/v16_*
+/previews/v17_*

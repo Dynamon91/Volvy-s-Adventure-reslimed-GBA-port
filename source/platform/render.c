@@ -6,31 +6,44 @@
 #include "player_sprites.h"
 #include "boss_sprites.h"
 #include "core/boss_shrewy.h"
-#include "core/scene_window.h"
+#include "core/native_scene.h"
+#include "core/static_frame_scheduler.h"
 #include "shrewy_room.h"
-#include "shrewy_scene.h"
-#include "rm_w1_l1_scene.h"
-#include "rm_w1_l2_scene.h"
-#include "rm_w1_l3_scene.h"
 #include "w1_l1_objects.h"
 #include "bonus_w1_room.h"
-#include "bonus_w1_composite.h"
+#include "w1_l1_native.h"
+#include "w1_l2_native.h"
+#include "w1_l3_native.h"
+#include "bonus_native.h"
+#include "shrewy_native.h"
 #include "platform/ui.h"
 
 #define BG_MAP_MAIN ((u16 *)0x0600D800)
 #define BG_CHAR_BLOCK_1 ((u8 *)0x06004000)
 #define OBJ_VRAM ((u8 *)0x06010000)
 #define MAX_PLAYER_PARTS 8
-#define STATIC_ANIM_COUNT 14
+#define STATIC_ANIM_COUNT 25
 #define MAX_STATIC_FRAMES 16
-#define STATIC_OBJ_BASE_32 64 /* reserve first 2048B for animated player */
+#define STATIC_OBJ_BASE_32 160 /* reserve 5120B for native animated player frames */
 #define OBJ_8BPP_BIT (1u << 13)
 #define OBJ_HFLIP_BIT (1u << 12)
-#define BG_8BPP_BIT (1u << 7)
-#define STREAM_MAP_W SCENE_WINDOW_TILES_W
-#define STREAM_MAP_H SCENE_WINDOW_TILES_H
+#define OBJ_PRIORITY_SHIFT 10u
+#define OBJ_GAMEPLAY_PRIORITY (1u << OBJ_PRIORITY_SHIFT)
+#define NATIVE_BG_UPLOADS_PER_VBLANK 128u
+#define BOSS_ONION_OBJ_BASE32 192u /* 6144..7168, after player (0..5120), before boss (8192+) */
+#define STATIC_OBJ_UPLOAD_BUDGET 6144u
 
-static u16 s_scene_map[STREAM_MAP_W * STREAM_MAP_H] ALIGN(4);
+static u16 s_scene_map[NATIVE_SCENE_WINDOW_CELLS] ALIGN(4);
+static NativeSceneCache s_scene_cache;
+static NativeSceneUpload s_scene_uploads[NATIVE_SCENE_CACHE_TILES];
+static u16 s_scene_upload_count;
+static u16 s_scene_upload_pos;
+static int s_scene_loading;
+static int s_bg_hard_jump;
+static NativeScenePresentation s_scene_presentation;
+static int s_render_cam_x;
+static int s_render_cam_y;
+static int s_render_cam_initialized;
 static int s_scene_start_x = -1;
 static int s_scene_start_y = -1;
 static int s_scene_map_dirty = 1;
@@ -44,38 +57,40 @@ static const GbaSpriteFrame *s_pending_rock_frame;
 static const GbaSpriteFrame *s_uploaded_rock_frame;
 static u16 s_boss_onion_base32[16];
 static u8 s_boss_onion_frame_count;
+static int s_actor_cache_ready = 1;
+static int s_actor_reload_anim;
+static int s_actor_reload_part;
 
-static const u16 *scene_map_source(void)
+static const NativeSceneAsset *scene_asset_source(void)
 {
-    if (s_stage_requested == 5) return bonus_w1_composite_map;
-    if (s_stage_requested == 4) return shrewy_scene_map;
-    if (s_stage_requested == 3) return rm_w1_l3_scene_map;
-    if (s_stage_requested == 2) return rm_w1_l2_scene_map;
-    return rm_w1_l1_scene_map;
+    if (s_stage_requested == 5) return &g_bonus_native_scene;
+    if (s_stage_requested == 4) return &g_shrewy_native_scene;
+    if (s_stage_requested == 3) return &g_w1_l3_native_scene;
+    if (s_stage_requested == 2) return &g_w1_l2_native_scene;
+    return &g_w1_l1_native_scene;
 }
-static int scene_map_width(void)
+
+static void reset_native_scene_cache(void)
 {
-    if (s_stage_requested == 5) return BONUS_W1_COMPOSITE_MAP_WIDTH;
-    if (s_stage_requested == 4) return SHREWY_SCENE_MAP_WIDTH;
-    if (s_stage_requested == 3) return RM_W1_L3_SCENE_MAP_WIDTH;
-    if (s_stage_requested == 2) return RM_W1_L2_SCENE_MAP_WIDTH;
-    return RM_W1_L1_SCENE_MAP_WIDTH;
+    native_scene_cache_reset(&s_scene_cache);
+    s_scene_upload_count = 0;
+    s_scene_upload_pos = 0;
+    s_scene_start_x = -1;
+    s_scene_start_y = -1;
+    s_scene_map_dirty = 1;
+    s_scene_loading = 1;
+    s_bg_hard_jump = 0;
+    native_scene_presentation_reset(&s_scene_presentation);
+    s_render_cam_initialized = 0;
 }
-static int scene_map_height(void)
-{
-    if (s_stage_requested == 5) return BONUS_W1_COMPOSITE_MAP_HEIGHT;
-    if (s_stage_requested == 4) return SHREWY_SCENE_MAP_HEIGHT;
-    if (s_stage_requested == 3) return RM_W1_L3_SCENE_MAP_HEIGHT;
-    if (s_stage_requested == 2) return RM_W1_L2_SCENE_MAP_HEIGHT;
-    return RM_W1_L1_SCENE_MAP_HEIGHT;
-}
+
 void render_select_stage(uint8_t stage)
 {
     if (stage < 1 || stage > 3) stage = 1;
     s_stage_requested = stage;
-    s_scene_start_x = -1;
-    s_scene_start_y = -1;
-    s_scene_map_dirty = 1;
+    reset_native_scene_cache();
+    s_pending_frame = 0;
+    s_uploaded_frame = 0;
     s_pending_boss_frame = 0;
     s_pending_rock_frame = 0;
 }
@@ -83,9 +98,7 @@ void render_select_stage(uint8_t stage)
 void render_select_boss(void)
 {
     s_stage_requested = 4;
-    s_scene_start_x = -1;
-    s_scene_start_y = -1;
-    s_scene_map_dirty = 1;
+    reset_native_scene_cache();
     s_pending_frame = 0;
     s_uploaded_frame = 0;
     s_pending_boss_frame = 0;
@@ -97,17 +110,17 @@ void render_select_boss(void)
 void render_select_bonus(void)
 {
     s_stage_requested = 5;
-    s_scene_start_x = -1;
-    s_scene_start_y = -1;
-    s_scene_map_dirty = 1;
+    reset_native_scene_cache();
+    s_pending_frame = 0;
+    s_uploaded_frame = 0;
     s_pending_boss_frame = 0;
     s_uploaded_boss_frame = 0;
     s_pending_rock_frame = 0;
     s_uploaded_rock_frame = 0;
 }
 
-/* Static world actors share fully preloaded OBJ frame tiles. On-screen
- * instance animation selection does not require a per-instance VRAM upload. */
+/* Static actors share per-animation 8bpp OBJ slots; animation frames are
+ * streamed into those slots during VBlank. This is not a full-frame cache. */
 typedef enum StaticAnimId {
     STATIC_ONION = 0,
     STATIC_BREAKABLE,
@@ -122,15 +135,32 @@ typedef enum StaticAnimId {
     STATIC_BUMPER_TRI,
     STATIC_MOVING_PLATFORM,
     STATIC_MOVING_PLATFORM_WIDE,
-    STATIC_CLOUD_PLATFORM
+    STATIC_CLOUD_PLATFORM,
+    STATIC_HIVEFLY,
+    STATIC_CROWLY,
+    STATIC_VINECHOMP,
+    STATIC_SPIKES,
+    STATIC_CANNON,
+    STATIC_BUTTON,
+    STATIC_RAIL,
+    STATIC_BKG_SPACE_ONION,
+    STATIC_WORM,
+    STATIC_PLANTS,
+    STATIC_LEVEL_EXIT_HOLE
 } StaticAnimId;
 
 typedef struct StaticAnimGraphic {
     const GbaSpriteAnim *animation;
-    u16 frame_tile_base32[MAX_STATIC_FRAMES];
+    u16 part_tile_base32[MAX_PLAYER_PARTS];
+    u16 part_capacity32[MAX_PLAYER_PARTS];
+    u8 max_parts;
+    u8 loaded_frame;
+    u8 pending_frame;
+    u8 pending;
 } StaticAnimGraphic;
 
 static StaticAnimGraphic s_static_gfx[STATIC_ANIM_COUNT];
+static StaticFrameScheduler s_static_frame_scheduler;
 
 static void load_actor_graphics(void)
 {
@@ -141,33 +171,130 @@ static void load_actor_graphics(void)
         &g_spr_destructible_block_swolvy, &g_spr_bunny_hop,
         &g_spr_bumper_sq, &g_spr_bumper_tri,
         &g_spr_moving_platform, &g_spr_moving_platform_wide,
-        &g_spr_cloud_platform
+        &g_spr_cloud_platform, &g_spr_hivefly, &g_spr_crowly_fly,
+        &g_spr_vinechomp_base, &g_spr_spikes_dave, &g_spr_cannon,
+        &g_spr_button_off, &g_spr_rail_slice,
+        &g_spr_bkg_space_onion, &g_spr_worm, &g_spr_plants,
+        &g_spr_level_exit_hole
     };
     u16 base = STATIC_OBJ_BASE_32;
-    int i, f;
+    int i, f, p;
 
     for (i = 0; i < STATIC_ANIM_COUNT; ++i) {
         const GbaSpriteAnim *anim = animations[i];
+        unsigned int max_parts = 0;
         s_static_gfx[i].animation = anim;
+        s_static_gfx[i].pending = 0;
+        s_static_gfx[i].loaded_frame = 0;
+        s_static_gfx[i].pending_frame = 0;
+
         for (f = 0; f < anim->frame_count && f < MAX_STATIC_FRAMES; ++f) {
-            const GbaSpriteFrame *frame = &anim->frames[f];
-            const GbaSpritePart *part;
-            if (frame->part_count != 1) {
-                s_static_gfx[i].frame_tile_base32[f] = 0;
-                continue;
+            if (anim->frames[f].part_count > max_parts)
+                max_parts = anim->frames[f].part_count;
+        }
+        if (max_parts > MAX_PLAYER_PARTS) max_parts = MAX_PLAYER_PARTS;
+        s_static_gfx[i].max_parts = (u8)max_parts;
+
+        /* Reserve one native-size frame slot per animation part. Animation
+           frames are streamed into these slots instead of caching every frame. */
+        for (p = 0; p < (int)max_parts; ++p) {
+            u16 max_bytes = 0;
+            for (f = 0; f < anim->frame_count && f < MAX_STATIC_FRAMES; ++f) {
+                const GbaSpriteFrame *frame = &anim->frames[f];
+                if ((unsigned int)p < frame->part_count &&
+                    frame->parts[p].tile_bytes > max_bytes)
+                    max_bytes = frame->parts[p].tile_bytes;
             }
-            part = &frame->parts[0];
-            /* 8bpp OBJ entries must begin on even 32-byte tile indices. */
             if (base & 1u) ++base;
-            if ((unsigned int)base + part->tile_bytes / 32u > 1024u) {
-                s_static_gfx[i].frame_tile_base32[f] = 0;
-                continue;
+            s_static_gfx[i].part_tile_base32[p] = base;
+            s_static_gfx[i].part_capacity32[p] = (u16)(max_bytes / 32u);
+            base = (u16)(base + max_bytes / 32u);
+        }
+
+        if (anim->frame_count && anim->frames[0].part_count <= MAX_PLAYER_PARTS) {
+            const GbaSpriteFrame *first = &anim->frames[0];
+            for (p = 0; p < first->part_count; ++p) {
+                const GbaSpritePart *part = &first->parts[p];
+                dmaCopy(part->tiles,
+                        OBJ_VRAM + (unsigned int)s_static_gfx[i].part_tile_base32[p] * 32u,
+                        part->tile_bytes);
             }
-            s_static_gfx[i].frame_tile_base32[f] = base;
-            dmaCopy(part->tiles, OBJ_VRAM + base * 32u, part->tile_bytes);
-            base = (u16)(base + part->tile_bytes / 32u);
         }
     }
+    s_actor_cache_ready = 1;
+    s_actor_reload_anim = 0;
+    s_actor_reload_part = 0;
+}
+
+static void start_actor_graphics_reload(void)
+{
+    s_actor_cache_ready = 0;
+    s_actor_reload_anim = 0;
+    s_actor_reload_part = 0;
+}
+
+static void upload_actor_graphics_batch(void)
+{
+    unsigned int budget = 4096u;
+    while (s_actor_reload_anim < STATIC_ANIM_COUNT && budget) {
+        StaticAnimGraphic *gfx = &s_static_gfx[s_actor_reload_anim];
+        const GbaSpriteAnim *anim = gfx->animation;
+        const GbaSpriteFrame *first;
+        if (!anim || !anim->frame_count) {
+            ++s_actor_reload_anim;
+            s_actor_reload_part = 0;
+            continue;
+        }
+        first = &anim->frames[0];
+        if (s_actor_reload_part >= first->part_count ||
+            s_actor_reload_part >= gfx->max_parts) {
+            ++s_actor_reload_anim;
+            s_actor_reload_part = 0;
+            continue;
+        }
+        {
+            unsigned int part_index = (unsigned int)s_actor_reload_part;
+            const GbaSpritePart *part = &first->parts[part_index];
+            if (part->tile_bytes > budget && budget < 4096u) break;
+            dmaCopy(part->tiles,
+                    OBJ_VRAM + (unsigned int)gfx->part_tile_base32[part_index] * 32u,
+                    part->tile_bytes);
+            budget -= part->tile_bytes;
+            ++s_actor_reload_part;
+        }
+    }
+    if (s_actor_reload_anim >= STATIC_ANIM_COUNT) {
+        int i;
+        for (i = 0; i < STATIC_ANIM_COUNT; ++i) {
+            s_static_gfx[i].loaded_frame = 0;
+            s_static_gfx[i].pending = 0;
+        }
+        s_actor_cache_ready = 1;
+    }
+}
+
+static unsigned int request_static_frame(int gfx_id, unsigned int frame_index)
+{
+    StaticAnimGraphic *gfx;
+    const GbaSpriteFrame *wanted;
+    unsigned int bytes = 0;
+    unsigned int p;
+    unsigned int chosen;
+    if (gfx_id < 0 || gfx_id >= STATIC_ANIM_COUNT) return 0;
+    gfx = &s_static_gfx[gfx_id];
+    if (!gfx->animation || !gfx->animation->frame_count) return 0;
+    if (frame_index >= gfx->animation->frame_count) frame_index = 0;
+    wanted = &gfx->animation->frames[frame_index];
+    for (p = 0; p < wanted->part_count && p < gfx->max_parts; ++p)
+        bytes += wanted->parts[p].tile_bytes;
+    chosen = static_frame_scheduler_choose(&s_static_frame_scheduler,
+                                           (unsigned int)gfx_id, frame_index,
+                                           gfx->loaded_frame, bytes);
+    if (chosen != gfx->loaded_frame) {
+        gfx->pending_frame = (u8)chosen;
+        gfx->pending = 1;
+    }
+    return chosen;
 }
 
 static int static_animation_for_actor(const Level *level, int index)
@@ -181,26 +308,57 @@ static int static_animation_for_actor(const Level *level, int index)
         return level->actor_dx[index] || level->actor_frame > 8u
                ? STATIC_SQUIRREL_WALK : STATIC_SQUIRREL_IDLE;
     case WORLD_SPRINGBOARD: return STATIC_SPRING;
+    case WORLD_HIVEFLY: return STATIC_HIVEFLY;
+    case WORLD_PLANT: return STATIC_PLANTS;
+    case WORLD_WORM: return STATIC_WORM;
+    case WORLD_LEVEL_EXIT_HOLE: return STATIC_LEVEL_EXIT_HOLE;
     default: return -1;
     }
 }
 
-static void draw_world_actors(const Level *level, const Camera *camera,
-                              OBJATTR *oam, int next_oam,
-                              uint32_t anim_tick)
+static int draw_static_parts(const StaticAnimGraphic *gfx,
+                             const GbaSpriteFrame *frame,
+                             OBJATTR *oam, int next_oam,
+                             int base_x, int base_y, int facing_left)
+{
+    unsigned int part_index;
+    unsigned int count = frame->part_count;
+    if (count > gfx->max_parts) count = gfx->max_parts;
+    if (count > MAX_PLAYER_PARTS) count = MAX_PLAYER_PARTS;
+    for (part_index = 0; part_index < count && next_oam < VOLVY_OAM_COUNT;
+         ++part_index) {
+        const GbaSpritePart *part = &frame->parts[part_index];
+        int x = facing_left
+            ? base_x + frame->width - part->offset_x - part->hw_w
+            : base_x + part->offset_x;
+        int y = base_y + part->offset_y;
+        if (x + part->hw_w <= 0 || x >= 240 ||
+            y + part->hw_h <= 0 || y >= 160)
+            continue;
+        oam[next_oam].attr0 = (u16)((y & 255) | OBJ_8BPP_BIT |
+                                    ((u16)part->shape << 14));
+        oam[next_oam].attr1 = (u16)((x & 511) |
+                                    (facing_left ? OBJ_HFLIP_BIT : 0) |
+                                    ((u16)part->size_code << 14));
+        oam[next_oam].attr2 = (u16)(gfx->part_tile_base32[part_index] | OBJ_GAMEPLAY_PRIORITY);
+        oam[next_oam].dummy = 0;
+        ++next_oam;
+    }
+    return next_oam;
+}
+
+static int draw_world_actors(const Level *level, OBJATTR *oam, int next_oam,
+                             uint32_t anim_tick, int cam_x, int cam_y)
 {
     int i;
-    int cam_x = fx_to_int(camera->x);
-    int cam_y = fx_to_int(camera->y);
-    if (!level->world1_active) return;
+    if (!s_actor_cache_ready || !level->world1_active) return next_oam;
     for (i = 0; i < level_world_object_count(level) && next_oam < VOLVY_OAM_COUNT; ++i) {
         const WorldObject *object = level_world_object(level, i);
         const StaticAnimGraphic *gfx;
         const GbaSpriteAnim *anim;
         const GbaSpriteFrame *frame;
-        const GbaSpritePart *part;
         unsigned int frame_index;
-        int gfx_id, x, y;
+        int gfx_id, base_x, base_y, facing_left;
         if (!level_object_active(level, i)) continue;
         gfx_id = static_animation_for_actor(level, i);
         if (gfx_id < 0) continue;
@@ -209,31 +367,19 @@ static void draw_world_actors(const Level *level, const Camera *camera,
         if (!anim->frame_count) continue;
         frame_index = (anim_tick / (anim->frame_duration ?
                       anim->frame_duration : 1u)) % anim->frame_count;
-        if (object->kind == WORLD_SPRINGBOARD) {
-            if (level->actor_cooldown[i] && anim->frame_count > 1)
-                frame_index = 1u +
-                    ((level->actor_cooldown[i] / 4u) % (anim->frame_count - 1u));
-            else frame_index = 0;
-        }
         if (frame_index >= MAX_STATIC_FRAMES) continue;
+        /* OAM must describe the frame that VBlank will actually upload. */
+        frame_index = request_static_frame(gfx_id, frame_index);
         frame = &anim->frames[frame_index];
-        if (frame->part_count != 1) continue;
-        part = &frame->parts[0];
-        x = object->x + level_world_actor_offset(level, i) -
-            frame->origin_x + part->offset_x - cam_x;
-        y = object->y - frame->origin_y + part->offset_y - cam_y;
-        if (x + part->hw_w <= 0 || x >= 240 ||
-            y + part->hw_h <= 0 || y >= 160) continue;
-        oam[next_oam].attr0 = (u16)((y & 255) | OBJ_8BPP_BIT |
-                             ((u16)part->shape << 14));
-        oam[next_oam].attr1 = (u16)((x & 511) |
-                             (object->kind == WORLD_SQUIRREL &&
-                              level->actor_dir[i] < 0 ? OBJ_HFLIP_BIT : 0) |
-                             ((u16)part->size_code << 14));
-        oam[next_oam].attr2 = gfx->frame_tile_base32[frame_index];
-        oam[next_oam].dummy = 0;
-        ++next_oam;
+        base_x = (object->x + level_world_actor_offset(level, i)) * 2 -
+                 frame->origin_x - cam_x;
+        base_y = object->y * 2 - frame->origin_y - cam_y;
+        facing_left = object->kind == WORLD_SQUIRREL &&
+                      level->actor_dir[i] < 0;
+        next_oam = draw_static_parts(gfx, frame, oam, next_oam,
+                                     base_x, base_y, facing_left);
     }
+    return next_oam;
 }
 
 static const GbaSpriteAnim *choose_player_anim(const Player *player,
@@ -331,55 +477,108 @@ static const GbaSpriteAnim *choose_shrewy_anim(const ShrewyBoss *boss)
     }
 }
 
-static void scene_stream_update(const Camera *camera)
+static void scene_stream_update(int cam_x, int cam_y)
 {
+    const NativeSceneAsset *scene = scene_asset_source();
+    NativeSceneUpload uploads[NATIVE_SCENE_CACHE_TILES];
+    uint16_t upload_count = 0;
     int origin_x, origin_y;
-    scene_window_origin(fx_to_int(camera->x), fx_to_int(camera->y),
-                        scene_map_width(), scene_map_height(),
-                        &origin_x, &origin_y);
+
+    /* Never replace a staged map before its tile data and screen block
+       have actually been committed during VBlank. */
+    if ((s_scene_start_x >= 0 && s_scene_map_dirty) ||
+        s_scene_upload_pos < s_scene_upload_count) return;
+
+    native_scene_window_origin(cam_x, cam_y,
+                               scene->map_width, scene->map_height,
+                               &origin_x, &origin_y);
     if (origin_x == s_scene_start_x && origin_y == s_scene_start_y &&
         !s_scene_map_dirty) return;
 
-    scene_window_copy(scene_map_source(), scene_map_width(), scene_map_height(),
-                      origin_x, origin_y, s_scene_map);
+    if (!native_scene_cache_build(scene, origin_x, origin_y, &s_scene_cache,
+                                  s_scene_map, uploads, &upload_count))
+        return;
+
+    if (upload_count)
+        memcpy(s_scene_uploads, uploads,
+               (unsigned int)upload_count * sizeof(NativeSceneUpload));
+    s_scene_upload_count = upload_count;
+    s_scene_upload_pos = 0;
     s_scene_start_x = origin_x;
     s_scene_start_y = origin_y;
     s_scene_map_dirty = 1;
 }
 
+static int clamp_camera(int value, int world_size, int view_size)
+{
+    int maximum = world_size - view_size;
+    if (maximum < 0) maximum = 0;
+    if (value < 0) return 0;
+    if (value > maximum) return maximum;
+    return value;
+}
+
+static void render_compute_camera(const Level *level, const Player *player,
+                                  const Camera *camera, GameMode mode,
+                                  int *out_x, int *out_y)
+{
+    int target_x, target_y;
+    const NativeSceneAsset *scene = scene_asset_source();
+
+    if (level->boss_room) {
+        *out_x = fx_to_int(camera->x);
+        *out_y = fx_to_int(camera->y);
+        return;
+    }
+    if (mode == GAME_TITLE) {
+        *out_x = 0;
+        *out_y = 0;
+        s_render_cam_x = 0;
+        s_render_cam_y = 0;
+        s_render_cam_initialized = 1;
+        return;
+    }
+
+    /* Physics and collision remain in the 2:1 gameplay coordinate system.
+       The renderer maps those world positions back to original source pixels. */
+    target_x = (fx_to_int(player->x) + player->origin_x) * 2 - 120;
+    target_y = (fx_to_int(player->y) + player->origin_y) * 2 - 80;
+    target_x = clamp_camera(target_x, scene->map_width * 8, 240);
+    target_y = clamp_camera(target_y, scene->map_height * 8, 160);
+
+    if (!s_render_cam_initialized) {
+        s_render_cam_x = target_x;
+        s_render_cam_y = target_y;
+        s_render_cam_initialized = 1;
+    } else {
+        int dx = target_x - s_render_cam_x;
+        int dy = target_y - s_render_cam_y;
+        if (dx > -2 && dx < 2) s_render_cam_x = target_x;
+        else s_render_cam_x += dx / 2;
+        if (dy > -2 && dy < 2) s_render_cam_y = target_y;
+        else s_render_cam_y += dy / 2;
+    }
+    *out_x = s_render_cam_x;
+    *out_y = s_render_cam_y;
+}
+
 void render_init(Level *level)
 {
+    const NativeSceneAsset *scene = &g_w1_l1_native_scene;
     (void)level;
 
-    /* Disable layers while the original scene tiles and palettes are installed. */
+    /* Native 4bpp BG scene; the first window is streamed into BG VRAM. */
     SetMode(MODE_0);
-
-    /* Initial W1 L1 scene; subsequent switches upload in VBlank. */
-    dmaCopy(rm_w1_l1_scene_tiles, BG_CHAR_BLOCK_1,
-            RM_W1_L1_SCENE_TILE_COUNT * 64u);
-    dmaCopy(rm_w1_l1_scene_palette, (void *)BG_COLORS,
-            sizeof(rm_w1_l1_scene_palette));
-    s_stage_loaded = 1;
-    s_stage_requested = 1;
-
-    /* BG1 is an 8bpp 64x32 streaming map using character base block 1. */
-    BGCTRL[1] = BG_SIZE_1 | CHAR_BASE(1) | SCREEN_BASE(27) |
-                BG_8BPP_BIT | 1;
-
-    BG_OFFSET[0].x = 0; BG_OFFSET[0].y = 0;
-    BG_OFFSET[1].x = 0; BG_OFFSET[1].y = 0;
-    BG_OFFSET[2].x = 0; BG_OFFSET[2].y = 0;
-    BG_OFFSET[3].x = 0; BG_OFFSET[3].y = 0;
-
-    /* Palette RAM requires 16/32-bit stores: use aligned 32-bit DMA. */
+    BGCTRL[1] = BG_SIZE_0 | CHAR_BASE(1) | SCREEN_BASE(27) | 1;
+    dmaCopy(scene->palette, (void *)BG_COLORS, sizeof(u16) * 256u);
     dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
             sizeof(g_player_obj_palette));
     load_actor_graphics();
     gba_ui_init();
 
-    s_scene_start_x = -1;
-    s_scene_start_y = -1;
-    s_scene_map_dirty = 1;
+    s_stage_requested = 1;
+    s_stage_loaded = 1;
+    reset_native_scene_cache();
     s_pending_frame = 0;
     s_uploaded_frame = 0;
     s_pending_boss_frame = 0;
@@ -387,7 +586,8 @@ void render_init(Level *level)
     s_pending_rock_frame = 0;
     s_uploaded_rock_frame = 0;
 
-    SetMode(MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP);
+    /* BG1 remains disabled until the first 32x32 native tile window is ready. */
+    SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);
 }
 
 static void hide_all_objects(OBJATTR *oam)
@@ -403,7 +603,7 @@ static void hide_all_objects(OBJATTR *oam)
 
 static void draw_frame_parts(const GbaSpriteFrame *frame, OBJATTR *oam,
                              int first_oam, int base_x, int base_y,
-                             int facing_left, int base_tile64)
+                             int facing_left, int base_tile64, unsigned int priority)
 {
     int tile_index = 0;
     int i;
@@ -422,7 +622,8 @@ static void draw_frame_parts(const GbaSpriteFrame *frame, OBJATTR *oam,
                                          (facing_left ? OBJ_HFLIP_BIT : 0) |
                                          ((u16)part->size_code << 14));
         /* OBJ attr2 addresses 32-byte units; 8bpp tile payloads are 64B. */
-        oam[first_oam + i].attr2 = (u16)((base_tile64 + tile_index) * 2);
+        oam[first_oam + i].attr2 = (u16)(((base_tile64 + tile_index) * 2) |
+                                                ((priority & 3u) << OBJ_PRIORITY_SHIFT));
         oam[first_oam + i].dummy = 0;
         tile_index += part->tile_bytes / 64;
     }
@@ -454,7 +655,8 @@ static int draw_boss_room_props(const Level *level, OBJATTR *oam, int next_oam,
         oam[next_oam].attr0 = (u16)((y & 255) | OBJ_8BPP_BIT |
                                     ((u16)part->shape << 14));
         oam[next_oam].attr1 = (u16)((x & 511) | ((u16)part->size_code << 14));
-        oam[next_oam].attr2 = s_boss_onion_base32[frame_index];
+        oam[next_oam].attr2 = (u16)(s_boss_onion_base32[frame_index] |
+                                             OBJ_GAMEPLAY_PRIORITY);
         oam[next_oam].dummy = 0;
         ++next_oam;
     }
@@ -491,36 +693,54 @@ static int bonus_static_animation_for_instance(const Level *level,
         return STATIC_SQUIRREL_WALK;
     case BONUS_W1_ROOM_OBJ_SPRINGBOARD:
         return STATIC_SPRING;
+    case BONUS_W1_ROOM_OBJ_HIVEFLY:
+        return STATIC_HIVEFLY;
+    case BONUS_W1_ROOM_OBJ_CROWLY:
+        return STATIC_CROWLY;
+    case BONUS_W1_ROOM_OBJ_VINECHOMP:
+        return STATIC_VINECHOMP;
+    case BONUS_W1_ROOM_OBJ_SPIKES_DAVE:
+        return STATIC_SPIKES;
+    case BONUS_W1_ROOM_OBJ_CANNON:
+        return STATIC_CANNON;
+    case BONUS_W1_ROOM_OBJ_BUTTON:
+        return STATIC_BUTTON;
+    /* Source spr_hole is a uniform opaque green 16x16 marker, not visible
+       level art. Keep its room placement for logic/audits, but never allocate
+       or submit it as an OBJ. */
+    case BONUS_W1_ROOM_OBJ_RAIL_DAVE:
+        return STATIC_RAIL;
+    case BONUS_W1_ROOM_OBJ_BKG_SPACE_ONION:
+        return STATIC_BKG_SPACE_ONION;
     default:
         return -1;
     }
 }
 
-static int draw_bonus_actors(const Level *level, const BonusRace *race, OBJATTR *oam,
-                             int next_oam, int cam_x, int cam_y,
-                             uint32_t anim_tick)
+static int draw_bonus_actors(const Level *level, const BonusRace *race,
+                             OBJATTR *oam, int next_oam,
+                             int cam_x, int cam_y, uint32_t anim_tick)
 {
     int i;
-
+    if (!s_actor_cache_ready) return next_oam;
     for (i = 0; i < BONUS_W1_ROOM_INSTANCE_COUNT &&
                 next_oam < VOLVY_OAM_COUNT; ++i) {
         const BonusW1RoomInstance *instance = &bonus_w1_room_instances[i];
         const StaticAnimGraphic *gfx;
         const GbaSpriteAnim *anim;
         const GbaSpriteFrame *frame;
-        const GbaSpritePart *part;
         unsigned int frame_index;
-        int gfx_id, x, y;
-        int is_collectible_or_breakable =
-            instance->kind == BONUS_W1_ROOM_OBJ_ONION ||
-            instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK ||
-            instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK_ONEWAY ||
-            instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK_SWOLVY;
+        int gfx_id, base_x, base_y, facing_left = 0;
 
-        if (is_collectible_or_breakable && level->removed[i]) continue;
+        if (level->removed[i] &&
+            (instance->kind == BONUS_W1_ROOM_OBJ_ONION ||
+             instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK ||
+             instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK_ONEWAY ||
+             instance->kind == BONUS_W1_ROOM_OBJ_DESTRUCTIBLE_BLOCK_SWOLVY))
+            continue;
+
         gfx_id = bonus_static_animation_for_instance(level, instance, i);
         if (gfx_id < 0) continue;
-
         gfx = &s_static_gfx[gfx_id];
         anim = gfx->animation;
         if (!anim || !anim->frame_count) continue;
@@ -533,38 +753,31 @@ static int draw_bonus_actors(const Level *level, const BonusRace *race, OBJATTR 
             else frame_index = 0;
         }
         if (frame_index >= MAX_STATIC_FRAMES) continue;
+        /* OAM must describe the frame that VBlank will actually upload. */
+        frame_index = request_static_frame(gfx_id, frame_index);
         frame = &anim->frames[frame_index];
-        if (frame->part_count != 1) continue;
-        part = &frame->parts[0];
 
         if (instance->kind == BONUS_W1_ROOM_OBJ_MOVING_PLATFORM && race) {
             const BonusMovingPlatform *platform = bonus_platform_for_instance(
                 race->platforms, (unsigned int)i);
-            x = (platform ? fx_to_int(platform->x) : instance->x / 2) -
-                frame->origin_x + part->offset_x - cam_x;
-            y = (platform ? fx_to_int(platform->y) : instance->y / 2) -
-                frame->origin_y + part->offset_y - cam_y;
+            base_x = (platform ? fx_to_int(platform->x) * 2 : (int)instance->x) -
+                     frame->origin_x - cam_x;
+            base_y = (platform ? fx_to_int(platform->y) * 2 : (int)instance->y) -
+                     frame->origin_y - cam_y;
         } else if (instance->kind == BONUS_W1_ROOM_OBJ_BUNNY && race) {
             const BonusBunny *bunny = bonus_bunny_for_instance(
                 race->bunnies, (unsigned int)i);
-            x = (bunny ? fx_to_int(bunny->x) : instance->x / 2) -
-                frame->origin_x + part->offset_x - cam_x;
-            y = (bunny ? fx_to_int(bunny->y) : instance->y / 2) -
-                frame->origin_y + part->offset_y - cam_y;
+            base_x = (bunny ? fx_to_int(bunny->x) * 2 : (int)instance->x) -
+                     frame->origin_x - cam_x;
+            base_y = (bunny ? fx_to_int(bunny->y) * 2 : (int)instance->y) -
+                     frame->origin_y - cam_y;
+            facing_left = bunny && bunny->facing < 0;
         } else {
-            x = instance->x / 2 - frame->origin_x + part->offset_x - cam_x;
-            y = instance->y / 2 - frame->origin_y + part->offset_y - cam_y;
+            base_x = (int)instance->x - frame->origin_x - cam_x;
+            base_y = (int)instance->y - frame->origin_y - cam_y;
         }
-        if (x + part->hw_w <= 0 || x >= 240 ||
-            y + part->hw_h <= 0 || y >= 160) continue;
-
-        oam[next_oam].attr0 = (u16)((y & 255) | OBJ_8BPP_BIT |
-                                    ((u16)part->shape << 14));
-        oam[next_oam].attr1 = (u16)((x & 511) |
-                                    ((u16)part->size_code << 14));
-        oam[next_oam].attr2 = gfx->frame_tile_base32[frame_index];
-        oam[next_oam].dummy = 0;
-        ++next_oam;
+        next_oam = draw_static_parts(gfx, frame, oam, next_oam,
+                                     base_x, base_y, facing_left);
     }
     return next_oam;
 }
@@ -578,16 +791,46 @@ void render_draw(const Level *level, const Player *player,
     const GbaSpriteFrame *frame;
     unsigned int frame_index;
     int base_x, base_y;
-    int cam_x = fx_to_int(camera->x);
-    int cam_y = fx_to_int(camera->y);
+    int cam_x, cam_y;
     int part_count, next_oam;
     int facing = player->facing < 0 ? 1 : 0;
     int boss_room = level->boss_room != 0;
+    int player_scale = boss_room ? 1 : 2;
 
-    scene_stream_update(camera);
+    render_compute_camera(level, player, camera, mode, &cam_x, &cam_y);
+    s_render_cam_x = cam_x;
+    s_render_cam_y = cam_y;
+    scene_stream_update(cam_x, cam_y);
+    {
+        int desired_x = cam_x;
+        int desired_y = cam_y;
+        int requires_blackout = native_scene_presentation_camera(
+            &s_scene_presentation, desired_x, desired_y,
+            s_scene_start_x >= 0 ? s_scene_start_x : 0,
+            s_scene_start_y >= 0 ? s_scene_start_y : 0,
+            &cam_x, &cam_y);
+        /* A distant warp must not expose a new BG window at the old
+           scroll origin. The regular camera follow remains clamped to
+           the last committed 256x256 tile window while uploads progress. */
+        if (requires_blackout && s_scene_map_dirty) s_bg_hard_jump = 1;
+        if (s_bg_hard_jump && !s_scene_map_dirty) s_bg_hard_jump = 0;
+        s_render_cam_x = cam_x;
+        s_render_cam_y = cam_y;
+    }
+
     gba_ui_update(mode, player->onions, level->active_stage,
                   boss_room ? boss->health : 0,
                   level->race_elapsed_frames);
+    /* A single DMA budget is shared by all visible animation sets. Reserve
+       uploads before filling OAM, rather than drawing previous-frame geometry
+       above tiles that will be replaced in this same VBlank. */
+    static_frame_scheduler_begin(&s_static_frame_scheduler,
+                                 STATIC_OBJ_UPLOAD_BUDGET);
+    {
+        unsigned int a;
+        for (a = 0; a < STATIC_ANIM_COUNT; ++a)
+            s_static_gfx[a].pending = 0;
+    }
     hide_all_objects(oam);
 
     if (boss_room && mode != GAME_TITLE) {
@@ -608,16 +851,16 @@ void render_draw(const Level *level, const Player *player,
         base_x = 120 - frame->width / 2;
         base_y = 80 - frame->height / 2;
     } else {
-        base_x = fx_to_int(player->x) + player->origin_x -
+        base_x = (fx_to_int(player->x) + player->origin_x) * player_scale -
                  frame->origin_x - cam_x;
-        base_y = fx_to_int(player->y) + player->origin_y -
+        base_y = (fx_to_int(player->y) + player->origin_y) * player_scale -
                  frame->origin_y - cam_y;
     }
 
     part_count = frame->part_count;
     if (part_count > MAX_PLAYER_PARTS) part_count = MAX_PLAYER_PARTS;
-    draw_frame_parts(frame, oam, 0, base_x, base_y, facing,
-                     0);
+    draw_frame_parts(frame, oam, 0, base_x, base_y, facing, 0,
+                     mode == GAME_TITLE ? 0u : 1u);
     s_pending_frame = frame;
     next_oam = part_count;
 
@@ -634,7 +877,7 @@ void render_draw(const Level *level, const Player *player,
             boss_base_x = fx_to_int(boss->x) - boss_frame->origin_x - cam_x;
             boss_base_y = fx_to_int(boss->y) - boss_frame->origin_y - cam_y;
             draw_frame_parts(boss_frame, oam, next_oam, boss_base_x, boss_base_y,
-                             boss->facing == 0, 128);
+                             boss->facing == 0, 128, 1u);
             boss_parts = boss_frame->part_count;
             if (boss_parts > MAX_PLAYER_PARTS) boss_parts = MAX_PLAYER_PARTS;
             next_oam += boss_parts;
@@ -649,7 +892,7 @@ void render_draw(const Level *level, const Player *player,
             const GbaSpriteFrame *rock_frame = &rock_anim->frames[rock_frame_index];
             int rock_x = fx_to_int(boss->rock_x) - rock_frame->origin_x - cam_x;
             int rock_y = fx_to_int(boss->rock_y) - rock_frame->origin_y - cam_y;
-            draw_frame_parts(rock_frame, oam, next_oam, rock_x, rock_y, 0, 384);
+            draw_frame_parts(rock_frame, oam, next_oam, rock_x, rock_y, 0, 384, 1u);
             next_oam += rock_frame->part_count;
             s_pending_rock_frame = rock_frame;
         } else {
@@ -660,7 +903,8 @@ void render_draw(const Level *level, const Player *player,
     } else {
         s_pending_boss_frame = 0;
         s_pending_rock_frame = 0;
-        draw_world_actors(level, camera, oam, next_oam, anim_tick);
+        next_oam = draw_world_actors(level, oam, next_oam, anim_tick,
+                                     cam_x, cam_y);
         if (level->bonus_room)
             (void)draw_bonus_actors(level, race, oam, next_oam,
                                     cam_x, cam_y, anim_tick);
@@ -669,25 +913,21 @@ void render_draw(const Level *level, const Player *player,
 
 void render_vblank_commit(Level *level, const Camera *camera)
 {
-    int cam_x = fx_to_int(camera->x);
-    int cam_y = fx_to_int(camera->y);
-
+    const NativeSceneAsset *scene = scene_asset_source();
     (void)level;
+    (void)camera;
 
     if (s_stage_loaded != s_stage_requested) {
-        /* Largest scene: W1 L3 uses 473 8bpp tiles / 30,272 bytes.
-         * All three scenes fit in BG char blocks 1+2 (32,768 bytes).
-         * BG1 screenblocks 27-28 remain outside this region. */
+        /* All scenes use native-resolution 4bpp tiles and per-tile palette
+           banks. The 32x32 tile cache is rebuilt incrementally below. */
+        SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);
+        dmaCopy(scene->palette, (void *)BG_COLORS, sizeof(u16) * 256u);
         if (s_stage_requested == 4) {
-            dmaCopy(shrewy_scene_tiles, BG_CHAR_BLOCK_1,
-                    SHREWY_SCENE_TILE_COUNT * 64u);
-            dmaCopy(shrewy_scene_palette, (void *)BG_COLORS,
-                    sizeof(shrewy_scene_palette));
             dmaCopy(g_boss_obj_palette, (void *)OBJ_COLORS,
                     sizeof(g_boss_obj_palette));
             {
                 const GbaSpriteAnim *onion = &g_boss_spr_onion;
-                u16 base32 = 128;
+                u16 base32 = BOSS_ONION_OBJ_BASE32;
                 unsigned int f;
                 s_boss_onion_frame_count = onion->frame_count;
                 if (s_boss_onion_frame_count > 16) s_boss_onion_frame_count = 16;
@@ -704,47 +944,94 @@ void render_vblank_commit(Level *level, const Camera *camera)
                     }
                 }
             }
-        } else if (s_stage_requested == 5) {
-            dmaCopy(bonus_w1_composite_tiles, BG_CHAR_BLOCK_1,
-                    BONUS_W1_COMPOSITE_TILE_BYTES);
-            dmaCopy(bonus_w1_composite_palette, (void *)BG_COLORS,
-                    sizeof(bonus_w1_composite_palette));
-            dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
-                    sizeof(g_player_obj_palette));
-        } else if (s_stage_requested == 3) {
-            dmaCopy(rm_w1_l3_scene_tiles, BG_CHAR_BLOCK_1,
-                    RM_W1_L3_SCENE_TILE_COUNT * 64u);
-            dmaCopy(rm_w1_l3_scene_palette, (void *)BG_COLORS,
-                    sizeof(rm_w1_l3_scene_palette));
-            dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
-                    sizeof(g_player_obj_palette));
-        } else if (s_stage_requested == 2) {
-            dmaCopy(rm_w1_l2_scene_tiles, BG_CHAR_BLOCK_1,
-                    RM_W1_L2_SCENE_TILE_COUNT * 64u);
-            dmaCopy(rm_w1_l2_scene_palette, (void *)BG_COLORS,
-                    sizeof(rm_w1_l2_scene_palette));
-            dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
-                    sizeof(g_player_obj_palette));
         } else {
-            dmaCopy(rm_w1_l1_scene_tiles, BG_CHAR_BLOCK_1,
-                    RM_W1_L1_SCENE_TILE_COUNT * 64u);
-            dmaCopy(rm_w1_l1_scene_palette, (void *)BG_COLORS,
-                    sizeof(rm_w1_l1_scene_palette));
             dmaCopy(g_player_obj_palette, (void *)OBJ_COLORS,
                     sizeof(g_player_obj_palette));
+            /* The boss package overwrites the normal actor cache. Rebuild it
+               when returning to a platform stage. */
+            if (s_stage_loaded == 4)
+                start_actor_graphics_reload();
         }
-        /* Boss mode overlays onion frames in the world-actor OBJ allocation.
-         * Rebuild the normal actor cache when returning to a platform stage. */
-        if (s_stage_loaded == 4 && s_stage_requested != 4)
-            load_actor_graphics();
-        /* Restore the BG0 HUD glyph foreground after changing BG palette. */
-        BG_COLORS[15*16+1] = 0x7FFF;
+        BG_COLORS[15 * 16 + 1] = 0x7FFF;
         s_stage_loaded = s_stage_requested;
+        s_scene_loading = 1;
     }
 
-    if (s_scene_map_dirty) {
+    /* A distant camera warp may reuse tiles that appear under the previous
+       screen map. Blank BG1 before writing any of them, even when the new
+       window needs zero additional tile uploads (all tiles are cached). */
+    if (s_bg_hard_jump) {
+        SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);
+        s_scene_loading = 1;
+    }
+
+    if (s_scene_upload_pos < s_scene_upload_count) {
+        unsigned int budget = NATIVE_BG_UPLOADS_PER_VBLANK;
+        unsigned int remaining = s_scene_upload_count - s_scene_upload_pos;
+        unsigned int count = remaining < budget ? remaining : budget;
+        unsigned int i;
+
+        if (s_scene_upload_count > NATIVE_BG_UPLOADS_PER_VBLANK ||
+            s_bg_hard_jump)
+            s_scene_loading = 1;
+        if (s_scene_loading)
+            SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);
+
+        for (i = 0; i < count; ++i) {
+            const NativeSceneUpload *upload =
+                &s_scene_uploads[s_scene_upload_pos + i];
+            dmaCopy(scene->tiles + (unsigned int)upload->source_tile * 32u,
+                    BG_CHAR_BLOCK_1 + (unsigned int)upload->cache_slot * 32u,
+                    32u);
+        }
+        s_scene_upload_pos = (u16)(s_scene_upload_pos + count);
+    }
+
+    if (s_scene_upload_pos >= s_scene_upload_count && s_scene_map_dirty) {
         dmaCopy(s_scene_map, BG_MAP_MAIN, sizeof(s_scene_map));
+        native_scene_presentation_commit(&s_scene_presentation,
+                                         s_scene_start_x, s_scene_start_y);
         s_scene_map_dirty = 0;
+        s_scene_upload_count = 0;
+        s_scene_upload_pos = 0;
+        if (s_scene_loading && !s_bg_hard_jump) {
+            SetMode(MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP);
+            s_scene_loading = 0;
+        }
+    }
+
+    if (!s_actor_cache_ready)
+        upload_actor_graphics_batch();
+
+    if (s_actor_cache_ready) {
+    {
+        unsigned int budget = STATIC_OBJ_UPLOAD_BUDGET;
+        int gfx_id;
+        for (gfx_id = 0; gfx_id < STATIC_ANIM_COUNT; ++gfx_id) {
+            StaticAnimGraphic *gfx = &s_static_gfx[gfx_id];
+            const GbaSpriteFrame *frame;
+            unsigned int bytes = 0;
+            unsigned int part_index;
+            if (!gfx->pending || !gfx->animation ||
+                gfx->pending_frame >= gfx->animation->frame_count)
+                continue;
+            frame = &gfx->animation->frames[gfx->pending_frame];
+            for (part_index = 0; part_index < frame->part_count &&
+                                 part_index < gfx->max_parts; ++part_index)
+                bytes += frame->parts[part_index].tile_bytes;
+            if (bytes > budget) continue;
+            for (part_index = 0; part_index < frame->part_count &&
+                                 part_index < gfx->max_parts; ++part_index) {
+                const GbaSpritePart *part = &frame->parts[part_index];
+                dmaCopy(part->tiles,
+                        OBJ_VRAM + (unsigned int)gfx->part_tile_base32[part_index] * 32u,
+                        part->tile_bytes);
+            }
+            gfx->loaded_frame = gfx->pending_frame;
+            gfx->pending = 0;
+            budget -= bytes;
+        }
+    }
     }
 
     if (s_pending_frame && s_pending_frame != s_uploaded_frame) {
@@ -792,9 +1079,22 @@ void render_vblank_commit(Level *level, const Camera *camera)
         s_uploaded_rock_frame = s_pending_rock_frame;
     }
 
-    /* BG1 scroll is relative to the streamed 64-tile map window. */
-    gba_display_set_camera(cam_x - s_scene_start_x * 8,
-                           cam_y - s_scene_start_y * 8);
+    /* Scroll is derived from the map window actually visible in BG VRAM,
+       not from the newly staged origin. This prevents the 8px camera jump
+       previously seen when a map window changed before VBlank commit. */
+    if (s_scene_presentation.has_visible_map) {
+        int relative_x = s_render_cam_x -
+                         s_scene_presentation.visible_start_x * 8;
+        int relative_y = s_render_cam_y -
+                         s_scene_presentation.visible_start_y * 8;
+        if (relative_x >= 0 && relative_x <= 16 &&
+            relative_y >= 0 && relative_y <= 96 &&
+            !s_scene_map_dirty && !s_bg_hard_jump && s_scene_loading) {
+            SetMode(MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP);
+            s_scene_loading = 0;
+        }
+        gba_display_set_camera(relative_x, relative_y);
+    }
     gba_display_commit_oam();
     gba_ui_vblank_commit();
 }

@@ -12,6 +12,9 @@ FLAGS="-std=gnu11 -Wall -Wextra -Werror"
 # shellcheck disable=SC2086
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_fixed.c" -o "$TMP/fixed"
 "$TMP/fixed"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_static_frame_scheduler.c" \
+    "$ROOT/source/core/static_frame_scheduler.c" -o "$TMP/static_frame_scheduler"
+"$TMP/static_frame_scheduler"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_player.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/player"
 "$TMP/player"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_world1.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/world1"
@@ -43,9 +46,28 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_bonus_platforms.c" "$ROOT/source/core/bon
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_window.c" "$ROOT/source/core/scene_window.c" -o "$TMP/scene_window"
 "$TMP/scene_window"
 
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_native_scene.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_scene"
+"$TMP/native_scene"
+
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_native_presentation.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_presentation"
+"$TMP/native_presentation"
+
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_native_scene_assets.c" "$ROOT/source/core/native_scene.c" \
+    "$ROOT/assets/converted/rooms/w1_l1_native.c" \
+    "$ROOT/assets/converted/rooms/w1_l2_native.c" \
+    "$ROOT/assets/converted/rooms/w1_l3_native.c" \
+    "$ROOT/assets/converted/rooms/bonus_native.c" \
+    "$ROOT/assets/converted/rooms/shrewy_native.c" -o "$TMP/native_scene_assets"
+"$TMP/native_scene_assets"
+
 for src in "$ROOT"/source/*.c "$ROOT"/source/core/*.c "$ROOT"/source/platform/*.c "$ROOT"/assets/converted/*.c "$ROOT"/assets/converted/rooms/*.c "$ROOT"/assets/converted/tilesets/*.c; do
     $CC $FLAGS $INCLUDES -fsyntax-only "$src"
 done
 python3 "$ROOT/tests/test_asset_layout.py"
+python3 "$ROOT/tests/test_hud_font_asset_v17.py"
+python3 "$ROOT/tests/test_obj_vram_layout_v17.py"
+python3 "$ROOT/tests/test_oam_priority_v18.py"
+python3 "$ROOT/tests/test_invisible_marker_assets.py"
+python3 "$ROOT/tests/test_static_frame_renderer.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 printf '%s\n' 'All host C tests and source syntax checks PASS (hardware build not tested).'

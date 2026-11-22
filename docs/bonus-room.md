@@ -1,4 +1,34 @@
-# World 1 bonus/race room — `rm_w1_b1_00` (v1.3 runtime prototype)
+# World 1 bonus room — v1.6 native rendering
+
+## Active runtime scene
+
+The active bonus-room background is now the native 1:1 4bpp scene `bonus_native.c/.h`, not the earlier 2:1 8bpp composite.
+
+| Property | v1.6 result |
+|---|---:|
+| Source scene | 5312×1120 pixels |
+| Native tile map | 664×140 |
+| Unique 8×8 4bpp tiles | 154 |
+| Tile bytes | 4,928 |
+| Palette banks | 15 scene banks + HUD bank 15 |
+| Visible BG cache | 32×32 tiles / 1,024 slots |
+| OAM estimate | 66 / 128 including player reservation |
+
+The native conversion round-trips to the source room composite with zero differing pixels after BGR555 quantization. The 32×32 visible cache is streamed through BG1; the complete 140-tile-high room is not copied into VRAM at once.
+
+## Additional visible source actors
+
+The v1.6 runtime now draws original source artwork for the bonus room's bunny/ground-bunny placements, hiveflies, Crowly actors, Vinechomp, spikes, cannon, button, holes, rails, background-onion decoration, moving platforms, cloud platforms, bumpers, onions, breakable blocks, action blocks, springboards and squirrels.
+
+This is a rendering/animation integration milestone, not a claim that all those objects have original behavior. Enemy AI, attack timing, damage reactions, button/cannon logic, authentic bumper impulses and official race rewards remain incomplete. Moving-platform paths and several rebound forces remain provisional.
+
+The 2:1 `bonus_w1_composite.c/.h` conversion is retained as legacy comparison data and is not selected by the v1.6 renderer.
+
+---
+
+# Historical v1.3 bonus-room prototype notes (superseded by v1.6)
+
+The following 2:1/8bpp conversion metrics and runtime descriptions document the earlier prototype. The active v1.6 scene, sprite pipeline and current actor coverage are summarized at the top of this document.
 
 ## Classification and source evidence
 
@@ -21,11 +51,11 @@ The source trace does not expose bunny opponent positions or AI state. In v1.3, 
 
 The converter crops the 527×364 GameMaker layer storage to the 332×70 room bounds. It composites `Tiles_1` behind `TilesFront`, bakes tile rotate/mirror/flip flags into the tile art, and deduplicates the result. The full composite fits the combined 32 KiB 8bpp BG character-block budget.
 
-The renderer now streams the 332×70 map through its 64×32 BG1 window on both axes. The vertical map origin slides as needed to keep the 160px viewport inside the 32-tile (256px) BG window; BG scroll offsets are relative to that origin. This is needed because the room is 70 tiles tall, unlike the 23-tile platform scenes.
+The v1.3 renderer streamed this legacy 332×70 map through a 64×32 BG1 window. The active v1.6 renderer uses the native 664×140 scene and a 32×32 BG tile cache. The vertical map origin slides as needed to keep the 160px viewport inside the 32-tile (256px) BG window; BG scroll offsets are relative to that origin. This is needed because the room is 70 tiles tall, unlike the 23-tile platform scenes.
 
-The room extractor's `tile_layers.png` composites all four visible background-sprite layers (`bg_bonus_4`, `bg_bonus_3`, `bg_bonus_1`, `bg_bonus_2`) with both visible tile layers in GameMaker depth order. `tools/build_bonus_composite_gba.py` converts that full image to the runtime 332×70 map: 486 unique 8×8 tiles, 31,104 bytes and 24 opaque colors. It fits the combined 32 KiB BG character-block budget (charblocks 1+2). The source background layer parallax rates are retained in metadata, but this runtime composite is static; live parallax is not yet implemented.
+The room extractor's `tile_layers.png` composites all four visible background-sprite layers (`bg_bonus_4`, `bg_bonus_3`, `bg_bonus_1`, `bg_bonus_2`) with both visible tile layers. The old `build_bonus_composite_gba.py` conversion produced a 332×70 8bpp map (486 tiles / 31,104 bytes); it is retained as legacy comparison data, not used by v1.6. The active native 4bpp conversion is described at the top of this document.
 
-The separate `bonus_w1_room.c/.h` remains a tile-layer-only conversion (139 tiles / 8,896 bytes) and preserves the original 1,024-instance table. The renderer uses `bonus_w1_composite.c/.h` for the actual BG1 scene and `bonus_w1_room.c/.h` for source object placements.
+The separate `bonus_w1_room.c/.h` retains the source 1,024-instance table and legacy tile-only data. The active renderer uses `bonus_native.c/.h` for the BG scene and `bonus_w1_room.c/.h` for source object placements.
 
 ## Collision conversion
 
@@ -161,3 +191,7 @@ Two original `obj_moving_platform` placements are present at source pivots `(257
 The original platform setup IDs 3320 and 3321 are recorded, but their event code/path controllers have not been decompiled. Thus this prototype deliberately uses ±24 GBA-pixel patrols at 0.5 px/frame. The current runtime handles one-way landing and carrying while standing. Their original collision AABBs are excluded from the static grid to prevent invisible platforms after the actors move. Static cloud platforms retain downward-only tile collisions.
 
 `tools/trace_bonus_platforms.c` generates the compiled C frame-position CSV. `tools/preview_bonus_platforms.py` composites those positions over the source-derived backdrop for diagnostic frames 0 and 48; this is not an mGBA capture. `tests/test_bonus_platforms.c` verifies the original pivots/scale, dynamic geometry, carriage, pass-through from below, movement limits, and reset.
+
+## v1.9 invisible marker handling
+
+The source `obj_hole`/`obj_hole_dir` placements use `spr_hole`, whose only frame is a solid 16×16 green marker (palette index 36). This is not visible level artwork. v1.9 preserves the placement records but suppresses the marker from the bonus-room OBJ renderer. The OAM analysis tools also omit these markers from future visible-sprite estimates.

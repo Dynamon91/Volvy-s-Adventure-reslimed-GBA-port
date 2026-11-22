@@ -1,5 +1,18 @@
 # Original GameMaker asset extraction
 
+## Current active v1.6 pipeline
+
+The active platform renderer uses native 1:1 source-pixel assets, not the earlier 2:1 downscale described in the historical sections below.
+
+- Extractor default set: 105 selected source sprites from the 726 parsed sprite resources.
+- Runtime player/actor output: 56 animation sets, 501 metasprite parts and a 71-color 8bpp OBJ palette.
+- The largest player frame is 4,608 bytes; the renderer reserves 5,120 bytes.
+- Five active room scenes are converted to native 4bpp, per-tile palette-bank maps. Their visible 32×32 tile windows stream through BG1.
+- `tools/prepare_player_assets.py` sorts source sprite names before conversion. A fresh extraction and conversion of the same `data.win` reproduces the generated player C/header/manifest byte-for-byte.
+
+See the v1.6 pipeline and commands at the end of this document, plus `docs/visual-fidelity-v16.md`.
+
+
 ## Results
 
 The supplied `data.win` was parsed using a small, MIT-licensed subset of `gm-extract` (NazarHK, 2026); its license is included under `tools/vendor/gm_extract/LICENSE`.
@@ -36,7 +49,7 @@ Selected original source canvases include:
 
 All 18 original tilesets use 16x16 source tiles. They include beach, boardwalk, bonus, burrow, factory, forest, office, park, pipes, roof, sewer, shipping, subway and underground variants.
 
-## GBA conversion
+## Historical 2:1 GBA conversion (v1.0–v1.5)
 
 `tools/prepare_player_assets.py` performs:
 
@@ -50,7 +63,7 @@ The earlier 37-set platform player/world-actor package used 29 opaque colors plu
 
 The 18 BG tilesets were separately converted to deduplicated 8bpp tiles. Each tileset has at most 219 unique 8x8 tiles (within the 256-tile capacity of one 16 KiB GBA 8bpp character block). Combined tile data across all 18 sets is 108,480 bytes; only the active world's tileset is intended to be loaded at a time.
 
-## Reproduction
+## Historical 2:1 reproduction
 
 First extract the private PNGs from the user's `data.win`:
 
@@ -71,7 +84,7 @@ python tools/prepare_player_assets.py \
 Do not commit the private PNG extraction directory to a public repository without permission to redistribute the original assets.
 
 
-## World 1 Level 1 room reconstruction
+## Historical 2:1 World 1 Level 1 room reconstruction
 
 The GameMaker `ROOM` chunk was parsed for `rm_w1_l1_00`.
 
@@ -93,7 +106,7 @@ The visible tile layers were merged into a single 8bpp GBA room asset:
 This is comfortably below the 256-tile capacity of one 16 KiB 8bpp BG character block. The 50-tile room-layer C data is included separately. The flattened 209-tile scene is loaded by the BG1 renderer and streamed through a 64×32 map window. The original World 1 object AABBs are also converted to a collision grid and consumed by the platform controller. Collision remains an AABB approximation, not a pixel-perfect original mask.
 
 
-## Rebuilding the converted room data
+## Historical 2:1 room-data rebuild
 
 ```sh
 python tools/prepare_tilesets.py private_assets/manifest.json \
@@ -118,7 +131,7 @@ The six visible background/parallax layers and two visible tile layers were also
 
 This fits one 16 KiB 8bpp BG character block. The renderer now streams a 64x32 map window from this scene. The source parallax speeds are retained in the room metadata, but the current scene is a static composite and does not yet reproduce live parallax motion.
 
-## Shrewy arena and native-resolution boss assets (v0.6)
+## Historical v0.6 Shrewy arena and native-resolution boss assets
 
 The v0.6 selected source set included 86 sprite resources plus the 18 original tilesets. At that milestone, the player/world conversion script filtered 37 animation sets used by the platform controller (29 Volvy/Swolvy sets and 8 world actor sets). The separate `prepare_boss_sprites.py` converter emits 58 native-resolution boss/actor sprite sets with an 81-color 8bpp OBJ palette.
 
@@ -218,3 +231,75 @@ python tools/prepare_player_assets.py private_assets/manifest.json \
 The OBJ converter automatically derives `spr_moving_platform_wide` (source art stretched from 48×8 to 64×8 before 2:1 downscaling), matching the source room's 4/3 scale. No duplicate public source graphic is required. The shared 8bpp world palette now holds 34 opaque colors.
 
 Regenerate `bonus_w1_collision.c` with `tools/build_bonus_collision.py`. It deliberately excludes the moving platform placements from the static tile grid; their source pivots, dimensions and runtime collisions are in `bonus_platforms.c`.
+
+
+## Active v1.6 native-pixel pipeline
+
+The v1.6 renderer no longer uses the old 2:1 player/world conversion as its active path. Native source pixels are retained at 1:1; the 240×160 GBA viewport consequently shows a smaller portion of the original room.
+
+### Player and actor sprites
+
+The extractor's default sprite set now includes the original platform, cloud, bunny, bumper, hivefly, Crowly, Vinechomp, cannon, button, hole, rail, spikes, background-onion and level-exit artwork.
+
+```sh
+python tools/extract_gamemaker_assets.py data.win \
+  --out private_assets --no-tilesets
+
+python tools/prepare_player_assets.py private_assets/manifest.json \
+  --assets-root private_assets --out assets/converted --scale 1
+```
+
+The output contains 56 source animation sets, 501 metasprite parts and a 71-color 8bpp OBJ palette. The asset converter sorts source sprite names before code generation so repeated extraction produces byte-identical `player_sprites.c/.h` output.
+
+### Native 4bpp scenes
+
+Extract the source rooms with their visible background and tile layers:
+
+```sh
+python tools/extract_gamemaker_rooms.py data.win \
+  --out private_rooms \
+  --rooms rm_w1_l1_00 rm_w1_l2_00 rm_w1_l3_00 rm_w1_b1_00 rm_shrewy
+```
+
+Convert each `tile_layers.png` to a native-resolution 4bpp scene:
+
+```sh
+python tools/build_native_scene_gba.py private_rooms/rm_w1_l1_00/tile_layers.png \
+  --name w1_l1 --out assets/converted/rooms
+python tools/build_native_scene_gba.py private_rooms/rm_w1_l2_00/tile_layers.png \
+  --name w1_l2 --out assets/converted/rooms
+python tools/build_native_scene_gba.py private_rooms/rm_w1_l3_00/tile_layers.png \
+  --name w1_l3 --out assets/converted/rooms
+python tools/build_native_scene_gba.py private_rooms/rm_w1_b1_00/tile_layers.png \
+  --name bonus --out assets/converted/rooms
+python tools/build_native_scene_gba.py private_rooms/rm_shrewy/tile_layers.png \
+  --name shrewy --out assets/converted/rooms
+```
+
+Add `--preview-out previews/<scene>_native_roundtrip.png` to render the generated 4bpp map back to PNG and verify its BGR555 round-trip. All five current scene assets produce zero differing pixels after quantization.
+
+### World object tables and audits
+
+```sh
+python tools.build_world_objects.py private_rooms/rm_w1_l1_00/room_data.json \
+  --data-win data.win --out assets/converted/rooms
+python tools.build_world_objects.py private_rooms/rm_w1_l2_00/room_data.json \
+  --data-win data.win --out assets/converted/rooms
+python tools.build_world_objects.py private_rooms/rm_w1_l3_00/room_data.json \
+  --data-win data.win --out assets/converted/rooms
+```
+
+The bonus-room source table/collision pipeline remains separate:
+
+```sh
+python tools/build_bonus_room_gba.py private_rooms/rm_w1_b1_00/room_data.json \
+  private_assets/tilesets/TileSet_bonus.png --out assets/converted/rooms
+python tools/build_bonus_collision.py private_rooms/rm_w1_b1_00/room_data.json data.win \
+  --out assets/converted/rooms
+```
+
+Run `tools/analyze_world_oam_density.py` for W1 L1/L2/L3 and `tools/analyze_bonus_oam_density.py` for the bonus room. These audits count source metasprite parts at native 1:1 scale and reserve eight player OBJ entries.
+
+### Legacy conversion
+
+`build_room_scene_gba.py`, `build_bonus_composite_gba.py` and the files under `assets/experimental/legacy_2x/` are retained for comparison and historical testing. They are not the active v1.6 renderer asset path.

@@ -18,6 +18,11 @@ OBJ_TYPES = {
     'obj_action_block': 'WORLD_ACTION_BLOCK',
     'obj_squirrel': 'WORLD_SQUIRREL',
     'obj_springboard': 'WORLD_SPRINGBOARD',
+    'obj_hivefly': 'WORLD_HIVEFLY',
+    'obj_hole': 'WORLD_HOLE',
+    'obj_plant': 'WORLD_PLANT',
+    'obj_game': 'WORLD_WORM',
+    'obj_level_exit_hole': 'WORLD_LEVEL_EXIT_HOLE',
     'obj_level_transition_right': 'WORLD_EXIT_RIGHT',
     'obj_level_transition_up': 'WORLD_EXIT_UP',
     'obj_level_transition_down': 'WORLD_EXIT_DOWN',
@@ -28,7 +33,8 @@ WORLD_OBJECT_HEADER = '''#ifndef VOLVY_WORLD_OBJECTS_H
 #include <stdint.h>
 typedef enum WorldObjectType {
     WORLD_ONION=1, WORLD_BREAKABLE, WORLD_ACTION_BLOCK, WORLD_SQUIRREL,
-    WORLD_SPRINGBOARD, WORLD_EXIT_RIGHT, WORLD_EXIT_UP, WORLD_EXIT_DOWN
+    WORLD_SPRINGBOARD, WORLD_EXIT_RIGHT, WORLD_EXIT_UP, WORLD_EXIT_DOWN,
+    WORLD_HIVEFLY, WORLD_HOLE, WORLD_PLANT, WORLD_WORM, WORLD_LEVEL_EXIT_HOLE
 } WorldObjectType;
 typedef struct WorldObject {
     uint16_t kind;
