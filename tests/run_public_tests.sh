@@ -16,8 +16,13 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_static_frame_scheduler.c" "$ROOT/source/c
 "$TMP/static_frame_scheduler"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_sprite_visibility.c" -o "$TMP/sprite_visibility"
 "$TMP/sprite_visibility"
-$CC $FLAGS $INCLUDES "$ROOT/tests/test_obj_parts_v193.c" "$ROOT/source/platform/obj_parts.c" -o "$TMP/obj_parts"
+
+# Supply only the generated sprite type declarations; no private sprite data
+# or generated animation tables are needed by this OBJ-parts unit test.
+$CC $FLAGS -I"$ROOT/tests/support/obj_parts_fake" $INCLUDES \
+  "$ROOT/tests/test_obj_parts_v193.c" "$ROOT/source/platform/obj_parts.c" -o "$TMP/obj_parts"
 "$TMP/obj_parts"
+
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_window.c" "$ROOT/source/core/scene_window.c" -o "$TMP/scene_window"
 "$TMP/scene_window"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_native_scene.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_scene"
