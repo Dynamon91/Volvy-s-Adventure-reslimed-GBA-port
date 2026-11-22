@@ -12,11 +12,12 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 source=(ROOT/'source/platform/render.c').read_text(encoding='utf-8')
+obj_source=(ROOT/'source/platform/obj_parts.c').read_text(encoding='utf-8')
 assert '#define STATIC_OBJ_BASE_32 160' in source
 assert '#define BOSS_ONION_OBJ_BASE32 192u' in source
 assert 'u16 base32 = BOSS_ONION_OBJ_BASE32' in source
-assert '((base_tile64 + tile_index) * 2) |' in source
-assert '((priority & 3u) << OBJ_PRIORITY_SHIFT)' in source
+assert '((base_tile64 + tile_index) * 2) |' in obj_source
+assert '((priority & 3u) << OBJ_PRIORITY_SHIFT)' in obj_source
 
 player=json.loads((ROOT/'assets/converted/player_sprites_manifest.json').read_text())
 boss=json.loads((ROOT/'assets/converted/boss_sprites_manifest.json').read_text())
