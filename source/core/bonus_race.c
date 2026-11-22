@@ -52,10 +52,11 @@ void bonus_race_init(BonusRace *race)
     race->finished = 0;
     race->bumper_hits = 0;
     bonus_bunnies_init(race->bunnies);
+    bonus_platforms_init(race->platforms);
 }
 
 int bonus_race_update(BonusRace *race, Level *level, Player *player,
-                      int pre_bottom, int was_descending)
+                      int pre_x, int pre_bottom, int was_descending)
 {
     int px, py, player_right, bottom;
     unsigned int i;
@@ -163,6 +164,8 @@ int bonus_race_update(BonusRace *race, Level *level, Player *player,
 
     if (race->started) {
         bonus_bunnies_update(race->bunnies, level);
+        bonus_platforms_update(race->platforms, player,
+                               pre_x, pre_bottom, was_descending);
         ++race->elapsed_frames;
         level->race_elapsed_frames = race->elapsed_frames;
 
