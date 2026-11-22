@@ -2,7 +2,7 @@
 # Public-repository regressions that do not require the private converted room/sprite bundle.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-CC=\${CC:-gcc}
+CC=gcc
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT INT TERM
 INCLUDES="-I$ROOT/tests/support -I$ROOT/include"

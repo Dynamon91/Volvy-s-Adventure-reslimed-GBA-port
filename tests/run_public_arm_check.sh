@@ -2,8 +2,8 @@
 # Isolated ARM7TDMI code generation only; this is not a full cartridge link.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-CLANG=\${CLANG:-clang}
-OUT=\${OUT:-"$ROOT/build-public-arm-check"}
+CLANG=clang
+OUT="$ROOT/build-public-arm-check"
 mkdir -p "$OUT"
 cd "$ROOT"
 FLAGS="--target=armv4t-none-eabi -mcpu=arm7tdmi -mthumb -std=gnu11 -ffreestanding -fno-builtin -fno-stack-protector -fno-pic -O2 -Wall -Wextra -Werror"
