@@ -53,6 +53,9 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_window.c" "$ROOT/source/core/scene_
 
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_native_scene.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_scene"
 "$TMP/native_scene"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_cache_churn.c" \
+    "$ROOT/source/core/native_scene.c" -o "$TMP/scene_cache_churn"
+"$TMP/scene_cache_churn"
 
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_native_presentation.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_presentation"
 "$TMP/native_presentation"
@@ -75,5 +78,6 @@ python3 "$ROOT/tests/test_oam_priority_v18.py"
 python3 "$ROOT/tests/test_invisible_marker_assets.py"
 python3 "$ROOT/tests/test_static_frame_renderer.py"
 python3 "$ROOT/tests/test_static_visibility_renderer.py"
+python3 "$ROOT/tests/test_scene_stream_staging.py"
 python3 -m py_compile "$ROOT"/tools/*.py
 printf '%s\n' 'All host C tests and source syntax checks PASS (hardware build not tested).'
