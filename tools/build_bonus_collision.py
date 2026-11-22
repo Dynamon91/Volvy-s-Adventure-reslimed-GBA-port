@@ -24,7 +24,6 @@ COLLISION_TYPES = {
     "obj_destructible_block_swolvy": TILE_SWOLVY_BLOCK,
     "obj_destructible_block_oneway": TILE_BREAKABLE_ONEWAY,
     "obj_cloud_platform": TILE_ONEWAY,
-    "obj_moving_platform": TILE_ONEWAY,
     "obj_spikes_dave": TILE_HAZARD,
     "obj_rail_dave": TILE_RAIL,
 }
@@ -141,14 +140,14 @@ extern const uint8_t bonus_w1_collision[BONUS_W1_COLLISION_CELLS];
         "object_placements_used": dict(placed_counts),
         "collision_cell_counts": {str(k): v for k, v in final_cell_counts.items()},
         "unsupported_collision_types": {
-            "obj_moving_platform": "static one-way AABB only; movement path not implemented",
+            "obj_moving_platform": "two source instances handled by dynamic platform controller; intentionally not in static grid",
             "obj_hole": "visual/hazard semantics not confirmed",
             "obj_hole_dir": "visual/hazard semantics not confirmed"
         },
         "notes": [
             "AABBs are derived from source sprite dimensions, origins, scales and rotations.",
             "These are not pixel-perfect collision masks.",
-            "Cloud and moving platforms are represented as one-way cells; moving-platform paths are not implemented.",
+            "Only cloud platforms are static one-way cells; moving platforms use runtime AABBs and provisional horizontal motion.",
             "One-way destructible blocks break on downward ground-pound/Swolvy contact only.",
             "Swolvy-only source blocks have distinct tile 9; normal Volvy cannot destroy them.",
             "Spikes are represented as hazardous cells; exact hurt masks remain provisional."
