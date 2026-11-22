@@ -1,0 +1,37 @@
+{
+  "project": "Volvy's Adventure: ReSlimed GBA port",
+  "version": "1.9.6",
+  "base": "v1.9.5",
+  "rom": "Volvy_Reslimed_GBA_v1.9.6_experimental.gba",
+  "rom_bytes": 2097152,
+  "rom_sha256": "ef8b7635c458156fa133d2e07a8f9f6c5dba79c2b484ed4cf5766383aa8e2ff5",
+  "source_video": {
+    "parts": 6,
+    "combined_bytes": 601191189,
+    "duration_seconds": 8534.076372,
+    "video": "H.264 640x360 30fps",
+    "audio": "AAC",
+    "reference_doc": "docs/walkthrough-reference-v1_0.md"
+  },
+  "fixes": [
+    "per-level 60 Hz timer for standard stages and Shrewy",
+    "timer paused with gameplay and Bonus Race timer retained",
+    "M:SS:CC centisecond timer formatting",
+    "compact X### onion count replaces prototype ONIONS label",
+    "remove prototype W1-Lx, SHREWY HP, HAND ATTACK and RACE HUD labels"
+  ],
+  "verification": {
+    "portable_host_tests": "PASS",
+    "walkthrough_hud_contract": "PASS",
+    "armv4t_thumb_stub_codegen": "PASS (43 translation units)",
+    "experimental_clang_lld_rom": "PASS (44 C translation units)",
+    "rom_structure": "PASS (2 MiB)",
+    "mgba_boot": "NOT_TESTED",
+    "rendered_hud": "NOT_TESTED",
+    "devkitARM_libgba": "NOT_TESTED",
+    "real_hardware": "NOT_TESTED"
+  },
+  "content_expansion": false,
+  "fidelity_to_original_verified": false,
+  "overall_reconstruction_estimate_percent": 44
+}
