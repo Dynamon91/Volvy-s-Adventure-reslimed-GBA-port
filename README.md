@@ -1,20 +1,29 @@
 
-> **Current development milestone: v1.9.6 (22 Nov 2026).** Uses the newly
-> supplied 2h22 gameplay walkthrough to correct the HUD: standard stages and
-> Shrewy now have a 60 Hz stopwatch (`M:SS:CC`) and compact onion count, while
-> prototype-only labels are removed. See `RELEASE_NOTES_v1_9_6.md` and
-> `docs/walkthrough-reference-v1_0.md`. Host, ARM and ROM structure pass;
-> mGBA rendering and hardware remain **not verified**.
+> **Current development milestone: v1.9.7 (22 Nov 2026).** Adds walkthrough-derived
+> 16×16 onion and stopwatch HUD icons around the existing `X###` counter and
+> `M:SS:CC` timer. This is a source-only patch: no v1.9.7 ROM or mGBA capture
+> is claimed. See `RELEASE_NOTES_v1_9_7.md` and `docs/verification-v197.md`.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.6 walkthrough-derived HUD timer correction.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.7 walkthrough-derived HUD icon pass.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md) for the timestamped 2h22 source-game timeline and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md) for confirmed missing content and next reconstruction priorities. The private keyframe pack is stored separately from the public source repository.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
 **Public repository asset policy:** the GitHub repository contains source code, conversion tools, tests and documentation. It intentionally excludes the original `data.win`, converted source-derived sprite/tile graphics and the experimental ROM. Those generated assets are included in the private v1.9 development ZIP; rebuilding from source requires supplying your own original `data.win` and running the extraction commands below.
+
+## v1.9.7: walkthrough-derived HUD icon pass
+
+- Add 16×16 onion and stopwatch icons sampled from the 00:02:00 gameplay HUD.
+- Store each icon as four 8×8 4bpp BG tiles after the 40 existing font tiles.
+- Preserve the source font's white palette index and transparent tile index.
+- Keep the onion count and stopwatch/timer groups aligned with the original HUD layout.
+- Patch-level UI syntax and source-contract tests pass. This is a source-only update; a v1.9.7 ROM, ARM build and mGBA rendering have not been verified.
+- The icons are compressed-video reconstructions, not confirmed bit-identical source sprites.
+
+See [HUD icon extraction notes](docs/hud-icon-extraction-v197.md) and [v1.9.7 verification](docs/verification-v197.md).
 
 ## v1.9.6: walkthrough-derived gameplay HUD correction
 

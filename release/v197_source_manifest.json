@@ -1,0 +1,36 @@
+{
+  "project": "Volvy's Adventure: ReSlimed GBA port",
+  "version": "1.9.7",
+  "base": "1.9.6",
+  "release_type": "source-only",
+  "rom": null,
+  "source_video": {
+    "parts": 6,
+    "combined_bytes": 601191189,
+    "duration_seconds": 8534.076372,
+    "video": "H.264 640x360 30fps",
+    "sample_frame": "00:02:00"
+  },
+  "changes": [
+    "walkthrough-derived 16x16 onion HUD icon",
+    "walkthrough-derived 16x16 stopwatch HUD icon",
+    "eight 4bpp tiles appended after the 40 source-font tiles",
+    "dedicated palette bank 15 while preserving transparent index 0 and white font index 1",
+    "one-tile HUD margin and right-aligned stopwatch group",
+    "overflow-safe quotient/remainder centisecond cache conversion"
+  ],
+  "verification": {
+    "ui_c_syntax_with_minimal_stubs": "PASS",
+    "walkthrough_icon_asset_layout_test": "PASS",
+    "walkthrough_hud_source_contract": "PASS",
+    "full_host_suite": "NOT_RUN_PRIVATE_GENERATED_ASSETS_REQUIRED",
+    "armv4t_thumb_codegen": "NOT_TESTED",
+    "experimental_rom_build": "NOT_BUILT",
+    "mgba_boot_and_rendered_hud": "NOT_TESTED",
+    "devkitarm_libgba": "NOT_TESTED",
+    "physical_gba": "NOT_TESTED"
+  },
+  "content_expansion": false,
+  "fidelity_to_original_verified": false,
+  "overall_reconstruction_estimate_percent": 44
+}
