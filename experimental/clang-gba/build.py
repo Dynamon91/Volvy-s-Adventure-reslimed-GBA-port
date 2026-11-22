@@ -16,7 +16,7 @@ objcopy=shutil.which(os.environ.get('OBJCOPY','llvm-objcopy'))
 if not all((clang,ld,objcopy)):
     sys.exit('Missing clang, ld.lld or llvm-objcopy.')
 include=[toolroot/'include', root/'include',root/'assets/converted',
-         root/'assets/converted/rooms',root/'assets/converted/tilesets',root/'tests/support/arm_includes']
+         root/'assets/converted/rooms',root/'assets/converted/tilesets',root/'tests/support',root/'tests/support/arm_includes']
 flags=['--target=armv4t-none-eabi','-mcpu=arm7tdmi','-mthumb','-std=gnu11',
        '-ffreestanding','-fno-builtin','-fno-stack-protector','-fno-pic',
        '-O2','-Wall','-Wextra','-Werror', '-ffunction-sections','-fdata-sections']
@@ -41,6 +41,13 @@ divmod=outdir/'divmod.o'
 subprocess.run([clang,'--target=armv4t-none-eabi','-mcpu=arm7tdmi',
                 '-c',str(toolroot/'divmod.s'),'-o',str(divmod)],check=True)
 objects.append(divmod)
+# The public experimental linker does not use devkitPro bin2o; include the
+# exact same compressed result-screen asset through a tiny ARM .incbin object.
+asset_obj=outdir/'stage_clear_v198_asset.o'
+subprocess.run([clang,'--target=armv4t-none-eabi','-mcpu=arm7tdmi',
+                '-c',str(toolroot/'stage_clear_asset.s'),'-o',str(asset_obj)],
+               cwd=root,check=True)
+objects.append(asset_obj)
 elf=outdir/'volvy_reslimed.elf'
 subprocess.run([ld,'-flavor','gnu','-T',str(toolroot/'gba_cart.ld'),
                 '--gc-sections', '-Map',str(outdir/'volvy_reslimed.map'),

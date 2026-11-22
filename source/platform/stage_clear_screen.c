@@ -33,7 +33,7 @@ int stage_clear_screen_prepare(void)
     if (s_stage_clear_prepared)
         return 1;
 
-    if (stage_clear_v198_bin_size < 4u || stage_clear_v198_bin[0] != 0x10u)
+    if (stage_clear_v198_bin[0] != 0x10u)
         return 0;
 
     declared_size = (u32)stage_clear_v198_bin[1] |
