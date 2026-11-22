@@ -1,0 +1,42 @@
+{
+  "project": "Volvy's Adventure: ReSlimed GBA port",
+  "version": "1.9.8",
+  "base": "1.9.7",
+  "release_type": "source-and-reference-asset",
+  "rom": null,
+  "source_video": {
+    "parts": 6,
+    "duration_seconds": 8534.076372,
+    "video": "H.264 640x360 30fps",
+    "stage_clear_frame_offset": "00:04:00"
+  },
+  "asset": {
+    "path": "assets/converted/ui/stage_clear_v198.bin",
+    "bytes": 8780,
+    "sha256": "c61600aac8af65892f5609bcf84ec1a9df6857f6c863a666e11efbf1f9c487ea",
+    "compression": "GBA BIOS LZ77",
+    "decompressed_bytes": 16200,
+    "format": "240x135 packed 4bpp, 16-color BGR555 palette",
+    "runtime_display": "240x160 Mode 4 bitmap, 12px top / 13px bottom letterbox"
+  },
+  "changes": [
+    "static walkthrough-derived Stage Clear result frame",
+    "Mode 4 BG2 display with 16-color palette",
+    "VBlank-only VRAM and palette commit",
+    "restore Mode 0 before returning to the native scene renderer",
+    "integration restricted to provisional W1-L1 victory; boss and bonus excluded"
+  ],
+  "verification": {
+    "asset_lz77_pixel_palette_test": "PASS",
+    "stage_clear_c_syntax_with_test_gba_header": "PASS",
+    "renderer_transition_source_contract": "PASS",
+    "full_host_suite": "NOT_RUN_PRIVATE_GENERATED_ASSETS_REQUIRED",
+    "armv4t_thumb_codegen": "NOT_TESTED",
+    "devkitarm_libgba_rom": "NOT_BUILT",
+    "mgba_boot_and_render": "NOT_TESTED",
+    "physical_gba": "NOT_TESTED"
+  },
+  "dynamic_results_system": false,
+  "fidelity_to_original_verified": false,
+  "overall_reconstruction_estimate_percent": 44
+}

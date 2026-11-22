@@ -1,18 +1,29 @@
 
-> **Current development milestone: v1.9.7 (22 Nov 2026).** Adds walkthrough-derived
-> 16×16 onion and stopwatch HUD icons around the existing `X###` counter and
-> `M:SS:CC` timer. This is a source-only patch: no v1.9.7 ROM or mGBA capture
-> is claimed. See `RELEASE_NOTES_v1_9_7.md` and `docs/verification-v197.md`.
+> **Current development milestone: v1.9.8 (22 Nov 2026).** Adds the first
+> walkthrough-matched Stage Clear screen for the provisional W1-L1 route, using
+> a 16-color GBA bitmap committed during VBlank. The screen is static; dynamic
+> scoring and mGBA rendering remain unverified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.7 walkthrough-derived HUD icon pass.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.8 walkthrough-derived Stage Clear screen.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md) for the timestamped 2h22 source-game timeline and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md) for confirmed missing content and next reconstruction priorities. The private keyframe pack is stored separately from the public source repository.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
 **Public repository asset policy:** the GitHub repository contains source code, conversion tools, tests and documentation. It intentionally excludes the original `data.win`, converted source-derived sprite/tile graphics and the experimental ROM. Those generated assets are included in the private v1.9 development ZIP; rebuilding from source requires supplying your own original `data.win` and running the extraction commands below.
+
+## v1.9.8: walkthrough-derived Stage Clear screen
+
+- Reconstruct the purple illustrated Stage Clear frame observed at walkthrough offset 04:00.
+- Convert the 240×135 image to a 16-color 4bpp source stream, BIOS-LZ77 compress it, then expand to a 240×160 Mode 4 bitmap at runtime.
+- Preserve the full 16:9 image with 12px top / 13px bottom purple margins; do not crop the Volvy artwork or result text.
+- Show this static result frame only on the provisional W1-L1 victory route. The walkthrough's outdoor first-stage mapping is plausible but not proven; boss and bonus results retain the existing renderer.
+- All VRAM/palette writes are queued to VBlank, and the renderer restores Mode 0 before loading the next scene.
+- The result text, medals and score display are static reference data, not a dynamic scoring/ranking system. No v1.9.8 ROM or mGBA capture is claimed.
+
+See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md) and [v1.9.8 verification](docs/verification-v198.md).
 
 ## v1.9.7: walkthrough-derived HUD icon pass
 
