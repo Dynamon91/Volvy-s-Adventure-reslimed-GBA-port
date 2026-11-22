@@ -2,7 +2,7 @@
 TAB NAME: docs__walkthrough-stage-index.csv>index,video_time,sequence,direct_observation,confidence,current_port_gap
 0,00:00,Title screen,Start Game / Settings / Quit,High,Title UI not yet source-faithful in GBA
 1,00:30-04:00,Outdoor platform course,Stage Clear at 04:00,High,World 1 L1 may be related; not proven from video alone
-2,10:30,Selection screen,"Fuzz Forest, 0/4",Medium,Menu shell and selection flow absent
+2,10:30,Selection screen,"Fuzz Forest, 0/4",High,Menu shell and selection flow absent
 3,11:00-15:30,Dark forest/checkerboard,"Onions, breakable blocks, combo effects",High,No matching scene in current 5-scene ROM
 4,16:30,Selection screen,"Bonus Stage, x20",High,Bonus selection/reward UI absent
 5,17:00-24:30,Cave challenge,Brown/orange obstacle course; placement/ranking,High,Current Bonus Race is not verified as this sequence
@@ -12,7 +12,7 @@ TAB NAME: docs__walkthrough-stage-index.csv>index,video_time,sequence,direct_obs
 9,40:00-44:30,Industrial/green facility,Stage Clear,High,Scene absent
 10,45:00-51:00,Industrial hazard encounter,"Green liquid, jets, moving hazard/enemy",Medium,Encounter identity unresolved
 11,51:30-56:30,Cave challenge,2ND placement indicator,High,Ranking system absent
-12,57:00-65:30,City/rooftops course,Big City Rooftops title partly legible; Stage Clear,Medium,Scene absent
+12,57:00-65:30,City/rooftops course,Rigatoni Rooftops card title; Stage Clear,High,Scene absent
 13,66:00-71:30,Construction course,"Chains, suspended platforms, wrecking balls",High,Scene absent
 14,72:00-79:30,Dark industrial course/boss,Fishpig Defeated,High,Fishpig boss absent
 15,80:00-88:30,Starry race course,Macho Metro selection card at 81:30 (partly legible); starry course; On Your Marks; 1st/2nd indicators,Medium title / High gameplay,Race placement logic absent
