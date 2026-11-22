@@ -1,3 +1,12 @@
+## v1.9.11 — walkthrough handheld-card asset pipeline
+
+- Rejoined and reopened the six supplied walkthrough segments; extracted full-resolution 640×360 reference frames for the title and handheld selection cards.
+- Corrected the 57:00 selection-card title from the previous guess “Big City Rooftops” to the directly legible “Rigatoni Rooftops”.
+- Added a reproducible converter for 240×135 16:9 content letterboxed to the GBA 240×160 screen, with 4bpp/16-color and 8bpp/256-color modes, BGR555 palette generation, BIOS-LZ77 compression, previews and source-hash manifests.
+- Prefer 8bpp/256-color output for the complex handheld cards; the 16-color test loses significant device/course-preview detail.
+- Add public host regression coverage for both pixel formats, LZ77 round-trip, palette bounds and 12/13px letterbox geometry.
+- Source-derived card images and generated binaries remain private. The converter is not yet wired into a runtime selection state; no course routing or Fuzz Forest-to-W1 mapping is claimed.
+
 ## v1.9.10 — title-menu navigation scaffold
 
 - Match the three title entries directly observed in the supplied walkthrough: Start Game, Settings and Quit.
