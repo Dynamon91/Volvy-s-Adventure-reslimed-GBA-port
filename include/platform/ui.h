@@ -4,6 +4,7 @@
 #include "core/game.h"
 void gba_ui_init(void);
 void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
-                   uint8_t boss_health, uint32_t timer_frames);
+                   uint8_t boss_health, uint32_t timer_frames,
+                   uint8_t title_selection);
 void gba_ui_vblank_commit(void);
 #endif
