@@ -40,6 +40,12 @@ $CC $FLAGS -I"$ROOT/tests/support/stage_clear_fake" $INCLUDES \
   "$ROOT/source/platform/stage_clear_screen.c" -o "$TMP/stage_clear_runtime"
 "$TMP/stage_clear_runtime"
 
+# Exercise 256-color card playback using deterministic public synthetic bytes.
+$CC $FLAGS -I"$ROOT/tests/support/stage_clear_fake" $INCLUDES \
+  "$ROOT/tests/test_handheld_card_screen_runtime.c" \
+  "$ROOT/source/platform/handheld_card_screen.c" -o "$TMP/card_screen_runtime"
+"$TMP/card_screen_runtime"
+
 # World interaction logic uses a synthetic public object set, not private level assets.
 $CC $FLAGS -I"$ROOT/tests/support/world_interactions_fake" $INCLUDES \
   "$ROOT/tests/test_world_interactions_public.c" \
