@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.9.4 — safer and more efficient native 4bpp background streaming
+
+- Remove the 4 KiB temporary scene upload array from the ARM7TDMI stack and fill the existing persistent upload staging queue directly; remove the per-window 4 KiB copy.
+- Replace repeated from-zero vacant-slot scans with a monotonic free-slot cursor in native scene cache tile allocation (same first-fit slot order).
+- Add a 540-window stress regression comparing cache slots, uploaded source tiles, priority/flip/palette map entries and reference mapping against an independent first-fit oracle.
+- Keep prior gameplay, original converted art, sprite animation and all 5 source-native scene assets unchanged.
+- Host C tests, ARM codegen and experimental ROM structure: PASS. Real mGBA gameplay / devkitARM cross-build: NOT VERIFIED.
+
+
 ## v1.9.3 — prevent phantom OBJ sprites during camera/room transitions
 
 - Filter each off-screen player, Shrewy boss and Shrewy-rock metasprite part *before* writing OAM. GBA X/Y hardware coordinates wrap at 512/256 px; failing to cull could place an invisible actor back in view.
