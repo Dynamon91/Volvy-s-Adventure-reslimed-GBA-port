@@ -46,6 +46,15 @@ static int fx_floor_pixel(fx32 value)
     return v;
 }
 
+/* Grid coordinates must use mathematical floor, including pixels -1..-7.
+ * C's signed integer division truncates toward zero and otherwise lets the
+ * player pass 7 pixels outside a negative world boundary. */
+static int tile_floor_pixel(int pixel)
+{
+    return pixel >= 0 ? pixel / LEVEL_TILE_SIZE :
+           -1 - ((-1 - pixel) / LEVEL_TILE_SIZE);
+}
+
 static fx32 physics_scale(const Player *player, fx32 value)
 {
     return player->native_scale ? value * 2 : value;
@@ -197,6 +206,10 @@ static int rail_tile_y(const Player *player, const Level *level)
     return -1;
 }
 
+/* Continuous collision against every crossed grid column/row. Checking
+ * only the destination tile allows a dash, a bounce or future boosted
+ * movement to tunnel through a single 8x8 barrier. Preserve the original
+ * contact and destruction rules; only the tile traversal is corrected. */
 static void move_horizontal(Player *player, Level *level)
 {
     fx32 next_x = player->x + player->vx;
@@ -204,53 +217,63 @@ static void move_horizontal(Player *player, Level *level)
     int new_x = fx_floor_pixel(next_x);
     int top = fx_floor_pixel(player->y);
     int bottom = top + player->height - 1;
-    int y;
+    int y, tx;
 
     if (new_x > old_x) {
-        int edge = fx_floor_pixel(next_x + fx_from_int(player->width - 1));
-        int tx = edge / 8;
-        for (y = top + 1; y <= bottom - 1; y += 5) {
-            int ty = y / 8;
-            uint8_t tile = level_get_tile(level, tx, ty);
-
-            if (((tile == TILE_BREAKABLE &&
-                  (player->hand_state == HAND_DASH || player->swole)) ||
-                 (tile == TILE_SWOLVY_BLOCK && player->swole))) {
-                level_break_tile(level, tx, ty);
-                continue;
-            }
-            if (level_is_solid(tile)) {
-                next_x = fx_from_int(tx * 8 - player->width);
-                player->vx = 0;
-                if (player->hand_state == HAND_DASH) {
-                    player->hand_state = HAND_NONE;
-                    player->hand_timer = 0;
+        int old_edge = tile_floor_pixel(old_x + player->width - 1);
+        int new_edge = tile_floor_pixel(new_x + player->width - 1);
+        int first_tx = new_edge > old_edge ? old_edge + 1 : new_edge;
+        for (tx = first_tx; tx <= new_edge; ++tx) {
+            int blocked = 0;
+            for (y = top + 1; y <= bottom - 1; y += 5) {
+                int ty = tile_floor_pixel(y);
+                uint8_t tile = level_get_tile(level, tx, ty);
+                if ((tile == TILE_BREAKABLE &&
+                     (player->hand_state == HAND_DASH || player->swole)) ||
+                    (tile == TILE_SWOLVY_BLOCK && player->swole)) {
+                    level_break_tile(level, tx, ty);
+                    continue;
                 }
-                break;
+                if (level_is_solid(tile)) {
+                    next_x = fx_from_int(tx * LEVEL_TILE_SIZE - player->width);
+                    player->vx = 0;
+                    if (player->hand_state == HAND_DASH) {
+                        player->hand_state = HAND_NONE;
+                        player->hand_timer = 0;
+                    }
+                    blocked = 1;
+                    break;
+                }
             }
+            if (blocked) break;
         }
     } else if (new_x < old_x) {
-        int edge = new_x;
-        int tx = edge / 8;
-        for (y = top + 1; y <= bottom - 1; y += 5) {
-            int ty = y / 8;
-            uint8_t tile = level_get_tile(level, tx, ty);
-
-            if (((tile == TILE_BREAKABLE &&
-                  (player->hand_state == HAND_DASH || player->swole)) ||
-                 (tile == TILE_SWOLVY_BLOCK && player->swole))) {
-                level_break_tile(level, tx, ty);
-                continue;
-            }
-            if (level_is_solid(tile)) {
-                next_x = fx_from_int((tx + 1) * 8);
-                player->vx = 0;
-                if (player->hand_state == HAND_DASH) {
-                    player->hand_state = HAND_NONE;
-                    player->hand_timer = 0;
+        int old_edge = tile_floor_pixel(old_x);
+        int new_edge = tile_floor_pixel(new_x);
+        int first_tx = new_edge < old_edge ? old_edge - 1 : new_edge;
+        for (tx = first_tx; tx >= new_edge; --tx) {
+            int blocked = 0;
+            for (y = top + 1; y <= bottom - 1; y += 5) {
+                int ty = tile_floor_pixel(y);
+                uint8_t tile = level_get_tile(level, tx, ty);
+                if ((tile == TILE_BREAKABLE &&
+                     (player->hand_state == HAND_DASH || player->swole)) ||
+                    (tile == TILE_SWOLVY_BLOCK && player->swole)) {
+                    level_break_tile(level, tx, ty);
+                    continue;
                 }
-                break;
+                if (level_is_solid(tile)) {
+                    next_x = fx_from_int((tx + 1) * LEVEL_TILE_SIZE);
+                    player->vx = 0;
+                    if (player->hand_state == HAND_DASH) {
+                        player->hand_state = HAND_NONE;
+                        player->hand_timer = 0;
+                    }
+                    blocked = 1;
+                    break;
+                }
             }
+            if (blocked) break;
         }
     }
 
@@ -263,65 +286,71 @@ static void move_vertical(Player *player, Level *level)
     int new_y = fx_floor_pixel(next_y);
     int left = fx_floor_pixel(player->x);
     int right = left + player->width - 1;
-    int x;
+    int x, ty;
 
     player->grounded = 0;
 
     if (player->vy >= 0) {
-        /* Use the exclusive bottom edge so grounded is stable at zero velocity. */
-        int edge = fx_floor_pixel(next_y + fx_from_int(player->height));
-        int ty = edge / 8;
-
-        for (x = left + 1; x <= right - 1; x += 5) {
-            int tx = x / 8;
-            uint8_t tile = level_get_tile(level, tx, ty);
-
-            if (((tile == TILE_BREAKABLE || tile == TILE_BREAKABLE_ONEWAY) &&
-                 (player->hand_state == HAND_GROUND_POUND || player->swole)) ||
-                (tile == TILE_SWOLVY_BLOCK && player->swole)) {
-                level_break_tile(level, tx, ty);
-                continue;
-            }
-
-            if (tile == TILE_ONEWAY || tile == TILE_BREAKABLE_ONEWAY) {
-                int old_bottom = fx_floor_pixel(player->y +
-                                                fx_from_int(player->height));
-                int platform_top = ty * LEVEL_TILE_SIZE;
-                if (old_bottom <= platform_top && edge >= platform_top) {
-                    next_y = fx_from_int(platform_top - player->height);
+        int old_bottom = fx_floor_pixel(player->y + fx_from_int(player->height));
+        int new_bottom = fx_floor_pixel(next_y + fx_from_int(player->height));
+        int old_ty = tile_floor_pixel(old_bottom);
+        int new_ty = tile_floor_pixel(new_bottom);
+        int first_ty = new_ty > old_ty ? old_ty + 1 : new_ty;
+        for (ty = first_ty; ty <= new_ty; ++ty) {
+            int blocked = 0;
+            for (x = left + 1; x <= right - 1; x += 5) {
+                int tx = tile_floor_pixel(x);
+                uint8_t tile = level_get_tile(level, tx, ty);
+                if (((tile == TILE_BREAKABLE || tile == TILE_BREAKABLE_ONEWAY) &&
+                     (player->hand_state == HAND_GROUND_POUND || player->swole)) ||
+                    (tile == TILE_SWOLVY_BLOCK && player->swole)) {
+                    level_break_tile(level, tx, ty);
+                    continue;
+                }
+                if (tile == TILE_ONEWAY || tile == TILE_BREAKABLE_ONEWAY) {
+                    int platform_top = ty * LEVEL_TILE_SIZE;
+                    if (old_bottom <= platform_top && new_bottom >= platform_top) {
+                        next_y = fx_from_int(platform_top - player->height);
+                        player->vy = 0;
+                        player->grounded = 1;
+                        blocked = 1;
+                        break;
+                    }
+                    continue;
+                }
+                if (level_is_solid(tile)) {
+                    next_y = fx_from_int(ty * LEVEL_TILE_SIZE - player->height);
                     player->vy = 0;
                     player->grounded = 1;
+                    if (player->hand_state == HAND_GROUND_POUND) {
+                        player->hand_state = HAND_NONE;
+                        player->hand_timer = 0;
+                    }
+                    blocked = 1;
                     break;
                 }
-                continue;
             }
-
-            if (level_is_solid(tile)) {
-                next_y = fx_from_int(ty * 8 - player->height);
-                player->vy = 0;
-                player->grounded = 1;
-                if (player->hand_state == HAND_GROUND_POUND) {
-                    player->hand_state = HAND_NONE;
-                    player->hand_timer = 0;
-                }
-                break;
-            }
+            if (blocked) break;
         }
     } else {
-        int ty = new_y / 8;
-
-        for (x = left + 1; x <= right - 1; x += 5) {
-            int tx = x / 8;
-            uint8_t tile = level_get_tile(level, tx, ty);
-
-            if (level_is_solid(tile)) {
-                next_y = fx_from_int((ty + 1) * 8);
-                player->vy = 0;
-                break;
+        int old_ty = tile_floor_pixel(fx_floor_pixel(player->y));
+        int new_ty = tile_floor_pixel(new_y);
+        int first_ty = new_ty < old_ty ? old_ty - 1 : new_ty;
+        for (ty = first_ty; ty >= new_ty; --ty) {
+            int blocked = 0;
+            for (x = left + 1; x <= right - 1; x += 5) {
+                int tx = tile_floor_pixel(x);
+                uint8_t tile = level_get_tile(level, tx, ty);
+                if (level_is_solid(tile)) {
+                    next_y = fx_from_int((ty + 1) * LEVEL_TILE_SIZE);
+                    player->vy = 0;
+                    blocked = 1;
+                    break;
+                }
             }
+            if (blocked) break;
         }
     }
-
     player->y = next_y;
 }
 
