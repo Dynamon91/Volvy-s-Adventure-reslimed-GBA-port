@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.9.3 — prevent phantom OBJ sprites during camera/room transitions
+
+- Filter each off-screen player, Shrewy boss and Shrewy-rock metasprite part *before* writing OAM. GBA X/Y hardware coordinates wrap at 512/256 px; failing to cull could place an invisible actor back in view.
+- Pack visible OBJ parts into contiguous OAM entries; preserve the unchanged per-part 8bpp tile addresses, H-flip behavior and sprite priority.
+- Unit-test the actual extracted OBJ drawing routine for ±512-pixel and 256-pixel wrap cases, partial clipping, mirror positions, 8bpp tile indexing, HUD priority and 128-entry OAM capacity.
+- Keep animations, sprite images, world levels and collisions unchanged; this is a renderer stability fix, not new gameplay content.
+- Portable host tests, ARMv4T/Thumb cross-codegen and Clang/LLD ROM structure: PASS. Real mGBA gameplay and devkitARM/libgba: NOT TESTED.
+
+
 ## v1.9.2 — visible-actor animation streaming optimization
 
 - Skip requesting static OBJ animation frame uploads for World 1 and Bonus Race actors whose full desired and current resident frames are both outside the 240×160 viewport.
