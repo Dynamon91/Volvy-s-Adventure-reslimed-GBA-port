@@ -1,0 +1,35 @@
+{
+  "project": "Volvy's Adventure: ReSlimed GBA port",
+  "version": "1.9.12",
+  "release_type": "source-only preview integration and graphics restoration fix",
+  "build_output_gba": null,
+  "private_asset_required_for_preview": true,
+  "game_stage_routing_unchanged": true,
+  "preview": {
+    "source_card": "Fuzz Forest at 00:10:30 in the supplied 2h22 walkthrough",
+    "source_aspect": "16:9",
+    "payload": "240x135 BIOS-LZ77 compressed 8bpp",
+    "palette": "up to 256 BGR555 colors",
+    "target": "GBA Mode 4 240x160",
+    "preview_flag": "DEV_CARD_PREVIEW=1",
+    "normal_flag_default": "DEV_CARD_PREVIEW=0",
+    "dev_controls": "L on title opens preview; B or START dismisses"
+  },
+  "fixes": [
+    "Invalidate Mode 0 native BG tile cache on return from committed Stage Clear Mode 4",
+    "Refresh HUD font/icon palette after scene BG palette reload",
+    "Prevent drawing old map against bitmap-overwritten tile VRAM",
+    "Handheld bitmap cache checks data and palette identity"
+  ],
+  "verification": {
+    "github_actions_run": "45070191433",
+    "url": "https://github.com/Dynamon91/Volvy-s-Adventure-reslimed-GBA-port/actions/runs/45070191433",
+    "public_host_regressions": "PASS",
+    "isolated_arm7tdmi_codegen": "PASS",
+    "dev_card_preview_full_rom": "NOT_BUILT",
+    "devkitarm_libgba_full_project": "NOT_VERIFIED",
+    "mgba_boot": "NOT_TESTED",
+    "physical_gba": "NOT_TESTED"
+  },
+  "overall_port_estimate_percent": 44
+}
