@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.9.6 — walkthrough-derived HUD timer correction
+
+- Analyze the user's six-part, 2h22 gameplay reference and add a timestamped
+  scene/boss/menu timeline with keyframe evidence.
+- Add a per-stage 60 Hz elapsed timer for standard platform stages and Shrewy;
+  pause freezes it. Bonus Race retains its gate-triggered timer.
+- Render the observed `M:SS:CC` stopwatch and compact `X###` onion counter.
+- Remove prototype-only `W1-Lx`, `SHREWY HP`, `HAND ATTACK`, `RACE` and
+  `ONIONS` labels from the in-game HUD.
+- Add C regression tests for frame-to-centisecond formatting.
+- Host tests, ARMv4T/Thumb stub codegen and experimental Clang/LLD ROM
+  structure: PASS. mGBA/hardware rendering: NOT TESTED.
+- The walkthrough exposes substantial missing scenes and bosses; this patch
+  is a HUD correction only and does not increase content coverage.
+
 ## v1.9.5 — swept collisions, negative edge correction and fidelity audit
 
 - Fix a reproduced high-speed dash-through-wall bug, checking each crossed
