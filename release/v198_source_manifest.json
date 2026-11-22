@@ -21,7 +21,7 @@
   },
   "changes": [
     "static walkthrough-derived Stage Clear result frame",
-    "Mode 4 BG2 display with 16-color palette",
+    "Mode 4 BG2 bitmap with 16-color palette",
     "VBlank-only VRAM and palette commit",
     "restore Mode 0 before returning to the native scene renderer",
     "integration restricted to provisional W1-L1 victory; boss and bonus excluded"
@@ -30,9 +30,10 @@
     "asset_lz77_round_trip": "PASS",
     "asset_dimensions_palette_inspection": "PASS",
     "renderer_source_contract_inspection": "PASS",
-    "stage_clear_c_syntax": "NOT_RUN",
+    "stage_clear_c_syntax_with_test_gba_shim": "PASS",
+    "stage_clear_armv4t_thumb_object_codegen": "PASS",
     "full_host_suite": "NOT_RUN_PRIVATE_ASSETS_REQUIRED",
-    "armv4t_thumb_codegen": "NOT_RUN",
+    "full_project_armv4t_thumb_codegen": "NOT_TESTED",
     "devkitarm_libgba_rom": "NOT_BUILT",
     "mgba_boot_and_render": "NOT_TESTED",
     "physical_gba": "NOT_TESTED"

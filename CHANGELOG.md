@@ -8,7 +8,7 @@
 - Gate the screen to the provisional W1-L1 victory route; do not reuse it for boss or bonus victories.
 - Queue bitmap/palette writes for VBlank and restore Mode 0 before the next scene streams in.
 - Add asset decompression, palette, dimensions and renderer-transition regression tests.
-- BIOS-LZ77 round-trip and renderer source-contract inspection: PASS. C syntax, ARM code generation, full ROM build and mGBA rendering: NOT VERIFIED.
+- BIOS-LZ77 round-trip, palette/layout inspection, renderer source-contract inspection, isolated C syntax and ARM7TDMI/Thumb object generation for the Stage Clear module/asset: PASS. Full ROM build and mGBA rendering: NOT VERIFIED.
 - The captured result values/art remain static; dynamic combo, rank and score calculations are still missing.
 
 ## v1.9.7 — walkthrough-derived HUD icon pass

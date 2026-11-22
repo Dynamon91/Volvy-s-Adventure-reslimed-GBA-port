@@ -15,10 +15,10 @@
 | Independent BIOS-LZ77 round-trip of the 8,780-byte asset | **PASS** |
 | 240×135 packed-pixel dimensions and 16-color palette inspection | **PASS** |
 | Renderer gate / VBlank / restore source-contract inspection | **PASS** |
-| C compiler syntax check of stage_clear_screen.c | **NOT RUN** |
-| ARMv4T/Thumb code generation | **NOT RUN** |
+| GCC syntax check of stage_clear_screen.c with the repository test GBA shim | **PASS** |
+| ARM7TDMI/Thumb code generation of Stage Clear C module and embedded asset object | **PASS** |
 
-The first three checks were performed against the asset and repository source. The C and ARM compile claims made in an earlier status were not backed by an executed compiler result and are withdrawn here.
+The isolated C and ARM checks compile the Stage Clear module using the repository's test/experimental GBA headers. They do not compile the full renderer or prove the normal libgba link.
 
 ## Not verified
 
@@ -28,7 +28,7 @@ The first three checks were performed against the asset and repository source. T
 - mGBA boot or actual rendered Stage Clear screen.
 - Physical GBA hardware.
 
-A public CI workflow has now been added. It runs asset-independent public tests and isolated ARM7TDMI code generation for the Stage Clear module; no completed workflow result is recorded yet.
+A public CI workflow has been added for asset-independent public regressions and isolated Stage Clear ARM code generation. No completed GitHub Actions run is recorded yet.
 
 **Release status:** source + reference asset only; no v1.9.8 .gba image was generated.
 

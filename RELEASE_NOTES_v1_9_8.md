@@ -21,8 +21,8 @@ The Stage Clear artwork and result text are a static walkthrough frame. The resu
 - Independent BIOS-LZ77 asset round-trip: **PASS**.
 - Packed-pixel dimensions and 16-color palette inspection: **PASS**.
 - Renderer gate/VBlank/restore source-contract inspection: **PASS**.
-- C syntax check: **NOT RUN**.
-- ARMv4T/Thumb code generation: **NOT RUN**.
+- GCC syntax check of the Stage Clear C module with the repository test GBA shim: **PASS**.
+- ARM7TDMI/Thumb object generation for the Stage Clear C module and embedded asset: **PASS**.
 - Full host suite: **NOT RUN** (the public repository excludes the private generated game-asset bundle).
 - Full-project ARMv4T/Thumb link: **NOT TESTED**.
 - devkitARM/libgba ROM build: **NOT TESTED**.
