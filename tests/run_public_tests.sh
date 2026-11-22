@@ -27,6 +27,12 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_scene_cache_churn.c" "$ROOT/source/core/n
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_native_presentation.c" "$ROOT/source/core/native_scene.c" -o "$TMP/native_presentation"
 "$TMP/native_presentation"
 
+# Exercise the Stage Clear C module against host-side GBA memory/DMA stubs.
+$CC $FLAGS -I"$ROOT/tests/support/stage_clear_fake" $INCLUDES \
+  "$ROOT/tests/test_stage_clear_screen_runtime.c" \
+  "$ROOT/source/platform/stage_clear_screen.c" -o "$TMP/stage_clear_runtime"
+"$TMP/stage_clear_runtime"
+
 # The result-screen module can be syntax-checked without the private game assets.
 $CC $FLAGS $INCLUDES -fsyntax-only "$ROOT/source/platform/stage_clear_screen.c"
 

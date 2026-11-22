@@ -16,9 +16,10 @@
 | 240×135 packed-pixel dimensions and 16-color palette inspection | **PASS** |
 | Renderer gate / VBlank / restore source-contract inspection | **PASS** |
 | GCC syntax check of stage_clear_screen.c with the repository test GBA shim | **PASS** |
+| Host C runtime test: prepare-once, nibble expansion, letterbox, palette/frame commit and Mode 0 restore (deterministic LZ77 stub) | **PASS** |
 | ARM7TDMI/Thumb code generation of Stage Clear C module and embedded asset object | **PASS** |
 
-The isolated C and ARM checks compile the Stage Clear module using the repository's test/experimental GBA headers. They do not compile the full renderer or prove the normal libgba link.
+The runtime test executes the actual Stage Clear C module against a host GBA shim. Its LZ77 function is deterministic test data, so this test validates pixel expansion, frame layout, palette/frame transfer and display-mode transitions; the separate asset test validates the real BIOS-LZ77 stream. The isolated ARM check compiles the module using the experimental GBA headers. These checks do not compile the full renderer or prove the normal libgba link.
 
 ## Not verified
 

@@ -10,7 +10,9 @@
 #define STAGE_CLEAR_TOP_MARGIN 12u
 #define STAGE_CLEAR_PACKED_BYTES 16200u
 #define STAGE_CLEAR_FRAME_BYTES (STAGE_CLEAR_WIDTH * STAGE_CLEAR_HEIGHT)
+#ifndef STAGE_CLEAR_FRAMEBUFFER
 #define STAGE_CLEAR_FRAMEBUFFER ((void *)0x06000000)
+#endif
 
 /* The 4bpp source pixels are expanded to Mode 4's 8bpp framebuffer. */
 static u8 s_stage_clear_packed[STAGE_CLEAR_PACKED_BYTES] ALIGN(4);
