@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4 — Source-derived bonus moving platforms
+
+- Extracted original moving-platform and cloud-platform animation resources.
+- Added a source-accurate wider moving-platform OBJ graphic derived deterministically from the original 48×8 sprite and source instance 4/3 scale.
+- Implemented two source-anchored moving one-way platform actors with prototype movement, descending landing, player carry, and reset.
+- Removed moving-platform tiles from the static collision grid to prevent invisible platforms left behind.
+- Added dedicated tests and actual C-trace-driven motion previews.
+- Kept authentic trajectories and gameplay rules explicitly unverified.
+
+Verification: host tests PASS, 33 ARMv4T/Thumb translation units PASS with test-only headers; **no real devkitARM build or mGBA boot**.
+
 ## v1.3 — Source-anchored bunny prototypes and bumper geometry
 
 - Implemented separate, deterministic movement state for two original `obj_bunny` instances. Nine `obj_bunny_ground` placements stay static; no original racing AI or prizes are implied.
