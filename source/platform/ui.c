@@ -2,6 +2,7 @@
 #include <string.h>
 #include "platform/ui.h"
 #include "core/game_timer.h"
+#include "core/title_menu.h"
 #include "hud_source_font.h"
 #include "platform/hud_walkthrough_icons.h"
 
@@ -25,6 +26,7 @@ static uint16_t s_last_onions = 0xFFFF;
 static uint8_t s_last_stage = 0;
 static uint8_t s_last_boss_health = 0xFF;
 static uint32_t s_last_timer_centiseconds = 0xFFFFFFFFu;
+static uint8_t s_last_title_selection = 0xFFu;
 static u8 s_dirty;
 
 static unsigned int glyph_index(char ch)
@@ -86,7 +88,8 @@ void gba_ui_init(void)
 }
 
 void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
-                   uint8_t boss_health, uint32_t timer_frames)
+                   uint8_t boss_health, uint32_t timer_frames,
+                   uint8_t title_selection)
 {
     char count[] = "X000";
     char time_text[9];
@@ -97,9 +100,12 @@ void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
 
     (void)boss_health;
     (void)stage;
+    if (title_selection >= TITLE_MENU_ITEM_COUNT)
+        title_selection = TITLE_MENU_START_GAME;
 
     if (mode == s_last_mode && onions == s_last_onions &&
-        elapsed_centiseconds == s_last_timer_centiseconds)
+        elapsed_centiseconds == s_last_timer_centiseconds &&
+        title_selection == s_last_title_selection)
         return;
 
     s_last_mode = mode;
@@ -107,6 +113,7 @@ void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
     s_last_stage = stage;
     s_last_boss_health = boss_health;
     s_last_timer_centiseconds = elapsed_centiseconds;
+    s_last_title_selection = title_selection;
 
     memset(s_ui_map, 0, sizeof(s_ui_map));
 
@@ -116,6 +123,9 @@ void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
         draw_str(9, 13, "START GAME");
         draw_str(9, 15, "SETTINGS");
         draw_str(10, 17, "QUIT");
+        /* Focus bar uses the existing source-font dash glyph. Its exact
+         * original shape and animation remain to be matched. */
+        draw_str(7, 13 + (int)title_selection * 2, "-");
     } else if (mode == GAME_PLAYING || mode == GAME_PAUSED ||
                mode == GAME_BOSS || mode == GAME_BONUS) {
         if (onions > 999u) onions = 999u;
