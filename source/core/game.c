@@ -130,6 +130,7 @@ void game_update(void)
             s_mode = GAME_PAUSED;
             break;
         }
+        ++s_level.elapsed_frames;
 
         {
             int old_bottom = fx_to_int(s_player.y) + s_player.height;
@@ -184,6 +185,7 @@ void game_update(void)
             s_mode = GAME_PAUSED;
             break;
         }
+        ++s_level.elapsed_frames;
         {
             int old_bottom = fx_to_int(s_player.y) + s_player.height;
             int descending = s_player.vy >= 0;
