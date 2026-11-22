@@ -17,7 +17,10 @@
  * There is no separate 32,400-byte scratch buffer. */
 static u8 s_card_frame[CARD_FRAME_BYTES] ALIGN(4);
 static u16 s_card_palette[256] ALIGN(4);
-static const HandheldCardAsset *s_prepared_asset;
+static const u8 *s_prepared_stream;
+static const u16 *s_prepared_palette;
+static u32 s_prepared_stream_bytes;
+static u16 s_prepared_palette_entries;
 static u8 s_prepared;
 
 int handheld_card_screen_prepare(const HandheldCardAsset *asset)
@@ -29,7 +32,12 @@ int handheld_card_screen_prepare(const HandheldCardAsset *asset)
         asset->palette_entries == 0u || asset->palette_entries > 256u)
         return 0;
 
-    if (s_prepared && s_prepared_asset == asset)
+    /* A caller may reuse one descriptor while browsing several cards.
+     * Cache by asset data identity, not by the descriptor's address. */
+    if (s_prepared && s_prepared_stream == asset->lz77 &&
+        s_prepared_stream_bytes == asset->lz77_bytes &&
+        s_prepared_palette == asset->palette &&
+        s_prepared_palette_entries == asset->palette_entries)
         return 1;
 
     if (asset->lz77[0] != 0x10u)
@@ -49,7 +57,10 @@ int handheld_card_screen_prepare(const HandheldCardAsset *asset)
     memcpy(s_card_palette, asset->palette,
            (unsigned int)asset->palette_entries * sizeof(u16));
 
-    s_prepared_asset = asset;
+    s_prepared_stream = asset->lz77;
+    s_prepared_stream_bytes = asset->lz77_bytes;
+    s_prepared_palette = asset->palette;
+    s_prepared_palette_entries = asset->palette_entries;
     s_prepared = 1u;
     return 1;
 }
