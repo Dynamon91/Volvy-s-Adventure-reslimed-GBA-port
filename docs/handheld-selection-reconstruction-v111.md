@@ -11,10 +11,10 @@ that recording, not in-game clocks.
 | 00:00 | Volvy title screen; Start Game / Settings / Quit | Framed title artwork | Start Game pointer |
 | 10:30 | Fuzz Forest | Green horizontal handheld | 0/4 |
 | 16:30 | Bonus Stage | Green horizontal handheld | ×20 reward |
-| 57:00 | Rigatoni Rooftops | Pink handheld marked “YOLVY Single” | 0/4 |
-| 81:30 | Course title partly legible; likely Macho Metro | Pink “YOLVY Single” handheld | 1/4 |
+| 57:00 | Rigatoni Rooftops | Pink handheld shell with YOLVY wordmark | 0/4 |
+| 81:30 | Course title partly legible; likely Macho Metro | Pink handheld shell with YOLVY wordmark | 1/4 |
 | 111:30 | Bonus Stage | Teal handheld | 1/1 |
-| 114:00 | Fishpig | Pink “YOLVY Single” handheld | Boss card |
+| 114:00 | Fishpig | Pink handheld shell with YOLVY wordmark | Boss card |
 | 124:00 | Bundtcake Burrows | Green horizontal handheld | 4/4 |
 | 126:30 | Master Gator | Teal handheld | Boss card |
 
