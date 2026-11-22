@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.9.2 — visible-actor animation streaming optimization
+
+- Skip requesting static OBJ animation frame uploads for World 1 and Bonus Race actors whose full desired and current resident frames are both outside the 240×160 viewport.
+- Unify part-level clipping with the off-screen visibility check, including hardware X/Y coordinate wraparound cases.
+- Keep every source sprite, animation frame, actor placement and collision table unchanged. The v1.9.1 VBlank frame coherence scheduler remains intact.
+- Add portable viewport-edge tests plus a source-level regression that verifies culling happens *before* the shared frame upload budget is reserved.
+- Host C/asset tests, ARMv4T/Thumb code generation and experimental 2 MiB GBA ROM structure: PASS. **No mGBA boot or hardware verification.**
+
 ## v1.9 — suppress source-only green hole marker
 
 - Reviewed the new mGBA recording and traced the neon-green 16×16 rectangle to the uniform `spr_hole` source marker (palette index 36 / BGR555 `0x33E6`).
