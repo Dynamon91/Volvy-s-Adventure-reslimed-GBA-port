@@ -17,6 +17,9 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_static_frame_scheduler.c" \
 "$TMP/static_frame_scheduler"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_sprite_visibility.c" -o "$TMP/sprite_visibility"
 "$TMP/sprite_visibility"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_obj_parts_v193.c" \
+    "$ROOT/source/platform/obj_parts.c" -o "$TMP/obj_parts_v193"
+"$TMP/obj_parts_v193"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_player.c" "$ROOT/source/core/player.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/player"
 "$TMP/player"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_world1.c" "$ROOT/source/core/level.c" "$ROOT/assets/converted/rooms/bonus_w1_room.c" "$ROOT/assets/converted/rooms/bonus_w1_collision.c" "$ROOT/assets/converted/rooms/w1_l1_objects.c" "$ROOT/assets/converted/rooms/w1_l2_objects.c" "$ROOT/assets/converted/rooms/w1_l3_objects.c" "$ROOT/assets/converted/rooms/shrewy_room.c" -o "$TMP/world1"
