@@ -997,4 +997,111 @@ void render_vblank_commit(Level *level, const Camera *camera)
 
     if (s_scene_upload_pos >= s_scene_upload_count && s_scene_map_dirty) {
         dmaCopy(s_scene_map, BG_MAP_MAIN, sizeof(s_scene_map));
-        native_scene_presentation_commit(&s_scene_presentation,
+        native_scene_presentation_commit(&s_scene_presentation,                                         s_scene_start_x, s_scene_start_y);
+        s_scene_map_dirty = 0;
+        s_scene_upload_count = 0;
+        s_scene_upload_pos = 0;
+        if (s_scene_loading && !s_bg_hard_jump) {
+            SetMode(MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP);
+            s_scene_loading = 0;
+        }
+    }
+
+    if (!s_actor_cache_ready)
+        upload_actor_graphics_batch();
+
+    if (s_actor_cache_ready) {
+    {
+        unsigned int budget = STATIC_OBJ_UPLOAD_BUDGET;
+        int gfx_id;
+        for (gfx_id = 0; gfx_id < STATIC_ANIM_COUNT; ++gfx_id) {
+            StaticAnimGraphic *gfx = &s_static_gfx[gfx_id];
+            const GbaSpriteFrame *frame;
+            unsigned int bytes = 0;
+            unsigned int part_index;
+            if (!gfx->pending || !gfx->animation ||
+                gfx->pending_frame >= gfx->animation->frame_count)
+                continue;
+            frame = &gfx->animation->frames[gfx->pending_frame];
+            for (part_index = 0; part_index < frame->part_count &&
+                                 part_index < gfx->max_parts; ++part_index)
+                bytes += frame->parts[part_index].tile_bytes;
+            if (bytes > budget) continue;
+            for (part_index = 0; part_index < frame->part_count &&
+                                 part_index < gfx->max_parts; ++part_index) {
+                const GbaSpritePart *part = &frame->parts[part_index];
+                dmaCopy(part->tiles,
+                        OBJ_VRAM + (unsigned int)gfx->part_tile_base32[part_index] * 32u,
+                        part->tile_bytes);
+            }
+            gfx->loaded_frame = gfx->pending_frame;
+            gfx->pending = 0;
+            budget -= bytes;
+        }
+    }
+    }
+
+    if (s_pending_frame && s_pending_frame != s_uploaded_frame) {
+        int tile_index = 0;
+        int i;
+        int count = s_pending_frame->part_count;
+
+        if (count > MAX_PLAYER_PARTS) count = MAX_PLAYER_PARTS;
+        for (i = 0; i < count; ++i) {
+            const GbaSpritePart *part = &s_pending_frame->parts[i];
+            if (tile_index & 1) ++tile_index;
+            dmaCopy(part->tiles, OBJ_VRAM + tile_index * 64, part->tile_bytes);
+            tile_index += part->tile_bytes / 64;
+        }
+        s_uploaded_frame = s_pending_frame;
+    }
+
+    if (s_pending_boss_frame && s_pending_boss_frame != s_uploaded_boss_frame) {
+        int tile_index = 0;
+        int i;
+        int count = s_pending_boss_frame->part_count;
+        if (count > MAX_PLAYER_PARTS) count = MAX_PLAYER_PARTS;
+        for (i = 0; i < count; ++i) {
+            const GbaSpritePart *part = &s_pending_boss_frame->parts[i];
+            if (tile_index & 1) ++tile_index;
+            dmaCopy(part->tiles, OBJ_VRAM + (128u + tile_index) * 64u,
+                    part->tile_bytes);
+            tile_index += part->tile_bytes / 64;
+        }
+        s_uploaded_boss_frame = s_pending_boss_frame;
+    }
+
+    if (s_pending_rock_frame && s_pending_rock_frame != s_uploaded_rock_frame) {
+        int tile_index = 0;
+        int i;
+        int count = s_pending_rock_frame->part_count;
+        if (count > MAX_PLAYER_PARTS) count = MAX_PLAYER_PARTS;
+        for (i = 0; i < count; ++i) {
+            const GbaSpritePart *part = &s_pending_rock_frame->parts[i];
+            if (tile_index & 1) ++tile_index;
+            dmaCopy(part->tiles, OBJ_VRAM + (384u + tile_index) * 64u,
+                    part->tile_bytes);
+            tile_index += part->tile_bytes / 64;
+        }
+        s_uploaded_rock_frame = s_pending_rock_frame;
+    }
+
+    /* Scroll is derived from the map window actually visible in BG VRAM,
+       not from the newly staged origin. This prevents the 8px camera jump
+       previously seen when a map window changed before VBlank commit. */
+    if (s_scene_presentation.has_visible_map) {
+        int relative_x = s_render_cam_x -
+                         s_scene_presentation.visible_start_x * 8;
+        int relative_y = s_render_cam_y -
+                         s_scene_presentation.visible_start_y * 8;
+        if (relative_x >= 0 && relative_x <= 16 &&
+            relative_y >= 0 && relative_y <= 96 &&
+            !s_scene_map_dirty && !s_bg_hard_jump && s_scene_loading) {
+            SetMode(MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP);
+            s_scene_loading = 0;
+        }
+        gba_display_set_camera(relative_x, relative_y);
+    }
+    gba_display_commit_oam();
+    gba_ui_vblank_commit();
+}
