@@ -1,0 +1,30 @@
+<PARSED TEXT FOR SHEET: 1 / 1 TABS
+TAB NAME: docs__walkthrough-stage-index.csv>index,video_time,sequence,direct_observation,confidence,current_port_gap
+0,00:00,Title screen,Start Game / Settings / Quit,High,Title UI not yet source-faithful in GBA
+1,00:30-04:00,Outdoor platform course,Stage Clear at 04:00,High,World 1 L1 may be related; not proven from video alone
+2,10:30,Selection screen,"Fuzz Forest, 0/4",Medium,Menu shell and selection flow absent
+3,11:00-15:30,Dark forest/checkerboard,"Onions, breakable blocks, combo effects",High,No matching scene in current 5-scene ROM
+4,16:30,Selection screen,"Bonus Stage, x20",High,Bonus selection/reward UI absent
+5,17:00-24:30,Cave challenge,Brown/orange obstacle course; placement/ranking,High,Current Bonus Race is not verified as this sequence
+6,25:30-29:30,Boss arena,"Shrewy Defeated, final ranking 3/5",High,Shrewy implemented provisionally; result UI missing
+7,30:00-33:30,Sky island course,Stage Clear,High,Scene absent
+8,34:00-39:30,Purple night/water course,Stage Clear,High,Scene absent
+9,40:00-44:30,Industrial/green facility,Stage Clear,High,Scene absent
+10,45:00-51:00,Industrial hazard encounter,"Green liquid, jets, moving hazard/enemy",Medium,Encounter identity unresolved
+11,51:30-56:30,Cave challenge,2ND placement indicator,High,Ranking system absent
+12,57:00-65:30,City/rooftops course,Big City Rooftops title partly legible; Stage Clear,Medium,Scene absent
+13,66:00-71:30,Construction course,"Chains, suspended platforms, wrecking balls",High,Scene absent
+14,72:00-79:30,Dark industrial course/boss,Fishpig Defeated,High,Fishpig boss absent
+15,80:00-88:30,Starry race course,Macho Metro selection card at 81:30 (partly legible); starry course; On Your Marks; 1st/2nd indicators,Medium title / High gameplay,Race placement logic absent
+16,89:00-95:30,Grey industrial course,Stage Clear; Highest combo 73,High,Combo/scoring system absent
+17,96:00-105:30,Purple night course,Platforming and combo effects,High,Scene absent
+18,106:00-110:30,Sky/water course,"Floating platforms, aquatic scenery",High,Scene absent
+19,111:30,Selection screen,"Bonus Stage, 1/1",High,Selection UI absent
+20,112:00-116:30,Boss encounter,Fishpig selection card at 114:00; Fishpig Defeated at 116:30,High,Fishpig boss absent
+21,117:00-120:00,Cave course,Stage Clear,High,Scene absent
+22,120:30-122:00,Boss arena,Shrewy Defeated,High,Shrewy implemented provisionally
+23,123:30-126:00,Hub/park,NPC and mechanical structure,High,Hub scene absent
+24,126:30,Selection screen,Master Gator,High,Master Gator boss absent
+25,127:00-133:30,Industrial/sky course,Stage Clear,High,Scene absent
+26,134:00-136:30,Starry platform course,1st/2nd indicators and spikes,High,Race/placement logic absent
+27,137:00-142:14,Dark city boss encounter,Boss in blue energy field/mechanical vehicle; title unreadable,High encounter / Low name,Boss absent; identity unresolved
