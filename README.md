@@ -1,9 +1,9 @@
 
-> **Current development milestone: v1.9.9 gameplay interaction regression (22 Nov 2026).** Stops object processing after fatal contact and adds synthetic public interaction tests. The earlier v1.9.8 Stage Clear test hardening adds
-> a host runtime regression test for Stage Clear's one-time preparation,
-> 4bpp-to-8bpp expansion, palette/frame commit and Mode 0 restore. The
-> development-only SELECT stage cycling is now disabled in normal builds.
-> Full ROM boot and mGBA rendering remain unverified.
+> **Current development milestone: v1.9.10 title-menu navigation scaffold (22 Nov 2026).** Adds
+> bounded Up/Down navigation and a focus marker for the three title entries
+> confirmed in the walkthrough. A/Start launches Start Game; Settings and Quit
+> remain non-dispatched pending verified original behavior and GBA mapping.
+> Public host and ARM7TDMI CI checks pass; full ROM/mGBA verification remains separate.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
