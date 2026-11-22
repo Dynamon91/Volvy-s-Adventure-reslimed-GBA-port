@@ -8,6 +8,7 @@
 #include "core/boss_shrewy.h"
 #include "core/native_scene.h"
 #include "core/static_frame_scheduler.h"
+#include "core/sprite_visibility.h"
 #include "shrewy_room.h"
 #include "w1_l1_objects.h"
 #include "bonus_w1_room.h"
@@ -316,6 +317,40 @@ static int static_animation_for_actor(const Level *level, int index)
     }
 }
 
+/* Culling before frame scheduling is important: off-screen instances used to
+ * claim the same VBlank upload allowance as visible actors. Test the desired
+ * and the resident frame, because their part positions may differ. */
+static int static_frame_visible(const GbaSpriteFrame *frame,
+                                int base_x, int base_y, int facing_left)
+{
+    unsigned int i;
+    for (i = 0; i < frame->part_count && i < MAX_PLAYER_PARTS; ++i) {
+        const GbaSpritePart *part = &frame->parts[i];
+        int x = facing_left
+            ? base_x + frame->width - part->offset_x - part->hw_w
+            : base_x + part->offset_x;
+        int y = base_y + part->offset_y;
+        if (sprite_part_intersects_viewport(x, y, part->hw_w, part->hw_h))
+            return 1;
+    }
+    return 0;
+}
+
+static int static_actor_visible(const StaticAnimGraphic *gfx,
+                                const GbaSpriteFrame *requested,
+                                int world_x, int world_y, int cam_x, int cam_y,
+                                int facing_left)
+{
+    const GbaSpriteFrame *loaded;
+    if (static_frame_visible(requested, world_x - requested->origin_x - cam_x,
+                             world_y - requested->origin_y - cam_y, facing_left))
+        return 1;
+    if (gfx->loaded_frame >= gfx->animation->frame_count) return 0;
+    loaded = &gfx->animation->frames[gfx->loaded_frame];
+    return static_frame_visible(loaded, world_x - loaded->origin_x - cam_x,
+                                world_y - loaded->origin_y - cam_y, facing_left);
+}
+
 static int draw_static_parts(const StaticAnimGraphic *gfx,
                              const GbaSpriteFrame *frame,
                              OBJATTR *oam, int next_oam,
@@ -332,8 +367,7 @@ static int draw_static_parts(const StaticAnimGraphic *gfx,
             ? base_x + frame->width - part->offset_x - part->hw_w
             : base_x + part->offset_x;
         int y = base_y + part->offset_y;
-        if (x + part->hw_w <= 0 || x >= 240 ||
-            y + part->hw_h <= 0 || y >= 160)
+        if (!sprite_part_intersects_viewport(x, y, part->hw_w, part->hw_h))
             continue;
         oam[next_oam].attr0 = (u16)((y & 255) | OBJ_8BPP_BIT |
                                     ((u16)part->shape << 14));
@@ -358,7 +392,7 @@ static int draw_world_actors(const Level *level, OBJATTR *oam, int next_oam,
         const GbaSpriteAnim *anim;
         const GbaSpriteFrame *frame;
         unsigned int frame_index;
-        int gfx_id, base_x, base_y, facing_left;
+        int gfx_id, base_x, base_y, facing_left, world_x, world_y;
         if (!level_object_active(level, i)) continue;
         gfx_id = static_animation_for_actor(level, i);
         if (gfx_id < 0) continue;
@@ -368,14 +402,19 @@ static int draw_world_actors(const Level *level, OBJATTR *oam, int next_oam,
         frame_index = (anim_tick / (anim->frame_duration ?
                       anim->frame_duration : 1u)) % anim->frame_count;
         if (frame_index >= MAX_STATIC_FRAMES) continue;
-        /* OAM must describe the frame that VBlank will actually upload. */
-        frame_index = request_static_frame(gfx_id, frame_index);
-        frame = &anim->frames[frame_index];
-        base_x = (object->x + level_world_actor_offset(level, i)) * 2 -
-                 frame->origin_x - cam_x;
-        base_y = object->y * 2 - frame->origin_y - cam_y;
+        world_x = (object->x + level_world_actor_offset(level, i)) * 2;
+        world_y = object->y * 2;
         facing_left = object->kind == WORLD_SQUIRREL &&
                       level->actor_dir[i] < 0;
+        frame = &anim->frames[frame_index];
+        if (!static_actor_visible(gfx, frame, world_x, world_y,
+                                  cam_x, cam_y, facing_left))
+            continue;
+        /* Reserve OBJ bandwidth only for an animation with visible parts. */
+        frame_index = request_static_frame(gfx_id, frame_index);
+        frame = &anim->frames[frame_index];
+        base_x = world_x - frame->origin_x - cam_x;
+        base_y = world_y - frame->origin_y - cam_y;
         next_oam = draw_static_parts(gfx, frame, oam, next_oam,
                                      base_x, base_y, facing_left);
     }
@@ -730,7 +769,7 @@ static int draw_bonus_actors(const Level *level, const BonusRace *race,
         const GbaSpriteAnim *anim;
         const GbaSpriteFrame *frame;
         unsigned int frame_index;
-        int gfx_id, base_x, base_y, facing_left = 0;
+        int gfx_id, base_x, base_y, world_x, world_y, facing_left = 0;
 
         if (level->removed[i] &&
             (instance->kind == BONUS_W1_ROOM_OBJ_ONION ||
@@ -753,29 +792,30 @@ static int draw_bonus_actors(const Level *level, const BonusRace *race,
             else frame_index = 0;
         }
         if (frame_index >= MAX_STATIC_FRAMES) continue;
-        /* OAM must describe the frame that VBlank will actually upload. */
-        frame_index = request_static_frame(gfx_id, frame_index);
-        frame = &anim->frames[frame_index];
-
         if (instance->kind == BONUS_W1_ROOM_OBJ_MOVING_PLATFORM && race) {
             const BonusMovingPlatform *platform = bonus_platform_for_instance(
                 race->platforms, (unsigned int)i);
-            base_x = (platform ? fx_to_int(platform->x) * 2 : (int)instance->x) -
-                     frame->origin_x - cam_x;
-            base_y = (platform ? fx_to_int(platform->y) * 2 : (int)instance->y) -
-                     frame->origin_y - cam_y;
+            world_x = platform ? fx_to_int(platform->x) * 2 : (int)instance->x;
+            world_y = platform ? fx_to_int(platform->y) * 2 : (int)instance->y;
         } else if (instance->kind == BONUS_W1_ROOM_OBJ_BUNNY && race) {
             const BonusBunny *bunny = bonus_bunny_for_instance(
                 race->bunnies, (unsigned int)i);
-            base_x = (bunny ? fx_to_int(bunny->x) * 2 : (int)instance->x) -
-                     frame->origin_x - cam_x;
-            base_y = (bunny ? fx_to_int(bunny->y) * 2 : (int)instance->y) -
-                     frame->origin_y - cam_y;
+            world_x = bunny ? fx_to_int(bunny->x) * 2 : (int)instance->x;
+            world_y = bunny ? fx_to_int(bunny->y) * 2 : (int)instance->y;
             facing_left = bunny && bunny->facing < 0;
         } else {
-            base_x = (int)instance->x - frame->origin_x - cam_x;
-            base_y = (int)instance->y - frame->origin_y - cam_y;
+            world_x = (int)instance->x;
+            world_y = (int)instance->y;
         }
+        frame = &anim->frames[frame_index];
+        if (!static_actor_visible(gfx, frame, world_x, world_y,
+                                  cam_x, cam_y, facing_left))
+            continue;
+        /* Both the bonus actors and World 1 actors use the same VBlank budget. */
+        frame_index = request_static_frame(gfx_id, frame_index);
+        frame = &anim->frames[frame_index];
+        base_x = world_x - frame->origin_x - cam_x;
+        base_y = world_y - frame->origin_y - cam_y;
         next_oam = draw_static_parts(gfx, frame, oam, next_oam,
                                      base_x, base_y, facing_left);
     }
