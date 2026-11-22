@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.9.5 — swept collisions, negative edge correction and fidelity audit
+
+- Fix a reproduced high-speed dash-through-wall bug, checking each crossed
+  tile rather than the final tile only.
+- Floor negative pixel coordinates to the correct outside tile so the player
+  cannot slip 7px beyond a solid left level boundary.
+- Preserve one-way and breakable interactions while sweeping vertical/horizontal
+  collision contacts, with two new C regression programs.
+- Host gameplay tests, ARM code generation and experimental ROM structural
+  checks pass. No mGBA or hardware boot has been proven for v1.9.5.
+- Add a gap audit distinguishing existing World 1 content from incomplete
+  Worlds 2–4 and unverified source-game behaviors.
+
+
 ## v1.9.4 — safer and more efficient native 4bpp background streaming
 
 - Remove the 4 KiB temporary scene upload array from the ARM7TDMI stack and fill the existing persistent upload staging queue directly; remove the per-window 4 KiB copy.
