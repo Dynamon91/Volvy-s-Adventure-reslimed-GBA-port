@@ -14,8 +14,11 @@ void gba_display_init(void)
 
     /* GBA VRAM spans 96 KiB: 64 KiB BG + 32 KiB OBJ. */
     memset((void *)VRAM, 0, 0x18000);
-    memset(BG_COLORS, 0, 512);
-    memset(OBJ_COLORS, 0, 512);
+    /* Palette RAM requires halfword or word writes on GBA hardware. */
+    for (i = 0; i < 256; ++i) {
+        BG_COLORS[i] = 0;
+        OBJ_COLORS[i] = 0;
+    }
 
     for (i = 0; i < VOLVY_OAM_COUNT; ++i) {
         s_oam_shadow[i].attr0 = ATTR0_DISABLED;
