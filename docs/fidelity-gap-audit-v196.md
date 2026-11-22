@@ -20,7 +20,7 @@ The project also has a player controller, native-resolution sprite sets, a 4bpp 
 - Combo counter and 1st/2nd placement indicators appear in relevant courses.
 - Results presentation: purple illustrated stage-clear / boss-clear screens with Volvy thumbs-up artwork, green splat and score/ranking text.
 - Selection/hub presentation: multiple handheld-style screens and an outdoor park/hub.
-- Named selection/results include Fuzz Forest (pixel text), Bonus Stage, Big City Rooftops (partly legible), Macho Metro (partly legible), Fishpig and Master Gator.
+- Named selection/results include Fuzz Forest, Bonus Stage, Rigatoni Rooftops (verified at 57:00), Macho Metro (still partly legible), Fishpig, Bundtcake Burrows and Master Gator.
 - Boss results explicitly show Shrewy and Fishpig. A later mechanical boss encounter is visible but its name cannot be read confidently.
 - The video spans many more environments than the current five scenes.
 
@@ -29,7 +29,7 @@ The project also has a player controller, native-resolution sprite sets, a 4bpp 
 | Area | Current state | Required work |
 |---|---|---|
 | Worlds / levels | Only World 1 L1–L3 plus Bonus Race | Reconstruct missing stage layouts, object placements, collision and routing |
-| Hub / selection | Not implemented faithfully | Rebuild handheld selection screens, entries, input flow and park/hub |
+| Hub / selection | Title-menu scaffold exists; walkthrough card art has a private conversion pipeline, but no runtime card state | Rebuild handheld selection screens, entries, input flow, course routing and park/hub |
 | Stage results | Generic text only | Recreate illustrated Stage Clear, five-thumb ranking and score metrics |
 | Boss results | Generic `BOSS CLEAR` text | Boss-specific names, completion times, rankings and original transitions |
 | Fishpig | Not implemented | Recover boss sprite/state/arena/attacks and collision |
