@@ -19,5 +19,5 @@ for debug_label in ('"ONIONS"', '"SHREWY"', '"HAND ATTACK"', '"RACE"', '"W1-L1"'
 assert 'uint32_t elapsed_frames;' in level
 assert game.count('++s_level.elapsed_frames;') == 2
 assert 'mode == GAME_BONUS ? level->race_elapsed_frames :' in render
-assert 'level->elapsed_frames);' in render
+assert 'level->elapsed_frames,' in render and 'title_selection);' in render
 print("Walkthrough HUD contract: PASS (onion/stopwatch icons, X###, M:SS:CC timer, pause-safe timing)")
