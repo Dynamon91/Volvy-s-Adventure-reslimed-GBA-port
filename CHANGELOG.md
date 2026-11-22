@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.9.8 test hardening — Stage Clear runtime coverage
+
+- Add a host-side C runtime test for the actual Stage Clear module.
+- Verify one-time preparation, low/high nibble expansion, 240×160 frame layout, 12px / 13px letterbox rows, palette and bitmap transfers, and Mode 0 restoration.
+- Use a deterministic LZ77 test stub for the runtime module test; the separate asset test continues to validate the real BIOS-LZ77 stream.
+- Make the framebuffer address overrideable only by the host test shim; the production default remains GBA VRAM at 0x06000000.
+- GCC host runtime test, GCC syntax check and isolated ARM7TDMI/Thumb module code generation: PASS.
+- Full ROM build, full renderer link and mGBA boot/render: NOT VERIFIED.
+
 ## v1.9.8 — walkthrough-derived Stage Clear screen
 
 - Add a static Stage Clear result frame sampled from the user's walkthrough at 04:00.
