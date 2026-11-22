@@ -1,13 +1,15 @@
 
-> **Current development milestone: v1.9.2 (22 Nov 2026).** Continued from
-> v1.9.1 without resetting World 1, Bonus Race, Shrewy or converted assets.
-> Off-screen static actors no longer reserve the shared VBlank sprite upload
-> budget. See `RELEASE_NOTES_v1_9_2.md`. Experimental ROM structural tests
-> pass, but the v1.9.2 ROM has **not** been booted in mGBA or on real GBA.
+> **Current development milestone: v1.9.3 (22 Nov 2026).** Based on v1.9.2,
+> keeping World 1, Bonus Race, Shrewy and all source-derived art unchanged.
+> Player, Shrewy and projectile metasprite parts outside the GBA viewport are
+> now culled *before* writing hardware OAM, avoiding 9-bit/8-bit wraparound
+> ghosts during camera transitions. Details: `RELEASE_NOTES_v1_9_3.md`.
+> Host regression, ARM codegen and ROM structure pass; mGBA/hardware gameplay
+> for v1.9.3 has not been verified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.2 visible-actor animation streaming optimization (built on the v1.9 source-marker fix and v1.9.1 VBlank synchronization).** The platform scenes and primary actor sprites now render at 1:1 source-pixel scale. Five source scenes are converted to 4bpp BG tiles with palette banks and a 32×32 streaming cache. The project now includes 56 native-resolution sprite animation sets, expanded World 1 enemy/prop rendering, original HUD glyphs, an OAM priority fix that keeps gameplay sprites from covering the HUD, and suppression of the source-only solid-green `spr_hole` marker. This remains a reconstruction prototype; the v1.9 ROM still needs an mGBA retest.
+**Current milestone: v1.9.3 GBA OBJ wraparound/phantom-sprite protection (built on v1.9.2 visible-actor streaming).** The platform scenes and primary actor sprites now render at 1:1 source-pixel scale. Five source scenes are converted to 4bpp BG tiles with palette banks and a 32×32 streaming cache. The project now includes 56 native-resolution sprite animation sets, expanded World 1 enemy/prop rendering, original HUD glyphs, an OAM priority fix that keeps gameplay sprites from covering the HUD, and suppression of the source-only solid-green `spr_hole` marker. This remains a reconstruction prototype; the v1.9 ROM still needs an mGBA retest.
 
 The project targets ARM7TDMI Game Boy Advance hardware using C, devkitARM/libgba, 20.12 fixed-point gameplay math, Mode 0 tiled backgrounds, hardware OBJ sprites, and VBlank-synchronized VRAM/OAM updates. The original user-supplied GameMaker `data.win` was parsed privately; it is not included in this project archive.
 
