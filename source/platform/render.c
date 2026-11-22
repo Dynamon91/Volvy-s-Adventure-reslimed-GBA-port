@@ -997,7 +997,8 @@ void render_vblank_commit(Level *level, const Camera *camera)
 
     if (s_scene_upload_pos >= s_scene_upload_count && s_scene_map_dirty) {
         dmaCopy(s_scene_map, BG_MAP_MAIN, sizeof(s_scene_map));
-        native_scene_presentation_commit(&s_scene_presentation,                                         s_scene_start_x, s_scene_start_y);
+        native_scene_presentation_commit(&s_scene_presentation,
+                                         s_scene_start_x, s_scene_start_y);
         s_scene_map_dirty = 0;
         s_scene_upload_count = 0;
         s_scene_upload_pos = 0;
