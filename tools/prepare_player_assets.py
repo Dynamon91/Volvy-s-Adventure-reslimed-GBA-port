@@ -82,10 +82,22 @@ def main():
         "spr_swolvy_punch_up", "spr_swolvy_swim", "spr_swolvy_transform", "spr_dig_swole",
         "spr_onion", "spr_destructible_block", "spr_destructible_block_swolvy",
         "spr_bunny_hop", "spr_bumper_sq", "spr_bumper_tri",
+        "spr_moving_platform", "spr_moving_platform_wide", "spr_cloud_platform",
         "spr_action_block", "spr_action_block_spent",
         "spr_squirrel_idle", "spr_squirrel_walk", "spr_squirrel_hurt", "spr_springboard"
     }
     sprites = [s for s in manifest["selected_sprites"] if s["name"] in player_render_sprites]
+    # Reproduce the source room's 4/3 X-scale instance without shipping an
+    # extra source PNG. The original 48x8 moving-platform art becomes 64x8
+    # (32x4 at 2:1) before the normal OBJ converter runs.
+    if not any(s["name"] == "spr_moving_platform_wide" for s in sprites):
+        original = next((s for s in sprites if s["name"] == "spr_moving_platform"), None)
+        if original is not None:
+            wide = dict(original)
+            wide["name"] = "spr_moving_platform_wide"
+            wide["width"] = 64
+            wide["origin"] = [32, 8]
+            sprites.append(wide)
     images = {}
     colors = collections.Counter()
 
@@ -95,6 +107,8 @@ def main():
         for frame in sprite["frames"]:
             path = args.assets_root / frame["file"]
             im = Image.open(path).convert("RGBA")
+            if name == "spr_moving_platform_wide":
+                im = im.resize((64, im.height), Image.Resampling.NEAREST)
             w = max(1, (im.width + args.scale - 1) // args.scale)
             h = max(1, (im.height + args.scale - 1) // args.scale)
             im = im.resize((w, h), Image.Resampling.NEAREST)
