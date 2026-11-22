@@ -100,6 +100,7 @@ int native_scene_cache_build(const NativeSceneAsset *scene,
                              uint16_t *upload_count)
 {
     unsigned int i;
+    unsigned int free_slot = 0;
     int x, y;
     uint16_t count = 0;
 
@@ -140,20 +141,23 @@ int native_scene_cache_build(const NativeSceneAsset *scene,
 
     /* Assign slots to newly visible source tiles. The 32x32 map has at most
        1024 cells, so its unique-tile working set always fits the cache. */
+    /* Source ids are visited in ascending order; the lowest vacant slot is
+     * always consumed first. A monotonic cursor gives identical allocations
+     * without rescanning the already-occupied prefix for every new tile. */
     for (i = 0; i < scene->tile_count; ++i) {
-        unsigned int slot;
         if (!cache->needed[i] || cache->source_to_slot[i] >= 0) continue;
-        for (slot = 0; slot < NATIVE_SCENE_CACHE_TILES; ++slot)
-            if (cache->slot_to_source[slot] == NATIVE_SCENE_INVALID_TILE)
-                break;
-        if (slot >= NATIVE_SCENE_CACHE_TILES ||
+        while (free_slot < NATIVE_SCENE_CACHE_TILES &&
+               cache->slot_to_source[free_slot] != NATIVE_SCENE_INVALID_TILE)
+            ++free_slot;
+        if (free_slot >= NATIVE_SCENE_CACHE_TILES ||
             count >= NATIVE_SCENE_CACHE_TILES)
             return 0;
-        cache->slot_to_source[slot] = (uint16_t)i;
-        cache->source_to_slot[i] = (int16_t)slot;
+        cache->slot_to_source[free_slot] = (uint16_t)i;
+        cache->source_to_slot[i] = (int16_t)free_slot;
         uploads[count].source_tile = (uint16_t)i;
-        uploads[count].cache_slot = (uint16_t)slot;
+        uploads[count].cache_slot = (uint16_t)free_slot;
         ++count;
+        ++free_slot;
     }
 
     for (y = 0; y < NATIVE_SCENE_WINDOW_H; ++y) {
