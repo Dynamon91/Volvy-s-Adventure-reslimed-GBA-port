@@ -1,0 +1,48 @@
+name: GBA port regression
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  host-regression:
+    name: Host gameplay and asset regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run host C tests and source checks
+        run: sh tests/run_host_tests.sh
+
+  experimental-arm-build:
+    name: Experimental ARM7TDMI cartridge link
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Clang and LLVM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm
+      - name: Compile and link experimental GBA image
+        run: python3 experimental/clang-gba/build.py
+      - name: Verify cartridge header and memory map
+        run: |
+          python3 tests/verify_experimental_rom.py \
+            build-clang-experimental/volvy_reslimed.gba \
+            build-clang-experimental/volvy_reslimed.elf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: volvy-gba-experimental-rom
+          path: |
+            build-clang-experimental/volvy_reslimed.gba
+            build-clang-experimental/volvy_reslimed.elf
+            build-clang-experimental/volvy_reslimed.map
+          if-no-files-found: error
+          retention-days: 14
