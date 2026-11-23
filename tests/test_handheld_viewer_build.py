@@ -83,6 +83,21 @@ def main() -> None:
         assert meta["card_count"] == len(CARDS)
         assert meta["rom_sha256"] == hashlib.sha256(rom).hexdigest()
         assert meta["mgba_boot"] == "NOT_TESTED"
+
+        # Reject truncated streams even when their BIOS header size looks valid.
+        malformed = folder / "corrupt_cards.zip"
+        with zipfile.ZipFile(archive) as original, zipfile.ZipFile(malformed, "w") as bad:
+            for entry in original.namelist():
+                blob = original.read(entry)
+                if entry == "assets/converted/ui/fuzz_forest.bin":
+                    blob = blob[:4]
+                bad.writestr(entry, blob)
+        invalid = subprocess.run([
+            sys.executable, str(root / "experimental/handheld-card-viewer/build.py"),
+            "--assets-zip", str(malformed), "--out", str(folder / "bad_build")
+        ], capture_output=True, text=True)
+        assert invalid.returncode != 0
+        assert "Truncated LZ77 flag" in invalid.stderr
     print("Standalone card viewer ARM7TDMI link / GBA checksum: PASS (synthetic assets only)")
 
 
