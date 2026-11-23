@@ -16,6 +16,7 @@ assert 'stage_clear_screen_restore();' in render
 assert 'gba_display_commit_oam();' in render
 assert 'LZ77UnCompWram(stage_clear_v198_bin, s_stage_clear_packed);' in screen
 assert 'SetMode(MODE_4 | BG2_ON);' in screen
+assert screen.count("VOLVY_BITMAP_WAIT_DMA3();") == 2
 assert 'dmaCopy(s_stage_clear_frame, STAGE_CLEAR_FRAMEBUFFER,' in screen
 assert 'SetMode(MODE_0 | BG0_ON | OBJ_ON | OBJ_1D_MAP);' in screen
 
@@ -51,6 +52,10 @@ assert "s_stage_clear_active = 1;" in commit_block
 assert "gba_display_commit_oam();" in commit_block
 assert "return;" in commit_block
 
+
+bitmap_header = (root / "include/platform/bitmap_dma_sync.h").read_text()
+assert "0x040000DCu" in bitmap_header
+assert "1u << 31" in bitmap_header
 arm_gba = (root / "experimental/clang-gba/include/gba.h").read_text()
 assert "#define MODE_4 4" in arm_gba
 assert 'swi 0x11' in arm_gba
