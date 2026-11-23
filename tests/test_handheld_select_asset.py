@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.build_handheld_select_asset import convert, lz77_decode
+from tools.build_handheld_select_asset import convert, lz77_decode, bgr555_preview_rgb
 
 
 def make_source(path: Path) -> None:
@@ -29,8 +29,10 @@ with tempfile.TemporaryDirectory() as temp:
     source = base / "source.png"
     make_source(source)
     for colors, expected_bpp, expected_bytes in ((16, 4, 16200), (256, 8, 32400)):
-        prefix = base / "converted" / "ui" / f"test_{colors}"
-        manifest = convert(source, prefix, f"test_{colors}", 630, colors)
+      for resample in ("nearest", "box", "lanczos"):
+        prefix = base / "converted" / "ui" / f"test_{colors}_{resample}"
+        manifest = convert(source, prefix, f"test_{colors}_{resample}", 630,
+                           colors, resample)
         compressed = prefix.with_suffix(".bin").read_bytes()
         raw = lz77_decode(compressed)
         assert compressed[0] == 0x10
@@ -38,11 +40,17 @@ with tempfile.TemporaryDirectory() as temp:
         assert manifest["pixel_bpp"] == expected_bpp
         assert manifest["packed_content_bytes"] == expected_bytes
         assert manifest["crop"] == "none"
+        assert manifest["resampling"] == resample
+        assert manifest["preview_palette"] == "BGR555 re-expanded to RGB888"
         assert manifest["letterbox_rows"] == {"top": 12, "bottom": 13}
         assert len(manifest["palette_bgr555"]) == colors
         assert all(int(value, 16) <= 0x7FFF for value in manifest["palette_bgr555"])
         preview = Image.open(prefix.with_suffix(".preview.png")).convert("P")
         assert preview.size == (240, 160)
+        image_palette = preview.getpalette()
+        for i, val in enumerate(manifest["palette_bgr555"]):
+            expected = bgr555_preview_rgb(int(val, 16))
+            assert tuple(image_palette[i * 3:i * 3 + 3]) == expected
         assert all(preview.getpixel((x, y)) == 0
                    for y in list(range(12)) + list(range(147, 160))
                    for x in range(240))
@@ -51,4 +59,10 @@ with tempfile.TemporaryDirectory() as temp:
         saved = json.loads(prefix.with_suffix(".manifest.json").read_text())
         assert saved["source_sha256"] == manifest["source_sha256"]
 
-print("Walkthrough handheld-card asset: PASS (16/8bpp, BIOS LZ77, BGR555 palette, no crop, 12/13px letterbox)")
+    try:
+        convert(source, base / "invalid", "bad", colors=256, resample="unknown")
+        assert False, "invalid resample was accepted"
+    except ValueError:
+        pass
+
+print("Walkthrough handheld-card asset: PASS (16/8bpp, nearest/box/lanczos, BIOS LZ77, hardware BGR555 preview, 12/13px)")

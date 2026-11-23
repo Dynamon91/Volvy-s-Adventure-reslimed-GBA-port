@@ -96,3 +96,30 @@ contract checks the optional dev-only input flow and restoration ordering.
 
 Limitations: no complete devkitARM/libgba ROM build or mGBA visual test
 with the private card assets; no new level or selection-hub progression.
+
+## v1.9.14 — source-preserving resampling and hardware-accurate previews
+
+The converter keeps **nearest** as its default because the original game is
+pixel art. Two *opt-in* 256-color resampling modes are available for A/B testing:
+
+- `--resample box`: averages source pixels before 240×135 quantization,
+  reducing aliasing of small UI lettering and diagonal shapes, at the cost of
+  softer pixel-art edges.
+- `--resample lanczos`: higher-order filtered downscale; can retain line
+  contrast but may introduce halos, so it is not the default.
+- `--resample nearest`: existing pixel-art-preserving behavior; retains
+  backwards compatibility with the v1.9.13 private card pack.
+
+All three modes preserve the **same 16:9 framing** and the 12/13px margins.
+
+**Preview correctness fix:** previously the PNG previews retained 24-bit
+quantized colors even though the GBA palette stored only 5 bits per R/G/B
+channel. Previews now use the exact generated BGR555 palette re-expanded to
+RGB888, making the preview accurately represent the output palette rather
+than promising unavailable colors.
+
+Public host tests cover both 4bpp and 8bpp, all three filters, BIOS-LZ77
+round-trips, letterbox pixels and exact 5-bit preview palette matching.
+This is a fidelity study, **not a claim that filtering restores lost 640×360
+detail**; screenshots should be checked in an emulator before selecting the
+best option for gameplay.

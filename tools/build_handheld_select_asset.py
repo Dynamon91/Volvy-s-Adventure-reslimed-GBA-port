@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Build private GBA Mode 4 assets from a 16:9 walkthrough selection-screen frame.
 
-Preserves the full frame at 240x135 (nearest-neighbour, no crop/stretch), with
-12/13px letterboxing for the 240x160 GBA display. Emits BIOS-LZ77 pixel data,
-a BGR555 palette C/header, a PNG preview, and a source-hash manifest.
+Preserves the full frame at 240x135 (no crop/stretch), with
+12/13px letterboxing for the 240x160 GBA display. Nearest-neighbour
+remains the default for pixel-art fidelity; optional box/lanczos filtering
+permits comparison of small lettering. PNG previews use the same 5-bit
+BGR555 palette values as physical GBA hardware, not the 24-bit source palette.
+Emits BIOS-LZ77 pixels, a BGR555 palette C/header and a source-hash manifest.
 Original-derived image outputs belong in the private asset bundle, not public Git.
 """
 from __future__ import annotations
@@ -17,6 +20,21 @@ W, H, CONTENT_H, TOP = 240, 160, 135, 12
 def bgr555(rgb):
     r, g, b = rgb
     return ((r * 31 + 127) // 255) | (((g * 31 + 127) // 255) << 5) | (((b * 31 + 127) // 255) << 10)
+
+
+def bgr555_preview_rgb(value):
+    """Re-expand the 5-bit BGR555 output to displayable PNG colors."""
+    def expand(v):
+        return (v << 3) | (v >> 2)
+    return (expand(value & 31), expand((value >> 5) & 31),
+            expand((value >> 10) & 31))
+
+
+RESAMPLE_MODES = {
+    "nearest": Image.Resampling.NEAREST,
+    "box": Image.Resampling.BOX,
+    "lanczos": Image.Resampling.LANCZOS,
+}
 
 
 def ident(value):
@@ -103,14 +121,17 @@ def lz77_decode(blob):
     return bytes(out)
 
 
-def convert(source: Path, prefix: Path, name: str, source_time=None, colors=256):
+def convert(source: Path, prefix: Path, name: str, source_time=None, colors=256,
+            resample="nearest"):
     source_bytes = source.read_bytes()
     image = Image.open(source).convert("RGB")
     if image.width * 9 != image.height * 16:
         raise ValueError(f"Expected 16:9 input, got {image.width}x{image.height}")
     if colors not in (16, 256):
         raise ValueError("colors must be 16 or 256")
-    content = image.resize((W, CONTENT_H), Image.Resampling.NEAREST)
+    if resample not in RESAMPLE_MODES:
+        raise ValueError(f"resample must be one of {', '.join(RESAMPLE_MODES)}")
+    content = image.resize((W, CONTENT_H), RESAMPLE_MODES[resample])
     quant = content.quantize(colors=colors, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
     indices = list(quant.getdata())
     rawpal = quant.getpalette() or []
@@ -146,7 +167,10 @@ def convert(source: Path, prefix: Path, name: str, source_time=None, colors=256)
     frame[TOP * W:(TOP + CONTENT_H) * W] = indices
     preview = Image.new("P", (W, H))
     preview.putdata(frame)
-    flat = [v for rgb in palette for v in rgb]
+    # Match the exact 5-bit palette that the .c file uploads to GBA BG RAM.
+    # This avoids falsely showing colors that the cartridge cannot display.
+    hardware_rgb = [bgr555_preview_rgb(word) for word in words]
+    flat = [v for rgb in hardware_rgb for v in rgb]
     preview.putpalette(flat + [0] * (768 - len(flat)))
     preview.save(prefix.with_suffix(".preview.png"))
     preview.resize((W * 3, H * 3), Image.Resampling.NEAREST).save(
@@ -157,7 +181,8 @@ def convert(source: Path, prefix: Path, name: str, source_time=None, colors=256)
         "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
         "source_time_seconds": source_time, "source_size": list(image.size),
         "target_size": [W, H], "content_size": [W, CONTENT_H],
-        "crop": "none", "resampling": "nearest-neighbour",
+        "crop": "none", "resampling": resample,
+        "preview_palette": "BGR555 re-expanded to RGB888",
         "letterbox_rows": {"top": TOP, "bottom": H - TOP - CONTENT_H},
         "pixel_bpp": 4 if colors == 16 else 8,
         "palette_entries": colors, "packed_content_bytes": len(packed),
@@ -176,8 +201,11 @@ def main():
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--source-time", type=int)
     ap.add_argument("--colors", type=int, choices=(16, 256), default=256)
+    ap.add_argument("--resample", choices=tuple(RESAMPLE_MODES), default="nearest",
+                    help="nearest preserves pixel art; box/lanczos are optional experiments")
     a = ap.parse_args()
-    print(json.dumps(convert(a.input, a.out, a.name, a.source_time, a.colors), indent=2))
+    print(json.dumps(convert(a.input, a.out, a.name, a.source_time,
+                             a.colors, a.resample), indent=2))
 
 
 if __name__ == "__main__":
