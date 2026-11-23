@@ -1,6 +1,7 @@
 #include <gba.h>
 #include <string.h>
 #include "platform/handheld_card_screen.h"
+#include "platform/bitmap_dma_sync.h"
 
 #define CARD_WIDTH 240u
 #define CARD_HEIGHT 160u
@@ -75,7 +76,10 @@ void handheld_card_screen_commit(void)
      * after DMA has completed, avoiding half-drawn visible frames. */
     SetMode(MODE_4 | BG2_ON | (1u << 7));
     dmaCopy(s_card_palette, (void *)BG_COLORS, sizeof(s_card_palette));
+    VOLVY_BITMAP_WAIT_DMA3();
     dmaCopy(s_card_frame, HANDHELD_CARD_FRAMEBUFFER, CARD_FRAME_BYTES);
+    /* dmaCopy schedules DMA3; it is not a completion barrier. */
+    VOLVY_BITMAP_WAIT_DMA3();
     SetMode(MODE_4 | BG2_ON);
 }
 
