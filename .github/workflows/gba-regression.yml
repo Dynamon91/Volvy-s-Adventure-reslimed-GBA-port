@@ -28,12 +28,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Clang
+      - name: Install Clang, LLD and LLVM binutils
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang
+          sudo apt-get install -y clang lld llvm
       - name: Compile Stage Clear module and embedded LZ77 asset
         run: sh tests/run_public_arm_check.sh
+      - name: Link synthetic-asset standalone GBA card viewer
+        run: python3 tests/test_handheld_viewer_build.py
       - uses: actions/upload-artifact@v4
         with:
           name: stage-clear-arm7tdmi-objects
