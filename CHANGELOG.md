@@ -1,3 +1,11 @@
+## v1.9.14 — pixel-art resampling comparison and hardware palette previews
+
+- Preserve nearest-neighbour as default, and add optional box/lanczos downsampling for 16:9 source-derived 240×135 selection cards.
+- Correct PNG previews to use the actual generated 5-bit BGR555 hardware palette, rather than 24-bit source quantized RGB; verify palette consistency in the public host suite for both 4bpp/8bpp and all three resampling modes.
+- Re-extract the nine source frames as PNG directly from the original six-part 640×360 walkthrough and generate two 256 KiB nine-card technical ROMs: nearest (pixel-art) and box (anti-aliased). Both ARM7TDMI link and GBA header checksum pass; no mGBA boot is claimed.
+- Source-frame reading correction at 81:30: “Macaroni Metro” is better supported than the former “Macho Metro”; this still needs original text-asset verification. The private asset ID `selection_81m30` is stable.
+- No new gameplay scene or original stage router is claimed; overall port estimate stays at 44%.
+
 ## v1.9.13 — first standalone 9-card GBA reference ROM
 
 - Built a 256 KiB GBA image containing all nine source-derived 256-color title and handheld selection screens; ARM7TDMI/Thumb ELF link, ROM header and checksum PASS.

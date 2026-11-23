@@ -20,7 +20,7 @@ The project also has a player controller, native-resolution sprite sets, a 4bpp 
 - Combo counter and 1st/2nd placement indicators appear in relevant courses.
 - Results presentation: purple illustrated stage-clear / boss-clear screens with Volvy thumbs-up artwork, green splat and score/ranking text.
 - Selection/hub presentation: multiple handheld-style screens and an outdoor park/hub.
-- Named selection/results include Fuzz Forest, Bonus Stage, Rigatoni Rooftops (verified at 57:00), Macho Metro (still partly legible), Fishpig, Bundtcake Burrows and Master Gator.
+- Named selection/results include Fuzz Forest, Bonus Stage, Rigatoni Rooftops (verified at 57:00), Macaroni Metro (rechecked 81:30 crop, still not confirmed against original game text assets), Fishpig, Bundtcake Burrows and Master Gator.
 - Boss results explicitly show Shrewy and Fishpig. A later mechanical boss encounter is visible but its name cannot be read confidently.
 - The video spans many more environments than the current five scenes.
 

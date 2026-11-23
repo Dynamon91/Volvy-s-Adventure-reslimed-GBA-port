@@ -33,7 +33,7 @@
 | 57:00–65:30 | Pink handheld selection card reads **Rigatoni Rooftops**; orange city-rooftop and vertical-building course follows. `STAGE CLEAR!` at 65:30. | High for card title and course |
 | 66:00–71:30 | Blue industrial/construction course with hanging chains, suspended platforms and swinging wrecking-ball hazards. | High |
 | 72:00–79:30 | Dark industrial/city course with spotlights and vertical routes. `FISHPIG DEFEATED!` at 79:30. | High; boss name is **Fishpig**, not Ashpig |
-| 80:00–88:30 | A handheld selection card appears at 81:30 and appears to read **Macho Metro**; the starry blue course follows, with multicolored platforms, `1ST`/`2ND` placement indicators and an `ON YOUR MARKS!` cue at 82:00. | Medium for title, high for course |
+| 80:00–88:30 | A handheld selection card appears at 81:30 and is better read as **Macaroni Metro** after rechecking the 640×360 source frame at 81:30 with an enlarged, unfiltered crop; the starry blue course follows, with multicolored platforms, `1ST`/`2ND` placement indicators and an `ON YOUR MARKS!` cue at 82:00. | Medium for title (compressed lettering), high for course |
 | 89:00–95:30 | Grey/white industrial course with conveyor-like structures, machinery and destructible objects. `STAGE CLEAR!`; `Highest combo: 73` at 95:30. | High |
 | 96:00–105:30 | Purple night course with lamps, platforms, enemies and combo effects. | High |
 | 106:00–110:30 | Bright sky/water course with floating platforms and large aquatic scenery. | High |
@@ -52,7 +52,7 @@
 1. **The target is substantially larger than the current GBA prototype.** The supplied recording contains many visual environments and encounters that are not represented by the five currently converted scenes.
 2. **The HUD is not the old prototype HUD.** Gameplay frames consistently show a compact onion icon/count at top-left and a stopwatch/time display at top-right. The timer appears in `M:SS:CC` form and resets for separate stage/encounter runs. Combo and placement indicators appear in relevant sections.
 3. **Results screens are distinctive.** Stage results use a purple illustrated screen, Volvy thumbs-up artwork, a green splat graphic and performance text (for example `Highest combo: 73`). Boss results name the boss and show completion time/ranking.
-4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fuzz Forest`, `Bonus Stage`, `Rigatoni Rooftops`, `Macho Metro` (partly legible), `Fishpig`, `Bundtcake Burrows` and `Master Gator`, plus an outdoor hub. The cards use distinct green, pink and teal handheld shells.
+4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fuzz Forest`, `Bonus Stage`, `Rigatoni Rooftops`, `Macaroni Metro` (likely reading of compressed frame), `Fishpig`, `Bundtcake Burrows` and `Master Gator`, plus an outdoor hub. The cards use distinct green, pink and teal handheld shells.
 5. **Boss content extends beyond Shrewy.** Fishpig is explicitly defeated twice in the recording. A later dark-city mechanical boss encounter is also visible, but its name is not legible enough to assert.
 6. **The video is a reference capture, not a GBA emulator test.** It must not be cited as proof that any experimental GBA ROM boots or matches the original.
 

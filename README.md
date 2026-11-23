@@ -1,5 +1,5 @@
 
-> **Current development milestone: v1.9.13 standalone card-viewer ROM test (23 Nov 2026).** Reopens the full
+> **Current development milestone: v1.9.14 pixel-art fidelity A/B test (23 Nov 2026).** Reopens the full
 > 2h22 reference, verifies the Rigatoni Rooftops card at 57:00, and adds a
 > tested 4bpp/8bpp BIOS-LZ77 converter for private 240×135 selection/title
 > frames. An optional L-button Mode 4 viewer is now connected in development
@@ -7,7 +7,7 @@
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.13 standalone card-viewer ROM test.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.14 pixel-art fidelity A/B test.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
 
@@ -30,6 +30,26 @@ See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md),
 ### Release input behavior
 
 The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
+
+## v1.9.14: pixel-art downsampling A/B builds and faithful GBA previews
+
+- Converted all nine private walkthrough-derived title/handheld screens again
+  from the original 640×360 source video frames (PNG extraction; no re-encoded
+  JPEG intermediate), using the public, backward-compatible conversion tool.
+- Supports `--resample nearest` (default), `box`, and `lanczos`. Nearest
+  preserves blocky source pixels; Box reduces aliasing but softens edges.
+  Neither filter can create detail lost at the 240×135 GBA resolution.
+- Fixed preview PNGs to display the exact **BGR555 5-bit** values that the
+  GBA receives, not the original 24-bit quantization palette.
+- Generated two separate nine-card **standalone technical ROMs** (Nearest and
+  Box, 256 KiB each), plus side-by-side screenshots and private asset packs.
+  ARM7TDMI/Thumb link and GBA header/checksum verification passed; actual
+  mGBA rendering and hardware boot are still **unverified**.
+- Re-examined the 81:30 level-card title: **Macaroni Metro** is now the
+  strongest reading of the original frame; the earlier “Macho Metro” guess
+  should not be used. Definitive spelling still requires original text assets.
+- No new gameplay level was implemented. The full port remains at a 44%
+  **planning estimate**, not a measured fidelity result.
 
 ## v1.9.13: standalone ROM build for the nine walkthrough cards
 

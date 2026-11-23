@@ -1,0 +1,45 @@
+{
+  "project": "Volvy's Adventure Reslimed GBA port",
+  "version": "1.9.14",
+  "release_type": "private-source-derived-standalone-card-viewer-A-B",
+  "current_gameplay_version": "unchanged",
+  "gbalink": "ARM7TDMI Thumb Clang LLD",
+  "cards": 9,
+  "source_video": {
+    "format": "H264 640x360 30fps",
+    "recording_seconds": 8534.076372,
+    "intermediate": "PNG directly from original split MP4"
+  },
+  "display": {
+    "width": 240,
+    "height": 160,
+    "content_height": 135,
+    "letterbox_top": 12,
+    "letterbox_bottom": 13,
+    "color_format": "BGR555 256-color 8bpp"
+  },
+  "variants": {
+    "nearest": {
+      "rom_bytes": 262144,
+      "rom_sha256": "bb90a047937fe8cf2bbb1aca8746655f5306e1a20c713c9ca145f5e6a3329c56",
+      "rom_header_checksum": "PASS"
+    },
+    "box": {
+      "rom_bytes": 262144,
+      "rom_sha256": "19e4109f4eddee87e9570b5d68d6df7cd3ce96f156dc164c41f50fd13cc65e9c",
+      "rom_header_checksum": "PASS"
+    }
+  },
+  "video_source_reading": {
+    "timestamp_seconds": 4890,
+    "card_label": "Macaroni Metro",
+    "confidence": "medium: enlarged source frame, not game text asset"
+  },
+  "public_source_only": true,
+  "private_assets_committed_to_github": false,
+  "mgba_boot": "NOT_TESTED",
+  "physical_hardware": "NOT_TESTED",
+  "full_game_rom": "NOT_BUILT",
+  "new_gameplay_levels": 0,
+  "port_estimate_percent": 44
+}

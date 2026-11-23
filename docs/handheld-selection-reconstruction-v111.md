@@ -12,7 +12,7 @@ that recording, not in-game clocks.
 | 10:30 | Fuzz Forest | Green horizontal handheld | 0/4 |
 | 16:30 | Bonus Stage | Green horizontal handheld | ×20 reward |
 | 57:00 | Rigatoni Rooftops | Pink handheld shell with YOLVY wordmark | 0/4 |
-| 81:30 | Course title partly legible; likely Macho Metro | Pink handheld shell with YOLVY wordmark | 1/4 |
+| 81:30 | Course title most plausibly reads Macaroni Metro (81:30 zoom, provisional) | Pink handheld shell with YOLVY wordmark | 1/4 |
 | 111:30 | Bonus Stage | Teal handheld | 1/1 |
 | 114:00 | Fishpig | Pink handheld shell with YOLVY wordmark | Boss card |
 | 124:00 | Bundtcake Burrows | Green horizontal handheld | 4/4 |
@@ -20,7 +20,7 @@ that recording, not in-game clocks.
 
 The 57:00 frame resolves a previous documentation error: the card reads
 **Rigatoni Rooftops**, not Big City Rooftops. The 81:30 course title remains
-uncertain; do not treat “Macho Metro” as fully verified from this frame alone.
+better reads “Macaroni Metro” in the re-extracted 640×360 frame. Compression makes individual letters ambiguous; definitive spelling still requires original text assets.
 
 The source cards use visibly different handheld shells. Their course previews,
 progress fractions, reward markers, medal/thumb rows, side counters and device
@@ -123,3 +123,13 @@ round-trips, letterbox pixels and exact 5-bit preview palette matching.
 This is a fidelity study, **not a claim that filtering restores lost 640×360
 detail**; screenshots should be checked in an emulator before selecting the
 best option for gameplay.
+
+## v1.9.14 — frame reading audit
+
+The user-supplied six-part walkthrough was rejoined again and frames were
+extracted directly at the nine selection-card timestamps, this time as PNG
+rather than intermediate JPEG. At 81:30 the pixel lettering is better read
+as **Macaroni Metro**, correcting earlier notes that guessed “Macho Metro”.
+This is a visually supported reading, **not a claim that source string tables
+have been decoded**. The internal asset filename remains
+`selection_81m30` for backward compatibility.
