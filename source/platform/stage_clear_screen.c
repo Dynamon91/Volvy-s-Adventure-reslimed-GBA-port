@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "platform/stage_clear_screen.h"
+#include "platform/bitmap_dma_sync.h"
 #include "stage_clear_v198_bin.h"
 
 #define STAGE_CLEAR_WIDTH 240u
@@ -72,8 +73,11 @@ void stage_clear_screen_commit(void)
     SetMode(MODE_4 | BG2_ON | (1u << 7));
     dmaCopy(s_stage_clear_palette, (void *)BG_COLORS,
             sizeof(s_stage_clear_palette));
+    VOLVY_BITMAP_WAIT_DMA3();
     dmaCopy(s_stage_clear_frame, STAGE_CLEAR_FRAMEBUFFER,
             STAGE_CLEAR_FRAME_BYTES);
+    /* Never expose the bitmap before its final VRAM DMA is complete. */
+    VOLVY_BITMAP_WAIT_DMA3();
     SetMode(MODE_4 | BG2_ON);
 }
 
