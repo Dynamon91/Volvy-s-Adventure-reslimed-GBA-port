@@ -25,5 +25,10 @@ assert 's_stage_loaded = 0;' in render
 assert 'reset_native_scene_cache();' in render
 assert 'gba_ui_init();' in render
 assert 'CARD_CONTENT_BYTES' in screen
+assert screen.count("VOLVY_BITMAP_WAIT_DMA3();") == 2
 assert 's_card_frame + CARD_WIDTH * CARD_TOP_MARGIN' in screen
+
+bitmap_header = (root / "include/platform/bitmap_dma_sync.h").read_text()
+assert "0x040000DCu" in bitmap_header
+assert "1u << 31" in bitmap_header
 print("Handheld card integration contract: PASS (dev-gated, private asset, VBlank, native BG rebuild)")
