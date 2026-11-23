@@ -1,0 +1,29 @@
+{
+  "project": "Volvy's Adventure Reslimed GBA port",
+  "version": "1.9.13",
+  "date": "2026-11-23",
+  "release_type": "source-plus-private-asset-derived-standalone-technical-gba-viewer",
+  "public_repo_contains_private_card_assets": false,
+  "main_game_rom": {
+    "created": false,
+    "verified": false
+  },
+  "standalone_viewer_rom": {
+    "created": true,
+    "path_in_public_repository": null,
+    "type": "9-card-mode4-reference-browser-not-playable-game",
+    "size_bytes": 262144,
+    "original_source_video_duration_seconds": 8534.076372,
+    "card_count": 9,
+    "sha256": "58e1047569798bd5b64647bc5dad5235a733d9a2a0746c968021f7b9e3fcd1d0",
+    "gcc_or_armv4t_toolchain": "Clang 17 ARM7TDMI/Thumb plus LLD",
+    "header_checksum": "PASS",
+    "offline_lz77_validation": "PASS",
+    "mgba_boot": "NOT_TESTED",
+    "physical_hardware": "NOT_TESTED"
+  },
+  "public_ci": "synthetic stand-alone ROM link and header checks, host game regressions, isolated ARM codegen",
+  "original_game_hub_reconstructed": false,
+  "new_playable_level": false,
+  "estimated_port_completion_percent": 44
+}

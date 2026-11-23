@@ -1,3 +1,11 @@
+## v1.9.13 — first standalone 9-card GBA reference ROM
+
+- Built a 256 KiB GBA image containing all nine source-derived 256-color title and handheld selection screens; ARM7TDMI/Thumb ELF link, ROM header and checksum PASS.
+- Added reproducible private ZIP-based builder, asset hashes, independent LZ77 validation and a public synthetic-card full ROM link regression to GitHub Actions.
+- Added L/R and D-pad left/right browsing; START returns to the first/title screen. This is a technical viewer, not a playable game or the original hub.
+- Corrected the experimental GBA shim's R keypad bit (bit 8) and added L (bit 9).
+- Actual rendered output in mGBA and physical GBA remains untested; the original game's full private-asset ROM still cannot be linked from the public repository alone. Port completeness estimate stays at 44%.
+
 ## v1.9.12 — Mode 4 reference-card viewer and VRAM restore repair
 
 - Add a generic GBA 256-color Mode 4 renderer for the private selection-card assets, decompressing 240x135 8bpp content directly into a 240x160 EWRAM buffer with 12/13px letterbox margins.

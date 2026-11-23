@@ -1,13 +1,13 @@
 
-> **Current development milestone: v1.9.12 private handheld-card runtime preview (22 Nov 2026).** Reopens the full
+> **Current development milestone: v1.9.13 standalone card-viewer ROM test (23 Nov 2026).** Reopens the full
 > 2h22 reference, verifies the Rigatoni Rooftops card at 57:00, and adds a
 > tested 4bpp/8bpp BIOS-LZ77 converter for private 240×135 selection/title
 > frames. An optional L-button Mode 4 viewer is now connected in development
-> builds, without changing release progression. Full ROM/mGBA remains unverified.
+> builds, without changing release progression. The main game ROM and mGBA gameplay remain unverified.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
-**Current milestone: v1.9.12 private handheld-card runtime preview.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.13 standalone card-viewer ROM test.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
 
@@ -30,6 +30,26 @@ See [Stage Clear reconstruction notes](docs/stage-clear-reconstruction-v198.md),
 ### Release input behavior
 
 The non-original development shortcut that cycles stages with SELECT is disabled by default. A test build can opt in explicitly with `make DEV_STAGE_SELECT=1`; standard builds use `make` and do not expose this shortcut.
+
+## v1.9.13: standalone ROM build for the nine walkthrough cards
+
+- A separate, experimental **GBA cartridge image** can now be compiled with
+  all nine private 256-color walkthrough title/selection frames (title, Fuzz
+  Forest, two bonus cards, Rigatoni Rooftops, the uncertain 81:30 selection,
+  Fishpig, Bundtcake Burrows and Master Gator). See
+  [standalone viewer](experimental/handheld-card-viewer/README.md).
+- R/RIGHT and L/LEFT cycle cards; START returns to the title. This is an
+  *asset viewer*, not the real selection hub, and adds no gameplay levels.
+- The local private-asset viewer linked as a valid ARM7TDMI/Thumb GBA image
+  of 262,144 bytes. The ROM header/checksum and 32,400-byte decoded card
+  payloads were validated. The generated test ROM is distributed as a
+  downloadable conversation artifact, not added to the public Git repository.
+- GitHub Actions also builds/links a separate 9-card viewer using **synthetic
+  assets only**. This verifies reproducibility without publishing original
+  source-derived screenshots. An invalid/truncated LZ77 source is rejected.
+- Fixed the experimental GBA keypad shim: R is bit 8, L is bit 9.
+- The **complete gameplay ROM remains unbuilt**, and the standalone image
+  has **not yet been boot-tested in mGBA or on a physical GBA**.
 
 ## v1.9.12: handheld Mode 4 viewer and bitmap VRAM restore
 
