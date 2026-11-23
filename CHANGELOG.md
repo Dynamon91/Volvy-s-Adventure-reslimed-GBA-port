@@ -1,3 +1,10 @@
+## v1.9.14 — DMA3 completion barrier follow-up (23 November 2026)
+
+- Fix a real Mode 4 transition hazard: libgba's `dmaCopy` starts DMA3 asynchronously. Forced blank must not be cleared immediately after scheduling the 38,400-byte framebuffer transfer.
+- Both Stage Clear and the source-derived handheld-card viewer now wait for DMA3 completion after palette and framebuffer copies. The barrier uses the hardware DMA3CNT enable bit and does not add a recurring gameplay-frame pause.
+- Extend host tests with simulated in-progress DMA3 transfers, detecting an overlapping second DMA and premature unblank. Public C/Python regression tests and isolated ARM7TDMI codegen pass.
+- Visual mGBA / physical-GBA evidence for flicker remains pending; this stability fix adds no playable levels.
+
 ## v1.9.14 — pixel-art resampling comparison and hardware palette previews
 
 - Preserve nearest-neighbour as default, and add optional box/lanczos downsampling for 16:9 source-derived 240×135 selection cards.
