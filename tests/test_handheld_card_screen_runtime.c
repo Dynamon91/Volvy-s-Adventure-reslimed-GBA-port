@@ -9,6 +9,10 @@ u8 test_vram[240u * 160u];
 u16 test_mode;
 u16 test_mode_trace[16];
 unsigned int test_mode_trace_count;
+unsigned int test_dma3_in_progress;
+unsigned int test_dma3_wait_calls;
+unsigned int test_dma3_overlapped;
+unsigned int test_mode_unblanked_early;
 static unsigned int lz77_calls;
 static const u8 valid_pixels[] = {0x10u, 0x90u, 0x7Eu, 0x00u};
 static const u8 alternative_pixels[] = {0x10u, 0x90u, 0x7Eu, 0x00u};
@@ -61,6 +65,10 @@ int main(void)
     assert(test_mode_trace[test_mode_trace_count - 1u] ==
            (MODE_4 | BG2_ON));
     assert(test_mode == (MODE_4 | BG2_ON));
+    assert(test_dma3_wait_calls == 2u);
+    assert(test_dma3_in_progress == 0u);
+    assert(test_dma3_overlapped == 0u);
+    assert(test_mode_unblanked_early == 0u);
     for (x = 0u; x < 4u; ++x)
         assert(test_bg_colors[x] == palette[x]);
     for (x = 4u; x < 256u; ++x)
@@ -90,6 +98,10 @@ int main(void)
     assert(handheld_card_screen_prepare(&reused) == 1);
     assert(lz77_calls == 3u);
     handheld_card_screen_commit();
+    assert(test_dma3_wait_calls == 4u);
+    assert(test_dma3_in_progress == 0u);
+    assert(test_dma3_overlapped == 0u);
+    assert(test_mode_unblanked_early == 0u);
     assert(test_bg_colors[0] == 0x4567u);
     assert(test_bg_colors[1] == 0x001Fu);
     assert(test_bg_colors[2] == 0u);
