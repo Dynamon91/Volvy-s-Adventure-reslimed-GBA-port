@@ -7,6 +7,8 @@
 u16 test_bg_colors[256];
 u8 test_vram[240u * 160u];
 u16 test_mode;
+u16 test_mode_trace[16];
+unsigned int test_mode_trace_count;
 static unsigned int lz77_calls;
 static const u8 valid_pixels[] = {0x10u, 0x90u, 0x7Eu, 0x00u};
 static const u8 alternative_pixels[] = {0x10u, 0x90u, 0x7Eu, 0x00u};
@@ -53,6 +55,11 @@ int main(void)
     assert(lz77_calls == 1u);
     handheld_card_screen_commit();
 
+    assert(test_mode_trace_count >= 2u);
+    assert(test_mode_trace[test_mode_trace_count - 2u] ==
+           (MODE_4 | BG2_ON | (1u << 7)));
+    assert(test_mode_trace[test_mode_trace_count - 1u] ==
+           (MODE_4 | BG2_ON));
     assert(test_mode == (MODE_4 | BG2_ON));
     for (x = 0u; x < 4u; ++x)
         assert(test_bg_colors[x] == palette[x]);

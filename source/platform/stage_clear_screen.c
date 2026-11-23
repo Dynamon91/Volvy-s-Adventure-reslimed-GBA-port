@@ -67,6 +67,9 @@ void stage_clear_screen_commit(void)
     if (!s_stage_clear_prepared)
         return;
 
+    /* A 38,400-byte DMA may run past VBlank. Keep the LCD forced blank
+     * until the entire Mode 4 frame and palette have been committed. */
+    SetMode(MODE_4 | BG2_ON | (1u << 7));
     dmaCopy(s_stage_clear_palette, (void *)BG_COLORS,
             sizeof(s_stage_clear_palette));
     dmaCopy(s_stage_clear_frame, STAGE_CLEAR_FRAMEBUFFER,

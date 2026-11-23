@@ -70,6 +70,10 @@ void handheld_card_screen_commit(void)
     if (!s_prepared)
         return;
 
+    /* 38,400 bytes cannot be guaranteed to fit one VBlank on real GBA.
+     * Force blank BEFORE touching shared BG VRAM; enable Mode 4 only
+     * after DMA has completed, avoiding half-drawn visible frames. */
+    SetMode(MODE_4 | BG2_ON | (1u << 7));
     dmaCopy(s_card_palette, (void *)BG_COLORS, sizeof(s_card_palette));
     dmaCopy(s_card_frame, HANDHELD_CARD_FRAMEBUFFER, CARD_FRAME_BYTES);
     SetMode(MODE_4 | BG2_ON);

@@ -28,6 +28,7 @@ typedef struct { u16 attr0, attr1, attr2, dummy; } OBJATTR;
 #define OBJ_PALETTE(n) ((n) << 12)
 #define MODE_0 0
 #define MODE_4 4
+#define GBA_FORCED_BLANK (1u << 7)
 #define BG0_ON (1u << 8)
 #define BG1_ON (1u << 9)
 #define BG2_ON (1u << 10)

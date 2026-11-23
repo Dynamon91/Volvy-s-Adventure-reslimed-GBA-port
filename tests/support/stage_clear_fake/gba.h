@@ -15,10 +15,16 @@ typedef uint32_t u32;
 extern u16 test_bg_colors[256];
 extern u8 test_vram[240u * 160u];
 extern u16 test_mode;
+extern u16 test_mode_trace[16];
+extern unsigned int test_mode_trace_count;
 #define BG_COLORS test_bg_colors
 #define STAGE_CLEAR_FRAMEBUFFER ((void *)test_vram)
 #define HANDHELD_CARD_FRAMEBUFFER ((void *)test_vram)
-static inline void SetMode(u16 mode) { test_mode = mode; }
+static inline void SetMode(u16 mode) {
+    test_mode = mode;
+    if (test_mode_trace_count < 16u)
+        test_mode_trace[test_mode_trace_count++] = mode;
+}
 static inline void dmaCopy(const void *src, void *dst, u32 size)
 {
     memcpy(dst, src, size);
