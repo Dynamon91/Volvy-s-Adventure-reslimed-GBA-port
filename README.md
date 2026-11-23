@@ -51,6 +51,16 @@ The non-original development shortcut that cycles stages with SELECT is disabled
 - No new gameplay level was implemented. The full port remains at a 44%
   **planning estimate**, not a measured fidelity result.
 
+### Mode 4 DMA3 completion safeguard (23 Nov 2026)
+
+Both the Stage Clear screen and optional handheld-card reference viewer now
+wait for the GBA DMA3 enable flag to clear after palette and bitmap uploads.
+This corrects a risk where `dmaCopy` only scheduled a transfer and the screen
+could be unblanked before the 38,400-byte framebuffer DMA completed. The wait
+runs only when switching bitmap screens, not on each gameplay frame. Synthetic
+host tests catch overlapping transfers and premature unblank. mGBA/hardware
+flicker testing of the final image remains pending.
+
 ## v1.9.13: standalone ROM build for the nine walkthrough cards
 
 - A separate, experimental **GBA cartridge image** can now be compiled with
