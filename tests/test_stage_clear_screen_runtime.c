@@ -9,6 +9,10 @@ u8 test_vram[240u * 160u];
 u16 test_mode;
 u16 test_mode_trace[16];
 unsigned int test_mode_trace_count;
+unsigned int test_dma3_in_progress;
+unsigned int test_dma3_wait_calls;
+unsigned int test_dma3_overlapped;
+unsigned int test_mode_unblanked_early;
 static unsigned int lz77_calls;
 
 /* Minimal valid BIOS-LZ77 header for a 16,200-byte packed 4bpp payload. */
@@ -36,6 +40,10 @@ int main(void)
     assert(test_mode_trace[test_mode_trace_count - 1u] ==
            (MODE_4 | BG2_ON));
     assert(test_mode == (MODE_4 | BG2_ON));
+    assert(test_dma3_wait_calls == 2u);
+    assert(test_dma3_in_progress == 0u);
+    assert(test_dma3_overlapped == 0u);
+    assert(test_mode_unblanked_early == 0u);
     assert(test_bg_colors[0] == 0x488Bu);
     assert(test_bg_colors[15] == 0x1C45u);
 
