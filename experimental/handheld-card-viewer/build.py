@@ -20,6 +20,42 @@ CARDS = (
 )
 
 
+def lz77_decode_checked(blob: bytes, expected: int) -> bytes:
+    """Independently validate compressed source before the GBA BIOS sees it."""
+    if len(blob) < 4 or blob[0] != 0x10:
+        raise ValueError("Missing BIOS LZ77 header")
+    declared = blob[1] | blob[2] << 8 | blob[3] << 16
+    if declared != expected:
+        raise ValueError("Wrong declared LZ77 output size")
+    output = bytearray()
+    pos = 4
+    while len(output) < expected:
+        if pos >= len(blob):
+            raise ValueError("Truncated LZ77 flag byte")
+        flags = blob[pos]
+        pos += 1
+        for bit in range(7, -1, -1):
+            if len(output) >= expected:
+                break
+            if flags & (1 << bit):
+                if pos + 1 >= len(blob):
+                    raise ValueError("Truncated LZ77 match")
+                a, b = blob[pos], blob[pos + 1]
+                pos += 2
+                distance = (((a & 15) << 8) | b) + 1
+                if distance > len(output):
+                    raise ValueError("Invalid LZ77 lookback distance")
+                count = min((a >> 4) + 3, expected - len(output))
+                for _ in range(count):
+                    output.append(output[-distance])
+            else:
+                if pos >= len(blob):
+                    raise ValueError("Truncated LZ77 literal")
+                output.append(blob[pos])
+                pos += 1
+    return bytes(output)
+
+
 def build(bundle: Path, out: Path) -> dict:
     root = Path(__file__).resolve().parents[2]
     viewer_dir = Path(__file__).resolve().parent
@@ -53,6 +89,8 @@ def build(bundle: Path, out: Path) -> dict:
             raw_size = payload[1] | (payload[2] << 8) | (payload[3] << 16)
             if (raw_size, meta.get("pixel_bpp"), meta.get("palette_entries")) != (32400, 8, 256):
                 raise ValueError(f"Incompatible Mode 4 card: {image_name}")
+            if len(lz77_decode_checked(payload, 32400)) != 32400:
+                raise ValueError(f"Corrupt private card content: {image_name}")
             (out / "assets" / f"{card}.bin").write_bytes(payload)
             (out / "palette" / f"{card}_palette.c").write_bytes(zf.read(pal_src))
             (out / "palette" / f"{card}_palette.h").write_bytes(zf.read(pal_hdr))
