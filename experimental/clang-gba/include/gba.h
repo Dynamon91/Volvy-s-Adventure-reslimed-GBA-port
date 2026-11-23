@@ -46,7 +46,8 @@ typedef struct { u16 attr0, attr1, attr2, dummy; } OBJATTR;
 #define KEY_LEFT (1u << 5)
 #define KEY_UP (1u << 6)
 #define KEY_DOWN (1u << 7)
-#define KEY_R (1u << 9)
+#define KEY_R (1u << 8)
+#define KEY_L (1u << 9)
 
 /* BIOS-independent VBlank polling. No IRQs are enabled in this shim. */
 static inline void irqInit(void) { }
