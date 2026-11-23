@@ -54,8 +54,8 @@ with tempfile.TemporaryDirectory() as temp:
         assert all(preview.getpixel((x, y)) == 0
                    for y in list(range(12)) + list(range(147, 160))
                    for x in range(240))
-        assert (prefix.parent.parent / f"test_{colors}_palette.c").exists()
-        assert (prefix.parent.parent / f"test_{colors}_palette.h").exists()
+        assert (prefix.parent.parent / f"test_{colors}_{resample}_palette.c").exists()
+        assert (prefix.parent.parent / f"test_{colors}_{resample}_palette.h").exists()
         saved = json.loads(prefix.with_suffix(".manifest.json").read_text())
         assert saved["source_sha256"] == manifest["source_sha256"]
 
