@@ -86,12 +86,18 @@ unsigned int world_interact_player(Level *level, Player *player,
                                hand_hits(player, ox, oy, ow, oh))) continue;
             if (hand_attacks(player) && hand_hits(player, ox, oy, ow, oh)) {
                 level->removed[i] = 1;
-                ++player->enemies_defeated;
+                if (player->enemies_defeated != UINT8_MAX)
+                    ++player->enemies_defeated;
+                if (player->enemies_defeated_total != UINT32_MAX)
+                    ++player->enemies_defeated_total;
                 events |= WORLD_INTERACT_DEFEAT;
             } else if (body_hit && was_descending &&
                        pre_bottom <= oy + 3 && bottom >= oy) {
                 level->removed[i] = 1;
-                ++player->enemies_defeated;
+                if (player->enemies_defeated != UINT8_MAX)
+                    ++player->enemies_defeated;
+                if (player->enemies_defeated_total != UINT32_MAX)
+                    ++player->enemies_defeated_total;
                 player->y = fx_from_int(oy - player->height);
                 player->vy = STOMP_REBOUND;
                 player->grounded = 0;
