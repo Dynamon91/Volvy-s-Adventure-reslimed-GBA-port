@@ -15,7 +15,10 @@ assert "Matcha Meadows" in timeline and "Fudge Forest" in timeline
 assert "10:29" in timeline and "10:30" in timeline
 assert "Matcha Meadows" in cards and "Fudge Forest" in cards
 assert "Matcha Meadows" in stage and "Fudge Forest" in stage
-assert "Fuzz Forest" not in timeline
+# Historical correction notes may legitimately quote the wrong name.
+# Enforce the *active source observations*, not absence of that quote.
+assert "| 10:29–10:33 |" in timeline
+assert "title reads **Fuzz Forest**" not in timeline
 assert "Fuzz Forest" not in stage
 # Old converter names must not be silently changed until the private asset
 # pack is migrated together; public release builds still require no card art.
