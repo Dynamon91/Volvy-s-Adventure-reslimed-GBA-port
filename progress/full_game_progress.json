@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "project": "Volvy's Adventure: ReSlimed — GBA port completo",
+  "snapshot_date": "2026-11-28",
+  "current_milestone": "v1.9.14",
+  "whole_game_progress": {
+    "completed_percent": 44,
+    "remaining_percent": 56,
+    "confidence": "stima provvisoria di pianificazione; non una misura verificata",
+    "original_total_scenes": null,
+    "source_scenes_implemented": 5,
+    "source_scenes": [
+      "World 1 L1",
+      "World 1 L2",
+      "World 1 L3",
+      "Bonus Race",
+      "Shrewy (provvisorio)"
+    ],
+    "note": "Percentuale storica invariata; cinque scene prototipo non equivalgono a cinque livelli completi."
+  },
+  "areas": [
+    {
+      "id": "engine",
+      "title": "Motore GBA, prestazioni e stabilità",
+      "status": "in_progress",
+      "evidence": "Fisica fixed-point, tile streaming e correzione DMA3; test pubblici passati.",
+      "missing": "Verifica mGBA del progetto completo, limiti hardware e prestazioni."
+    },
+    {
+      "id": "levels",
+      "title": "Tutti i livelli e mondi",
+      "status": "in_progress",
+      "evidence": "Cinque scene sorgente (W1 L1-L3, bonus, Shrewy).",
+      "missing": "Livelli ulteriori del walkthrough, collisioni, uscite e routing."
+    },
+    {
+      "id": "gameplay",
+      "title": "Meccaniche, nemici, IA e oggetti",
+      "status": "in_progress",
+      "evidence": "Controller e interazioni World 1 in forma parziale.",
+      "missing": "Comportamenti originali, oggetti, trasformazioni, timing e collisioni da verificare."
+    },
+    {
+      "id": "bosses",
+      "title": "Tutti i boss",
+      "status": "in_progress",
+      "evidence": "Shrewy implementato in modo provvisorio.",
+      "missing": "Fishpig, altri incontri incluso il finale e conferma di Master Gator."
+    },
+    {
+      "id": "graphics",
+      "title": "Grafica, sprite e animazioni",
+      "status": "in_progress",
+      "evidence": "56 set di animazioni sprite e conversione di cinque scene.",
+      "missing": "Art e animazioni dei livelli e boss ancora assenti."
+    },
+    {
+      "id": "interface",
+      "title": "Menu, hub, risultati e punteggi",
+      "status": "in_progress",
+      "evidence": "Menu iniziale semplificato, HUD e visualizzatore diagnostico.",
+      "missing": "Hub e selezione originali, combo, classifiche e risultati dinamici."
+    },
+    {
+      "id": "audio",
+      "title": "Colonna sonora ed effetti",
+      "status": "unverified",
+      "evidence": "Riproduzione completa dell'audio originale non verificata.",
+      "missing": "Inventario, conversione, integrazione e collaudo delle tracce e SFX."
+    },
+    {
+      "id": "progression",
+      "title": "Campagna, sblocchi e salvataggi",
+      "status": "unverified",
+      "evidence": "Completamento end-to-end e persistenza non verificati.",
+      "missing": "Percorso completo, salvataggi, sblocchi e condizioni di fine gioco."
+    },
+    {
+      "id": "testing",
+      "title": "Collaudo finale su emulatore e hardware",
+      "status": "unverified",
+      "evidence": "Regression test C/Python e moduli ARM isolati superati.",
+      "missing": "Build completa, test lungo in mGBA e test su GBA reale."
+    }
+  ],
+  "required_for_100": [
+    {
+      "id": "inventory",
+      "label": "Inventario completo degli stage e contenuti originali",
+      "verified": false
+    },
+    {
+      "id": "campaign",
+      "label": "Tutta la campagna giocabile dall'inizio alla fine",
+      "verified": false
+    },
+    {
+      "id": "bosses",
+      "label": "Tutti i boss e incontri completati",
+      "verified": false
+    },
+    {
+      "id": "mechanics",
+      "label": "Meccaniche, collisioni e nemici verificati",
+      "verified": false
+    },
+    {
+      "id": "ui",
+      "label": "Hub, menu, punteggi, risultati e sblocchi completi",
+      "verified": false
+    },
+    {
+      "id": "audio",
+      "label": "Tutte le musiche e gli effetti sonori verificati",
+      "verified": false
+    },
+    {
+      "id": "save",
+      "label": "Salvataggi e progressione verificati",
+      "verified": false
+    },
+    {
+      "id": "mgba",
+      "label": "ROM completa stabile e collaudata in mGBA",
+      "verified": false
+    },
+    {
+      "id": "hardware",
+      "label": "ROM completa testata su GBA reale",
+      "verified": false
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-11-28",
+      "milestone": "v1.9.14",
+      "completed_percent": 44,
+      "note": "Prima registrazione strutturata della stima storica; nessun nuovo livello aggiunto."
+    }
+  ],
+  "evidence_refs": [
+    "README.md",
+    "docs/fidelity-gap-audit-v196.md",
+    "docs/walkthrough-reference-v1_0.md",
+    "docs/verification.md"
+  ]
+}
