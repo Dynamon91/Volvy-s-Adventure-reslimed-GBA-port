@@ -14,6 +14,13 @@ $CC $FLAGS $INCLUDES "$ROOT/tests/test_game_timer.c" "$ROOT/source/core/game_tim
 "$TMP/game_timer"
 # Run-level results metrics must not invent unverified combo/rank formulas.
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_run_stats.c" "$ROOT/source/core/run_stats.c" -o "$TMP/run_stats"
+# Store verified clears and personal best times for the five native scenes.
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_campaign_progress.c" \
+  "$ROOT/source/core/campaign_progress.c" "$ROOT/source/core/run_stats.c" -o "$TMP/campaign_progress"
+"$TMP/campaign_progress"
+$CC $FLAGS $INCLUDES "$ROOT/tests/test_result_text.c" \
+  "$ROOT/source/core/result_text.c" -o "$TMP/result_text"
+"$TMP/result_text"
 "$TMP/run_stats"
 $CC $FLAGS $INCLUDES "$ROOT/tests/test_title_menu.c" "$ROOT/source/core/title_menu.c" -o "$TMP/title_menu"
 "$TMP/title_menu"
@@ -65,6 +72,7 @@ python3 "$ROOT/tests/test_scene_stream_staging.py"
 python3 "$ROOT/tests/test_hud_walkthrough_icons.py"
 python3 "$ROOT/tests/test_walkthrough_hud_contract.py"
 python3 "$ROOT/tests/test_run_stats_game_integration.py"
+python3 "$ROOT/tests/test_campaign_result_integration.py"
 python3 "$ROOT/tests/test_fudge_forest_reference_contract.py"
 python3 "$ROOT/tests/test_handheld_select_asset.py"
 python3 "$ROOT/tests/test_handheld_card_integration.py"
