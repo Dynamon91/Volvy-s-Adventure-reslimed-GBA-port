@@ -1,6 +1,6 @@
 # Stato di completamento — Volvy's Adventure ReSlimed GBA
 
-Aggiornato: 2026-11-28 | Versione: v1.9.14
+Aggiornato: 2026-11-28 | Versione: v1.9.15
 
 **[███████████░░░░░░░░░░░░░░] 44% completato · 56% rimanente**
 
@@ -45,6 +45,7 @@ Aggiornato: 2026-11-28 | Versione: v1.9.14
 | Data | Versione | Progresso | Motivo |
 |---|---|---:|---|
 | 2026-11-28 | v1.9.14 | 44% | Prima registrazione strutturata della stima storica; nessun nuovo livello aggiunto. |
+| 2026-11-28 | v1.9.15 | 44% | Record dei cinque livelli prototipo, schermate risultati dinamiche, 12 riferimenti video, preparazione audio; nessun nuovo livello giocabile. |
 
 Il valore complessivo non cresce automaticamente con nuovi test, documenti o ROM tecniche. Cambiarlo soltanto quando un milestone del gioco completo è stato implementato e verificato.
 
