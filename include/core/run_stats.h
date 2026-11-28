@@ -9,10 +9,13 @@ typedef struct RunStats {
     uint32_t active_frames;
     uint32_t onions_collected;
     uint32_t enemies_defeated;
-    uint16_t last_onions;
-    uint8_t last_enemies;
+    uint32_t last_collected_total;
+    uint32_t last_defeated_total;
 } RunStats;
 
-void run_stats_reset(RunStats *stats, uint16_t onions, uint8_t enemies);
-void run_stats_observe(RunStats *stats, uint16_t onions, uint8_t enemies);
+/* Inputs are monotonic event totals, NOT the current HUD onion inventory. */
+void run_stats_reset(RunStats *stats, uint32_t collected_total,
+                     uint32_t defeated_total);
+void run_stats_observe(RunStats *stats, uint32_t collected_total,
+                       uint32_t defeated_total);
 #endif
