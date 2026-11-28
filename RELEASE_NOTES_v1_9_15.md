@@ -17,6 +17,12 @@ transition into GAME_VICTORY, the game records:
 
 Entering a level or retrying still resets only the **current run**. The
 campaign records persist in RAM across transitions back to the title.
+
+The player now maintains independent 32-bit **monotonic event counters**
+for onion pickups and defeated enemies. Results no longer rely on the
+0–999 inventory display: consuming onions or filling that display
+cannot erase previously collected items. World 1 stomp and hand-hit
+defeats update the same event totals.
 They are reset on program initialization. No original-game SRAM format,
 unlock route, achievement, combo formula or leaderboard has been invented.
 
