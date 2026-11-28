@@ -11,11 +11,13 @@ import full_game_progress as tracker
 
 raw = json.loads((ROOT / "progress/full_game_progress.json").read_text(encoding="utf-8"))
 tracker.validate(raw)
-assert raw["whole_game_progress"]["completed_percent"] == 44
-assert raw["whole_game_progress"]["remaining_percent"] == 56
+pct = raw["whole_game_progress"]["completed_percent"]
+rem = raw["whole_game_progress"]["remaining_percent"]
+assert 0 <= pct <= 100
+assert rem == 100 - pct
 assert tracker.bar(0) == "░" * 25
 assert tracker.bar(100) == "█" * 25
-assert tracker.bar(44).count("█") == 11
+assert tracker.bar(pct).count("█") == (pct * 25 + 50) // 100
 assert tracker.readme_block(raw) in (ROOT / "README.md").read_text(encoding="utf-8")
 assert tracker.report(raw) == (ROOT / "docs/full-game-progress.md").read_text(encoding="utf-8")
 
@@ -48,4 +50,4 @@ except ValueError:
 else:
     raise AssertionError("Allowing invented scene count")
 
-print("Full game progress: PASS (44/56 baseline, generated docs and 100% release gates)")
+print("Full game progress: PASS (estimates, generated docs and 100% release gates)")
