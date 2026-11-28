@@ -2,6 +2,7 @@
 #include <string.h>
 #include "platform/ui.h"
 #include "core/game_timer.h"
+#include "core/result_text.h"
 #include "core/title_menu.h"
 #include "hud_source_font.h"
 #include "platform/hud_walkthrough_icons.h"
@@ -151,8 +152,25 @@ void gba_ui_update(GameMode mode, uint16_t onions, uint8_t stage,
         draw_str(11, 8, "GAME OVER");
         draw_str(9, 10, "PRESS START");
     } else if (mode == GAME_VICTORY) {
-        draw_str(10, 8, "STAGE CLEAR");
-        draw_str(9, 10, "PRESS START");
+        /* This interim result page uses the player's measured run totals,
+         * not a fabricated combo, ranking, bonus or unlock formula.
+         * Stage 1's private illustrated reference image is handled by the
+         * renderer separately and deliberately remains unchanged. */
+        const RunStats *run = game_run_stats();
+        char collected[11];
+        char defeated[11];
+        result_text_uint32(run->onions_collected, collected);
+        result_text_uint32(run->enemies_defeated, defeated);
+        draw_str(stage == 4u ? 7 : 9, 7,
+                 result_text_heading(stage));
+        draw_str(7, 11, "TIME");
+        game_timer_format(timer_frames, time_text);
+        draw_str(15, 11, time_text);
+        draw_str(7, 13, "COLLECTED");
+        draw_str(18, 13, collected);
+        draw_str(7, 15, "DEFEATED");
+        draw_str(18, 15, defeated);
+        draw_str(9, 18, "PRESS START");
     }
     s_dirty = 1;
 }
