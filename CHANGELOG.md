@@ -4,6 +4,9 @@
   pickups/defeats separately for five existing prototype scenes. Counters
   persist across retries in RAM, not in SRAM saves, and no original unlock
   rules are fabricated.
+- Correct per-run statistics to count real 32-bit pickup/defeat events;
+  transformation spending and the 999-onion display limit no longer
+  undercount results.
 - Show measured run time, collected pickups and defeats in the existing
   generic victory HUD, with Shrewy's source-confirmed result heading.
   Stage 1's source-derived illustrated result stays intact.
