@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Volvy's Adventure: ReSlimed — GBA port completo",
   "snapshot_date": "2026-11-28",
-  "current_milestone": "v1.9.14",
+  "current_milestone": "v1.9.15",
   "whole_game_progress": {
     "completed_percent": 44,
     "remaining_percent": 56,
@@ -136,6 +136,12 @@
       "milestone": "v1.9.14",
       "completed_percent": 44,
       "note": "Prima registrazione strutturata della stima storica; nessun nuovo livello aggiunto."
+    },
+    {
+      "date": "2026-11-28",
+      "milestone": "v1.9.15",
+      "completed_percent": 44,
+      "note": "Record dei cinque livelli prototipo, schermate risultati dinamiche, 12 riferimenti video, preparazione audio; nessun nuovo livello giocabile."
     }
   ],
   "evidence_refs": [
