@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "label": "Walkthrough-only visual checkpoints, NOT an inventory of all original levels",
+  "source": "User-supplied six-part 2:22:14.076 walkthrough (640x360, 30fps)",
+  "reference_video_duration_seconds": 8534.076372,
+  "status_note": "All checkpoints are source-video references. None confirms a matching playable native GBA course. GameMaker room names and official boss title require original source-asset verification.",
+  "checkpoints": [
+    {
+      "id": "fudge_forest",
+      "label": "Fudge Forest",
+      "second": 637,
+      "official_name_verified": true,
+      "confirmation": "Video 10:30-10:33 and original localization list",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "sky_island",
+      "label": "Sky/island environment",
+      "second": 1830,
+      "official_name_verified": false,
+      "confirmation": "Video 30:00-33:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "night_piers",
+      "label": "Night piers",
+      "second": 2130,
+      "official_name_verified": false,
+      "confirmation": "Video 34:00-39:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "industrial_facility",
+      "label": "Industrial facility",
+      "second": 2475,
+      "official_name_verified": false,
+      "confirmation": "Video 40:00-44:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "rigatoni_rooftops",
+      "label": "Rigatoni Rooftops",
+      "second": 3510,
+      "official_name_verified": true,
+      "confirmation": "Card visible at 57:00",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "construction",
+      "label": "Construction course",
+      "second": 4030,
+      "official_name_verified": false,
+      "confirmation": "Video 66:00-71:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "fishpig_route",
+      "label": "Fishpig route",
+      "second": 4515,
+      "official_name_verified": false,
+      "confirmation": "Video 72:00-79:30 ends in confirmed Fishpig defeat; route name descriptive",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "macaroni_metro",
+      "label": "Macaroni Metro",
+      "second": 4950,
+      "official_name_verified": true,
+      "confirmation": "Original localization list plus 81:30 card, lettering lower confidence",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "factory",
+      "label": "Factory/industrial course",
+      "second": 5400,
+      "official_name_verified": false,
+      "confirmation": "Video 89:00-95:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "dusk_towers",
+      "label": "Dusk towers",
+      "second": 5870,
+      "official_name_verified": false,
+      "confirmation": "Video 96:00-105:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "aquatic",
+      "label": "Sky/water course",
+      "second": 6420,
+      "official_name_verified": false,
+      "confirmation": "Video 106:00-110:30; descriptive environment label",
+      "course_in_native_gba": false
+    },
+    {
+      "id": "late_boss",
+      "label": "Late mechanical boss",
+      "second": 8410,
+      "official_name_verified": false,
+      "confirmation": "Video 137:00-142:14; boss's actual name unreadable",
+      "course_in_native_gba": false
+    }
+  ],
+  "output_policy": "Generated 240x160 8bpp BGR555 screenshots, comparison boards and GIFs are private user conversation artifacts; the public repository contains only their metadata and reproducible tooling."
+}
