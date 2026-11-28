@@ -1,35 +1,37 @@
 #include "core/run_stats.h"
 
-/* Track positive changes instead of the on-screen onion counter itself:
- * the counter can decrease when onions are spent on transformations.
- * The 8-bit enemy count may also reset/wrap; a decrease is not treated as
- * a new streak. This is a conservative lower bound, not an original score. */
-void run_stats_reset(RunStats *stats, uint16_t onions, uint8_t enemies)
+/* These totals follow the player's monotonic pickup and defeat event
+ * counters, not the 0..999 visible onion inventory. Consuming onions for
+ * Swolvy or reaching the HUD counter cap must never lose pickup history.
+ * Decreases are ignored; game.c resets counters on stage entry/retry. */
+void run_stats_reset(RunStats *stats, uint32_t collected_total,
+                     uint32_t defeated_total)
 {
     if (!stats) return;
     stats->active_frames = 0;
     stats->onions_collected = 0;
     stats->enemies_defeated = 0;
-    stats->last_onions = onions;
-    stats->last_enemies = enemies;
+    stats->last_collected_total = collected_total;
+    stats->last_defeated_total = defeated_total;
 }
 
-void run_stats_observe(RunStats *stats, uint16_t onions, uint8_t enemies)
+static uint32_t sat_add(uint32_t a, uint32_t b)
 {
-    unsigned int delta;
+    return UINT32_MAX - a < b ? UINT32_MAX : a + b;
+}
+
+void run_stats_observe(RunStats *stats, uint32_t collected_total,
+                       uint32_t defeated_total)
+{
     if (!stats) return;
     if (stats->active_frames != UINT32_MAX)
         ++stats->active_frames;
-    if (onions > stats->last_onions) {
-        delta = (unsigned int)(onions - stats->last_onions);
-        stats->onions_collected = UINT32_MAX - stats->onions_collected < delta
-            ? UINT32_MAX : stats->onions_collected + delta;
-    }
-    if (enemies > stats->last_enemies) {
-        delta = (unsigned int)(enemies - stats->last_enemies);
-        stats->enemies_defeated = UINT32_MAX - stats->enemies_defeated < delta
-            ? UINT32_MAX : stats->enemies_defeated + delta;
-    }
-    stats->last_onions = onions;
-    stats->last_enemies = enemies;
+    if (collected_total > stats->last_collected_total)
+        stats->onions_collected = sat_add(
+            stats->onions_collected, collected_total - stats->last_collected_total);
+    if (defeated_total > stats->last_defeated_total)
+        stats->enemies_defeated = sat_add(
+            stats->enemies_defeated, defeated_total - stats->last_defeated_total);
+    stats->last_collected_total = collected_total;
+    stats->last_defeated_total = defeated_total;
 }
