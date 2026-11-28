@@ -1,3 +1,18 @@
+## Original-game fidelity / stage groundwork — 28 November 2026
+
+- Correct a mistaken gameplay-card transcription: **Fudge Forest** at
+  10:30–10:33 is confirmed by original video frames and the existing
+  localization audit; 10:29 shows **Matcha Meadows** (3/4). Legacy
+  `fuzz_forest` asset IDs are retained to avoid breaking older builds.
+- Add per-run onion pickup and enemy-defeat accounting in the game core
+  with automatic resets and pause exclusion. Do not invent the original
+  combo/rank scoring algorithm.
+- Produce a private 32-frame 240×160 BGR555 video-derived GIF plus
+  reference-to-GBA still-image comparisons for Fudge Forest.
+- Postpone emulator verification as requested; do not equate video
+  conversion with a new playable GBA level. The whole-game estimate
+  remains the provisional 44%.
+
 ## Tracciamento del completamento del gioco completo — 28 novembre 2026
 
 - Aggiunto un progresso complessivo del porting originale: 44% completato e 56% rimanente, chiaramente indicato come stima provvisoria, non come completamento verificato.
@@ -31,7 +46,7 @@
 ## v1.9.12 — Mode 4 reference-card viewer and VRAM restore repair
 
 - Add a generic GBA 256-color Mode 4 renderer for the private selection-card assets, decompressing 240x135 8bpp content directly into a 240x160 EWRAM buffer with 12/13px letterbox margins.
-- Add optional dev-only title shortcut L to preview the Fuzz Forest card; B/START returns to title. The release build has DEV_CARD_PREVIEW=0 and no private card references.
+- Add optional dev-only title shortcut L to preview the Fudge Forest card; B/START returns to title. The release build has DEV_CARD_PREVIEW=0 and no private card references.
 - Repair Stage Clear and card-preview exits: invalidate the BG tile cache and reload the HUD font, icon graphics and BG color banks after Mode 4 overwrites shared VRAM.
 - Add public runtime C and ARM7TDMI module tests and source-contract checks.
 - No new course gameplay, selection hub, or complete .gba/mGBA build is claimed.
@@ -43,7 +58,7 @@
 - Added a reproducible converter for 240×135 16:9 content letterboxed to the GBA 240×160 screen, with 4bpp/16-color and 8bpp/256-color modes, BGR555 palette generation, BIOS-LZ77 compression, previews and source-hash manifests.
 - Prefer 8bpp/256-color output for the complex handheld cards; the 16-color test loses significant device/course-preview detail.
 - Add public host regression coverage for both pixel formats, LZ77 round-trip, palette bounds and 12/13px letterbox geometry.
-- Source-derived card images and generated binaries remain private. The converter is not yet wired into a runtime selection state; no course routing or Fuzz Forest-to-W1 mapping is claimed.
+- Source-derived card images and generated binaries remain private. The converter is not yet wired into a runtime selection state; no course routing or Fudge Forest-to-W1 mapping is claimed.
 
 ## v1.9.10 — title-menu navigation scaffold
 
