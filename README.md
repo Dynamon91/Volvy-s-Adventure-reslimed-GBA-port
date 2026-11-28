@@ -1,9 +1,9 @@
-
-> **Current development milestone: v1.9.14 pixel-art fidelity A/B test (23 Nov 2026).** Reopens the full
-> 2h22 reference, verifies the Rigatoni Rooftops card at 57:00, and adds a
-> tested 4bpp/8bpp BIOS-LZ77 converter for private 240×135 selection/title
-> frames. An optional L-button Mode 4 viewer is now connected in development
-> builds, without changing release progression. The main game ROM and mGBA gameplay remain unverified.
+> **Current development milestone: v1.9.15 whole-game content foundation (28 Nov 2026).**
+> The five existing prototype scenes now track cleared runs and personal-best times,
+> with measured result text. A private 12-area 256-color screenshot/GIF reference
+> pack and reproducible original-audio conversion tool support broader reconstruction.
+> No new playable world is claimed; the completed-game estimate remains 44%, and
+> full-ROM emulator testing is deferred by user request.
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
@@ -18,7 +18,7 @@ La percentuale è una stima provvisoria, non una verifica di fedeltà.
 [Dettagli, aree mancanti e storico](docs/full-game-progress.md)
 <!-- FULL_GAME_PROGRESS_END -->
 
-**Current milestone: v1.9.14 pixel-art fidelity A/B test.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
+**Current milestone: v1.9.15 campaign run records and full-world reference pass.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
 
@@ -71,6 +71,29 @@ could be unblanked before the 38,400-byte framebuffer DMA completed. The wait
 runs only when switching bitmap screens, not on each gameplay frame. Synthetic
 host tests catch overlapping transfers and premature unblank. mGBA/hardware
 flicker testing of the final image remains pending.
+
+## v1.9.15 — all-world gameplay bookkeeping and asset production
+
+- Five current playable-scene source prototypes now maintain separate
+  RAM-resident completion counts and best elapsed times across retries.
+  This is not the original unlock/save system; no SRAM persistence is claimed.
+- Generic result pages now show **actual current-run time, collected onions
+  and defeated enemies**. Shrewy displays a source-confirmed boss heading.
+  World 1 Level 1 keeps its existing source-derived Stage Clear illustration.
+  Ranking, combo thresholds and full result-page animation remain unresolved.
+- Twelve reference points from the original 2h22 walkthrough can be rendered
+  as private 240×160, 8bpp BGR555 screenshots/GIFs using
+  [the all-world source-preview generator](tools/build_world_reference_previews.py)
+  and [its audited timestamps](progress/reference_scene_checkpoints.json).
+  Converted video frames are **not** playable GBA scenes.
+- Add [private original OGG/WAV sound conversion](tools/prepare_gba_audio.py)
+  to 8-bit signed mono PCM chunks and an integrity manifest. No soundtrack
+  is in the public repository and actual GBA playback is not integrated.
+- Host unit tests check run resets, result formatting, campaign records,
+  visual palette bounds and audio chunk boundaries; isolated ARM7TDMI code
+  generation covers the new gameplay utility modules.
+- See [release notes](RELEASE_NOTES_v1_9_15.md). User-requested mGBA
+  verification is on hold during whole-game content implementation.
 
 ## Fudge Forest — original-source correction and run-stat foundation (28 Nov 2026)
 
