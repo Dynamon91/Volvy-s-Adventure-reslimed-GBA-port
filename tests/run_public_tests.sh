@@ -66,6 +66,8 @@ python3 "$ROOT/tests/test_handheld_card_integration.py"
 python3 "$ROOT/tests/test_stage_clear_asset.py"
 python3 "$ROOT/tests/test_stage_clear_screen_contract.py"
 python3 "$ROOT/tests/test_release_flags.py"
+python3 "$ROOT/tests/test_full_game_progress.py"
+python3 "$ROOT/tools/full_game_progress.py" --check
 python3 -m py_compile "$ROOT"/tools/*.py
 
 printf '%s\n' 'All public host regressions PASS. Private-asset gameplay suite and full ROM build are separate.'
