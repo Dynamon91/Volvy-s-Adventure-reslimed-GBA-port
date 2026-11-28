@@ -72,6 +72,22 @@ runs only when switching bitmap screens, not on each gameplay frame. Synthetic
 host tests catch overlapping transfers and premature unblank. mGBA/hardware
 flicker testing of the final image remains pending.
 
+## Fudge Forest — original-source correction and run-stat foundation (28 Nov 2026)
+
+Direct frames at 10:29–10:33 show **Matcha Meadows** followed by
+**Fudge Forest** (formerly documented incorrectly as “Fuzz Forest”).
+The original localization audit independently records both names. Old
+private asset IDs such as `fuzz_forest` remain temporarily unchanged
+to protect build compatibility. A source-video-based GBA-palette
+preview and 32-frame GIF were generated privately, **not** taken in an
+emulator or represented as playable level content.
+
+A new source-side `RunStats` counter tracks actual onion collection and
+enemy defeats during gameplay (not pause), resetting on retry/stage
+entry. It intentionally does **not** guess original combo decay, ranks
+or score thresholds. Complete-game emulator checks are deferred at the
+user's request until more game content is implemented.
+
 ## v1.9.13: standalone ROM build for the nine walkthrough cards
 
 - A separate, experimental **GBA cartridge image** can now be compiled with
@@ -94,7 +110,7 @@ flicker testing of the final image remains pending.
 
 ## v1.9.12: handheld Mode 4 viewer and bitmap VRAM restore
 
-- Add a development-only Fuzz Forest reference-card viewer. Convert the
+- Add a development-only Fudge Forest reference-card viewer. Convert the
   source frame with tools/build_handheld_select_asset.py, then use
   make DEV_CARD_PREVIEW=1. On the title screen, L opens the reference card;
   B/START dismisses it. Standard builds default to DEV_CARD_PREVIEW=0.
