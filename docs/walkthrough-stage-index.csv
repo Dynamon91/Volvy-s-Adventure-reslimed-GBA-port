@@ -1,8 +1,7 @@
-<PARSED TEXT FOR SHEET: 1 / 1 TABS
-TAB NAME: docs__walkthrough-stage-index.csv>index,video_time,sequence,direct_observation,confidence,current_port_gap
+index,video_time,sequence,direct_observation,confidence,current_port_gap
 0,00:00,Title screen,Start Game / Settings / Quit,High,Title UI not yet source-faithful in GBA
 1,00:30-04:00,Outdoor platform course,Stage Clear at 04:00,High,World 1 L1 may be related; not proven from video alone
-2,10:30,Selection screen,"Fuzz Forest, 0/4",High,Menu shell and selection flow absent
+2,10:29-10:33,Selection screens,"Matcha Meadows 3/4; Fudge Forest 0/4",High,Menu shell and selection flow absent
 3,11:00-15:30,Dark forest/checkerboard,"Onions, breakable blocks, combo effects",High,No matching scene in current 5-scene ROM
 4,16:30,Selection screen,"Bonus Stage, x20",High,Bonus selection/reward UI absent
 5,17:00-24:30,Cave challenge,Brown/orange obstacle course; placement/ranking,High,Current Bonus Race is not verified as this sequence
