@@ -1,3 +1,21 @@
+## v1.9.15 — whole-game reference and gameplay-result milestone (28 November 2026)
+
+- Record completion count, personal best 60 Hz frame time and accumulated
+  pickups/defeats separately for five existing prototype scenes. Counters
+  persist across retries in RAM, not in SRAM saves, and no original unlock
+  rules are fabricated.
+- Show measured run time, collected pickups and defeats in the existing
+  generic victory HUD, with Shrewy's source-confirmed result heading.
+  Stage 1's source-derived illustrated result stays intact.
+- Index 12 user-walkthrough source-video world checkpoints; add reusable
+  private 240×160 8bpp/BGR555 screenshot/GIF generator and source hashes.
+- Add original audio-input conversion tooling for signed 8-bit mono PCM
+  plus aligned ROM stream chunks and private conversion manifest.
+  Playback engine and original track integration are still outstanding.
+- Extend public C/Python and isolated ARM7TDMI regression tests.
+- mGBA verification remains deferred; no new playable level or complete
+  game ROM is claimed; historical full-game completion estimate remains 44%.
+
 ## Original-game fidelity / stage groundwork — 28 November 2026
 
 - Correct a mistaken gameplay-card transcription: **Fudge Forest** at
