@@ -7,6 +7,7 @@
 #include "core/level.h"
 #include "core/player.h"
 #include "core/title_menu.h"
+#include "core/run_stats.h"
 #include "core/world_interactions.h"
 #include "platform/render.h"
 #include "rm_w1_l1_scene.h"
@@ -23,6 +24,7 @@ static Player s_player;
 static Camera s_camera;
 static ShrewyBoss s_shrewy;
 static BonusRace s_bonus_race;
+static RunStats s_run_stats;
 static GameMode s_mode;
 static GameMode s_resume_mode;
 static uint32_t s_anim_tick;
@@ -37,6 +39,7 @@ static void reset_world1(uint8_t stage)
     level_init_world1_stage(&s_level, stage);
     /* Provisional safe spawn: original room object at (64,384) requires script verification. */
     player_init(&s_player, 25, stage == 3 ? 142 : 150);
+    run_stats_reset(&s_run_stats, s_player.onions, s_player.enemies_defeated);
     camera_init(&s_camera);
     render_select_stage(stage);
     s_mode = GAME_PLAYING;
@@ -50,6 +53,7 @@ static void reset_boss_shrewy(void)
     /* Safe floor-aligned spawn; source obj_volvy pivot (64,160) is below the
        144px room and its room-create relocation has not yet been decoded. */
     player_init_native(&s_player, 50, SHREWY_ARENA_FLOOR_Y - 19);
+    run_stats_reset(&s_run_stats, s_player.onions, s_player.enemies_defeated);
     camera_init(&s_camera);
     shrewy_init(&s_shrewy);
     render_select_boss();
@@ -64,6 +68,7 @@ static void reset_bonus_race(void)
     /* Source trace clip 1 begins at pivot (264.3,535.0) source px.
      * Convert to GBA scale and preserve the normal player's (7,6) pivot. */
     player_init(&s_player, 125, 261);
+    run_stats_reset(&s_run_stats, s_player.onions, s_player.enemies_defeated);
     camera_init(&s_camera);
     /* Start with the trace-derived spawn already framed on the 240x160 view. */
     s_camera.x = fx_from_int(27);
@@ -103,6 +108,7 @@ void game_init(void)
     level_init_world1(&s_level);
     /* Provisional safe spawn: original room object at (64,384) requires script verification. */
     player_init(&s_player, 25, 150);
+    run_stats_reset(&s_run_stats, s_player.onions, s_player.enemies_defeated);
     camera_init(&s_camera);
     s_mode = GAME_TITLE;
     s_resume_mode = GAME_PLAYING;
@@ -115,6 +121,7 @@ void game_init(void)
 void game_update(void)
 {
     const InputState *input = input_get_state();
+    const GameMode mode_before_update = s_mode;
     ++s_anim_tick;
 
     switch (s_mode) {
@@ -263,6 +270,17 @@ void game_update(void)
     default:
         s_mode = GAME_TITLE;
         break;
+    }
+
+    /* Measure actual source-derived pickup/defeat counters after a gameplay
+     * update. Do not advance the run during Pause or title/card previews.
+     * The observation still records the final victory/death frame. */
+    if ((mode_before_update == GAME_PLAYING ||
+         mode_before_update == GAME_BOSS ||
+         mode_before_update == GAME_BONUS) &&
+        s_mode != GAME_PAUSED) {
+        run_stats_observe(&s_run_stats, s_player.onions,
+                          s_player.enemies_defeated);
     }
 }
 
