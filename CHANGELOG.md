@@ -1,3 +1,10 @@
+## Tracciamento del completamento del gioco completo — 28 novembre 2026
+
+- Aggiunto un progresso complessivo del porting originale: 44% completato e 56% rimanente, chiaramente indicato come stima provvisoria, non come completamento verificato.
+- Creato un inventario in JSON con le cinque scene prototipo esistenti, nove aree da completare e nove criteri indispensabili per poter dichiarare il 100%.
+- Generatore standard-library per sincronizzare lo stato leggibile nella README e il rapporto dettagliato, più validazione automatica della coerenza in CI.
+- Nessun aumento della percentuale per le sole correzioni tecniche o ROM dimostrative; nessun nuovo livello completato in questo intervento.
+
 ## v1.9.14 — DMA3 completion barrier follow-up (23 November 2026)
 
 - Fix a real Mode 4 transition hazard: libgba's `dmaCopy` starts DMA3 asynchronously. Forced blank must not be cleared immediately after scheduling the 38,400-byte framebuffer transfer.
