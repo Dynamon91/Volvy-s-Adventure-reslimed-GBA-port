@@ -26,6 +26,11 @@ int main(void)
     assert(s.onions_collected == 5 && s.enemies_defeated == 2);
     run_stats_observe(&s, 1005, 262);
     assert(s.onions_collected == 5 && s.enemies_defeated == 2);
+    /* Unexpected backwards telemetry must not create phantom gains once
+     * the older watermark is reached again. */
+    run_stats_observe(&s, 999, 200);
+    run_stats_observe(&s, 1005, 262);
+    assert(s.onions_collected == 5 && s.enemies_defeated == 2);
     /* The player event counters cannot wrap: stats must saturate too. */
     s.onions_collected = UINT32_MAX - 1u;
     run_stats_observe(&s, 1010, 264);
