@@ -43,6 +43,10 @@ typedef struct Player {
     uint8_t native_scale;
     uint8_t enemies_defeated;
     uint8_t spring_activations;
+    /* Monotonic per-run event totals. Unlike the display counter, these do
+     * not lose pickup history after Swolvy consumption or the 999 cap. */
+    uint32_t onions_collected_total;
+    uint32_t enemies_defeated_total;
 } Player;
 
 void player_init(Player *player, int x, int y);
