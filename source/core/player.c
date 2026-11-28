@@ -118,6 +118,13 @@ static void collect_onions(Player *player, Level *level)
         }
     }
     if (gained) {
+        /* The visible 0..999 inventory is NOT the number collected.
+         * Preserve pickups even when a power-up consumes onions or the HUD
+         * counter is full; this is measured gameplay, not inferred scoring. */
+        if (player->onions_collected_total > UINT32_MAX - (uint32_t)gained)
+            player->onions_collected_total = UINT32_MAX;
+        else
+            player->onions_collected_total += (uint32_t)gained;
         player->onions = (uint16_t)((player->onions + gained > 999)
                                     ? 999 : player->onions + gained);
         /* The supplied rm_w1_b1_00 trace logs 42 onions but no Swolvy
@@ -378,6 +385,8 @@ void player_init(Player *player, int x, int y)
     player->native_scale = 0;
     player->enemies_defeated = 0;
     player->spring_activations = 0;
+    player->onions_collected_total = 0;
+    player->enemies_defeated_total = 0;
 }
 
 void player_init_native(Player *player, int x, int y)
