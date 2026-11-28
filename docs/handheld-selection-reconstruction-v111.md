@@ -9,7 +9,8 @@ that recording, not in-game clocks.
 | Offset | Directly visible selection/title card | Device appearance | Visible progress/state |
 |---|---|---|---|
 | 00:00 | Volvy title screen; Start Game / Settings / Quit | Framed title artwork | Start Game pointer |
-| 10:30 | Fuzz Forest | Green horizontal handheld | 0/4 |
+| 10:29 | Matcha Meadows | Green horizontal handheld | 3/4 |
+| 10:30–10:33 | Fudge Forest | Green horizontal handheld | 0/4 |
 | 16:30 | Bonus Stage | Green horizontal handheld | ×20 reward |
 | 57:00 | Rigatoni Rooftops | Pink handheld shell with YOLVY wordmark | 0/4 |
 | 81:30 | Course title most plausibly reads Macaroni Metro (81:30 zoom, provisional) | Pink handheld shell with YOLVY wordmark | 1/4 |
@@ -62,7 +63,7 @@ The actual private frame set was converted into nine local card/title previews.
 
 **This milestone is an asset-extraction pipeline, not runtime integration.**
 No new selection state, card navigation, stage routing, or gameplay scene is
-claimed. In particular, Fuzz Forest is not mapped to World 1 Level 2 without
+claimed. In particular, Fudge Forest is not mapped to World 1 Level 2 without
 transition evidence. The source-derived images, binaries and per-card palettes
 remain in the private asset bundle; the public repository receives only the
 reproducible converter, tests and documentation.
@@ -77,7 +78,7 @@ assets/converted/fuzz_forest_palette.c/.h. Build with:
 
     make DEV_CARD_PREVIEW=1
 
-On the title screen press L to preview Fuzz Forest. Press B or START to
+On the title screen press L to preview Fudge Forest. Press B or START to
 return to the title. Release builds use DEV_CARD_PREVIEW=0 and do not
 include the private card payload. This flow is a reference viewer only;
 it is intentionally not inserted into the unverified W1 stage sequence.
@@ -133,3 +134,19 @@ as **Macaroni Metro**, correcting earlier notes that guessed “Macho Metro”.
 This is a visually supported reading, **not a claim that source string tables
 have been decoded**. The internal asset filename remains
 `selection_81m30` for backward compatibility.
+
+## 28 November 2026 source-accuracy correction
+
+New direct PNG checks at 10:29, 10:30, 10:31 and 10:33, backed by
+the names already recorded in `docs/source-audit.md`, establish
+**Matcha Meadows** followed by **Fudge Forest**. The older transcription
+“Fuzz Forest” was incorrect. The internal binary/header identifiers
+`fuzz_forest` are **legacy filenames**, retained only so the v1.9.12
+developer-card preview and v1.9.13 standalone viewer continue to build.
+A rename must migrate the private .bin, .c, .h and generated references
+together, not break them by changing public includes in isolation.
+
+A 32-frame, four-second **video-derived GBA palette preview** was also
+generated privately from 10:36–10:40 (240×160, 256 stable BGR555 colors,
+12/13px letterbox). It is not a captured GBA emulator frame and does not
+constitute an implemented level. See `docs/fudge-forest-reference-audit.md`.
