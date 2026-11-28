@@ -20,7 +20,7 @@ The project also has a player controller, native-resolution sprite sets, a 4bpp 
 - Combo counter and 1st/2nd placement indicators appear in relevant courses.
 - Results presentation: purple illustrated stage-clear / boss-clear screens with Volvy thumbs-up artwork, green splat and score/ranking text.
 - Selection/hub presentation: multiple handheld-style screens and an outdoor park/hub.
-- Named selection/results include Fuzz Forest, Bonus Stage, Rigatoni Rooftops (verified at 57:00), Macaroni Metro (rechecked 81:30 crop, still not confirmed against original game text assets), Fishpig, Bundtcake Burrows and Master Gator.
+- Named selection/results include Fudge Forest, Bonus Stage, Rigatoni Rooftops (verified at 57:00), Macaroni Metro (rechecked 81:30 crop, still not confirmed against original game text assets), Fishpig, Bundtcake Burrows and Master Gator.
 - Boss results explicitly show Shrewy and Fishpig. A later mechanical boss encounter is visible but its name cannot be read confidently.
 - The video spans many more environments than the current five scenes.
 
@@ -67,3 +67,12 @@ booted in mGBA or tested on hardware, so the rendered HUD is not yet verified.
 hidden scripts or exact collision masks on its own.** Source-faithful behavior
 still needs either the original GameMaker data or enough controlled gameplay
 frames to reconstruct it.
+
+## Source wording correction — 28 November 2026
+
+The card at 10:30–10:33 is **Fudge Forest**, not the previously
+transcribed “Fuzz Forest”. The preceding 10:29 card is **Matcha Meadows**
+with visible `3/4` progress. Both names match the English
+localization list in `docs/source-audit.md`. The gameplay from
+10:36 onward remains a missing scene; a reference-frame preview must
+not be counted as a completed GBA course.
