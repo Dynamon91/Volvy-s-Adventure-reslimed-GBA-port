@@ -7,6 +7,17 @@
 
 # Volvy's Adventure: Reslimed — GBA homebrew adaptation
 
+<!-- FULL_GAME_PROGRESS_START -->
+### Completamento del gioco intero (stima)
+
+**[███████████░░░░░░░░░░░░░░] 44% completato · 56% rimanente**
+
+Riferito al **porting completo**, non alla ROM dimostrativa.
+La percentuale è una stima provvisoria, non una verifica di fedeltà.
+
+[Dettagli, aree mancanti e storico](docs/full-game-progress.md)
+<!-- FULL_GAME_PROGRESS_END -->
+
 **Current milestone: v1.9.14 pixel-art fidelity A/B test.** The port retains five source scenes (World 1 Levels 1–3, Bonus Race and Shrewy), 56 native-resolution sprite animation sets, source-derived World 1 actors and a streamed 4bpp BG renderer. The new reference recording exposes a compact onion counter, stage stopwatch, combo/rank displays, distinctive result screens and substantial later content that is not yet implemented. The GBA build is still a reconstruction prototype; mGBA rendering and original-game fidelity remain unverified.
 
 **New walkthrough evidence:** see [`docs/walkthrough-reference-v1_0.md`](docs/walkthrough-reference-v1_0.md), [`docs/handheld-selection-reconstruction-v111.md`](docs/handheld-selection-reconstruction-v111.md) for verified handheld-card frames and conversion rules, and [`docs/fidelity-gap-audit-v196.md`](docs/fidelity-gap-audit-v196.md). Source-derived keyframes and generated image binaries remain private.
