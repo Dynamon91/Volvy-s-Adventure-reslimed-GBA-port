@@ -4,6 +4,9 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 game=(root/"source/core/game.c").read_text()
 stats=(root/"source/core/run_stats.c").read_text()
+player_h=(root/"include/core/player.h").read_text()
+player=(root/"source/core/player.c").read_text()
+world=(root/"source/core/world_interactions.c").read_text()
 assert '#include "core/run_stats.h"' in game
 assert "static RunStats s_run_stats;" in game
 for start,end in [
@@ -23,4 +26,11 @@ assert "mode_before_update == GAME_BOSS" in update
 assert "mode_before_update == GAME_PLAYING" in update
 assert "UINT32_MAX" in stats
 assert "combo" not in stats.lower() or "not an original score" in stats
+assert "uint32_t onions_collected_total;" in player_h
+assert "uint32_t enemies_defeated_total;" in player_h
+assert "player->onions_collected_total += (uint32_t)gained;" in player
+assert "player->enemies_defeated_total" in world
+assert "s_player.onions_collected_total" in game
+assert "s_player.enemies_defeated_total" in game
+assert "run_stats_observe(&s_run_stats, s_player.onions," not in game
 print("RunStats integration: PASS (World1, boss, bonus and init resets; pause gating)")
