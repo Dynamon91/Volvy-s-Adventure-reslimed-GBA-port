@@ -34,10 +34,12 @@ def validate(d):
         raise ValueError("Completion must be integer from 0 to 100")
     if type(rem) is not int or rem != 100 - v:
         raise ValueError("Incorrect remaining percentage")
-    if p["original_total_scenes"] is not None:
-        raise ValueError("Cannot claim the unknown original stage count")
     if p["source_scenes_implemented"] != len(p["source_scenes"]):
         raise ValueError("Scene count does not match implemented scene list")
+    total = p["original_total_scenes"]
+    if total is not None and (type(total) is not int or
+                              total < p["source_scenes_implemented"]):
+        raise ValueError("Incorrect original scene denominator")
     date.fromisoformat(d["snapshot_date"])
     areas = d["areas"]
     if not areas or len({a["id"] for a in areas}) != len(areas):
@@ -51,8 +53,8 @@ def validate(d):
         raise ValueError("Release gates require unique IDs")
     if any(type(g["verified"]) is not bool for g in gates):
         raise ValueError("Release gate must be boolean")
-    if v == 100 and not all(g["verified"] for g in gates):
-        raise ValueError("Cannot claim 100% without verifying every gate")
+    if v == 100 and (total is None or not all(g["verified"] for g in gates)):
+        raise ValueError("Cannot claim 100% without a verified scene count and release gates")
     history = d["history"]
     if not history or history[-1]["completed_percent"] != v or \
        history[-1]["date"] != d["snapshot_date"]:
@@ -82,6 +84,8 @@ def report(d):
     p = d["whole_game_progress"]
     v = p["completed_percent"]
     rem = p["remaining_percent"]
+    original_total = p["original_total_scenes"]
+    original_label = "non ancora accertato" if original_total is None else str(original_total)
     lines = [
         "# Stato di completamento — Volvy's Adventure ReSlimed GBA",
         "",
@@ -96,7 +100,7 @@ def report(d):
         "",
         "**Scene presenti nei sorgenti:** " +
         str(p["source_scenes_implemented"]) +
-        " | **Totale scene originali:** non ancora accertato.",
+        " | **Totale scene originali:** " + original_label + ".",
         "",
     ]
     lines += ["- " + s for s in p["source_scenes"]]
