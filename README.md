@@ -77,6 +77,9 @@ flicker testing of the final image remains pending.
 - Five current playable-scene source prototypes now maintain separate
   RAM-resident completion counts and best elapsed times across retries.
   This is not the original unlock/save system; no SRAM persistence is claimed.
+- Record **actual monotonic 32-bit onion/defeat events** independently of
+  the visible HUD: spending onions and hitting the 999 display cap no
+  longer lose pickup counts.
 - Generic result pages now show **actual current-run time, collected onions
   and defeated enemies**. Shrewy displays a source-confirmed boss heading.
   World 1 Level 1 keeps its existing source-derived Stage Clear illustration.
