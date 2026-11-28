@@ -290,6 +290,11 @@ void game_render(void)
                 &s_camera, s_mode, s_anim_tick, s_title_selection);
 }
 
+const RunStats *game_run_stats(void)
+{
+    return &s_run_stats;
+}
+
 void game_vblank_commit(void)
 {
     render_vblank_commit(&s_level, &s_camera);
