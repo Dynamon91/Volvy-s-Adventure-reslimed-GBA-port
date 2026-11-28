@@ -20,8 +20,8 @@
 | 00:00 | Title screen with Volvy logo and `START GAME`, `SETTINGS`, `QUIT`. | High |
 | 00:30–04:00 | Outdoor platforming: blue sky, clouds, orange/checkerboard terrain, green grass, collectibles and vertical traversal. `STAGE CLEAR!` at 04:00. | High |
 | 04:30–10:00 | Further outdoor platforming with pipes, gates, moving/vertical routes and action effects. | High |
-| 10:30 | Green handheld-style selection screen; title reads **Fuzz Forest**. Progress indicator `0/4`. | High |
-| 11:00–15:30 | Dark forest/checkerboard platform section; onion pickups, breakable blocks and combo/action effects. | High |
+| 10:29–10:33 | Consecutive green handheld selection cards: **Matcha Meadows** (`3/4`), then **Fudge Forest** (`0/4`). Confirmed by re-extracting frames at 10:29, 10:30, 10:31 and 10:33. | High |
+| 10:36–15:33 | Dark forest/checkerboard Fudge Forest platform section; onion pickups, breakable blocks and combo/action effects. | High |
 | 16:30 | Green handheld-style selection screen reading **Bonus Stage**, with a `×20` reward indicator. | High |
 | 17:00–24:30 | Brown/orange cave-like obstacle course with destructible blocks, combo scoring and placement/ranking presentation. | High |
 | 25:30–29:00 | Industrial Shrewy arena with hazard signs and a central boss. `SHREWY DEFEATED!` at 29:30; final ranking shown as `3/5`. | High |
@@ -49,10 +49,17 @@
 
 ## What the recording proves about the target game
 
+**Correction (28 Nov 2026):** The original source-audit already
+lists the names **Matcha Meadows** and **Fudge Forest** in the English
+localization entries. Reopening the supplied walkthrough confirms both
+cards at 10:29–10:33. The former “Fuzz Forest” transcription was wrong.
+Legacy local filename `fuzz_forest` is retained for compatibility until
+the private asset pack can be migrated without breaking existing builds.
+
 1. **The target is substantially larger than the current GBA prototype.** The supplied recording contains many visual environments and encounters that are not represented by the five currently converted scenes.
 2. **The HUD is not the old prototype HUD.** Gameplay frames consistently show a compact onion icon/count at top-left and a stopwatch/time display at top-right. The timer appears in `M:SS:CC` form and resets for separate stage/encounter runs. Combo and placement indicators appear in relevant sections.
 3. **Results screens are distinctive.** Stage results use a purple illustrated screen, Volvy thumbs-up artwork, a green splat graphic and performance text (for example `Highest combo: 73`). Boss results name the boss and show completion time/ranking.
-4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fuzz Forest`, `Bonus Stage`, `Rigatoni Rooftops`, `Macaroni Metro` (likely reading of compressed frame), `Fishpig`, `Bundtcake Burrows` and `Master Gator`, plus an outdoor hub. The cards use distinct green, pink and teal handheld shells.
+4. **The game has a selection/hub presentation.** The walkthrough shows multiple handheld-style selection screens, including `Fudge Forest`, `Bonus Stage`, `Rigatoni Rooftops`, `Macaroni Metro` (likely reading of compressed frame), `Fishpig`, `Bundtcake Burrows` and `Master Gator`, plus an outdoor hub. The cards use distinct green, pink and teal handheld shells.
 5. **Boss content extends beyond Shrewy.** Fishpig is explicitly defeated twice in the recording. A later dark-city mechanical boss encounter is also visible, but its name is not legible enough to assert.
 6. **The video is a reference capture, not a GBA emulator test.** It must not be cited as proof that any experimental GBA ROM boots or matches the original.
 
