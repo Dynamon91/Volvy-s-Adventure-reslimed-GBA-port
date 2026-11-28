@@ -67,6 +67,15 @@ def make_mode4_preview(source: Image.Image) -> Image.Image:
     return frame
 
 
+def file_sha256(path: Path):
+    """Hash the entire private recording without allocating a 600 MB buffer."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def load_index(path: Path):
     data = json.loads(path.read_text(encoding="utf-8"))
     if data.get("schema_version") != 1:
@@ -179,7 +188,7 @@ def main():
 
     manifest = {
         "kind": "PRIVATE_SOURCE_VIDEO_TO_GBA_REFERENCE_PREVIEW_ONLY",
-        "video_sha256": hashlib.sha256(args.video.read_bytes()).hexdigest(),
+        "video_sha256": file_sha256(args.video),
         "frame_count": len(images),
         "not_emulator_verified": True,
         "no_gameplay_implementation_claimed": True,
