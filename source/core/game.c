@@ -8,6 +8,7 @@
 #include "core/player.h"
 #include "core/title_menu.h"
 #include "core/run_stats.h"
+#include "core/campaign_progress.h"
 #include "core/world_interactions.h"
 #include "platform/render.h"
 #include "rm_w1_l1_scene.h"
@@ -25,6 +26,7 @@ static Camera s_camera;
 static ShrewyBoss s_shrewy;
 static BonusRace s_bonus_race;
 static RunStats s_run_stats;
+static CampaignProgress s_campaign;
 static GameMode s_mode;
 static GameMode s_resume_mode;
 static uint32_t s_anim_tick;
@@ -105,6 +107,7 @@ static void select_title_stage(uint8_t stage)
 
 void game_init(void)
 {
+    campaign_progress_reset(&s_campaign);
     level_init_world1(&s_level);
     /* Provisional safe spawn: original room object at (64,384) requires script verification. */
     player_init(&s_player, 25, 150);
@@ -281,6 +284,15 @@ void game_update(void)
         s_mode != GAME_PAUSED) {
         run_stats_observe(&s_run_stats, s_player.onions,
                           s_player.enemies_defeated);
+        /* Record a result exactly once on a first transition to victory.
+         * This is local RAM bookkeeping only: original unlock/save logic is
+         * not known from the walkthrough and must not be invented. */
+        if (s_mode == GAME_VICTORY) {
+            uint32_t clear_frames = s_level.bonus_room
+                ? s_level.race_elapsed_frames : s_level.elapsed_frames;
+            campaign_progress_record_clear(&s_campaign, s_level.active_stage,
+                                           clear_frames, &s_run_stats);
+        }
     }
 }
 
@@ -293,6 +305,11 @@ void game_render(void)
 const RunStats *game_run_stats(void)
 {
     return &s_run_stats;
+}
+
+const CampaignProgress *game_campaign_progress(void)
+{
+    return &s_campaign;
 }
 
 void game_vblank_commit(void)
