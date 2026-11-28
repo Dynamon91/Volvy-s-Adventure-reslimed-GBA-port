@@ -2,6 +2,7 @@
 #define VOLVY_CORE_GAME_H
 
 #include "core/run_stats.h"
+#include "core/campaign_progress.h"
 
 typedef enum GameMode {
     GAME_TITLE = 0,
@@ -20,5 +21,7 @@ void game_render(void);
 void game_vblank_commit(void);
 /* Read-only current-run totals for the later dynamic results UI. */
 const RunStats *game_run_stats(void);
+/* Cleared-scene facts in RAM, not unlocked original world progression. */
+const CampaignProgress *game_campaign_progress(void);
 
 #endif
