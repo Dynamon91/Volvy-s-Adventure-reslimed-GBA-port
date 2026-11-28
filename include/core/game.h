@@ -1,6 +1,8 @@
 #ifndef VOLVY_CORE_GAME_H
 #define VOLVY_CORE_GAME_H
 
+#include "core/run_stats.h"
+
 typedef enum GameMode {
     GAME_TITLE = 0,
     GAME_PLAYING,
@@ -16,5 +18,7 @@ void game_init(void);
 void game_update(void);
 void game_render(void);
 void game_vblank_commit(void);
+/* Read-only current-run totals for the later dynamic results UI. */
+const RunStats *game_run_stats(void);
 
 #endif
